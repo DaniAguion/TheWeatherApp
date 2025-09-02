@@ -1,4 +1,4 @@
-import { fetchWeatherPack } from "./openMeteo";
+import { fetchWeatherPack } from "./openmeteo";
 import { WeatherPack } from "./types";
 import { getCached, setCached } from "../storage/cache";
 
