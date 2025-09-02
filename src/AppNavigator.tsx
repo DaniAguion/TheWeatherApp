@@ -37,9 +37,9 @@ function HomeStackNavigator() {
   );
 }
 
-// ----- Tabs
+
 type RootTabParamList = {
-  Inicio: undefined;       // contiene el stack (Hoy/Pronóstico)
+  Inicio: undefined;
   Favoritos: undefined;
   Ajustes: undefined;
 };
@@ -47,14 +47,9 @@ type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function AppNavigator() {
-  // Tema claro por defecto (puedes personalizar colores si quieres)
-  const theme = {
-    ...DefaultTheme,
-    colors: { ...DefaultTheme.colors, background: "#ffffff" },
-  };
 
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -62,18 +57,18 @@ export default function AppNavigator() {
         }}
       >
         <Tab.Screen
+          name="Favoritos"
+          component={FavoritesScreen}
+          options={{
+            tabBarIcon: () => <Text>⭐</Text>,
+          }}
+        />
+         <Tab.Screen
           name="Inicio"
           component={HomeStackNavigator}
           options={{
             tabBarLabel: "Hoy",
             tabBarIcon: () => <Text>🌤️</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="Favoritos"
-          component={FavoritesScreen}
-          options={{
-            tabBarIcon: () => <Text>⭐</Text>,
           }}
         />
         <Tab.Screen
