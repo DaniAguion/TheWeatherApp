@@ -57,14 +57,22 @@ export default function MainScreen({ navigation, route }: Props) {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.row}>
-        <Text style={styles.temp}>{Math.round(data.current.tempC)}°</Text>
-        <Text style={styles.icon}>{data.current.icon}</Text>
+      
+      <View style={styles.header_container}>
+        <View style={styles.header_main_group}>
+          <Text style={styles.title}>{title}</Text>
+          <View style={styles.temp_icon_group}>
+            <Text style={styles.temp}>{Math.round(data.current.tempC)}°</Text>
+            <Text style={styles.icon}>{data.current.icon}</Text>
+          </View>
+          <Text style={styles.weather_desc_text}>{data.current.weather_desc}</Text>
+        </View>
+        <View style={styles.header_sec_group}>
+          <Text style={styles.secondary_text}>🌫️  {Math.round(data.current.humidity)} %</Text> 
+          <Text style={styles.secondary_text}>🌧️ {Math.round(data.current.precipitationMm)} mm</Text>
+          <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
+        </View>
       </View>
-      <Text style={styles.desc}>{data.current.weather_desc}</Text>  
-      <Text style={styles.wind}>Viento: {Math.round(data.current.windSpeedKmh)} km/h</Text>
-      <View style={styles.spacer} />
     </ScrollView>
   );
 }

@@ -87,12 +87,9 @@ export async function fetchWeatherPack(lat: number, lon: number): Promise<Weathe
     "current": [
       "temperature_2m", 
       "relative_humidity_2m", 
-      "apparent_temperature", 
       "is_day", 
       "wind_speed_10m", 
-      "wind_direction_10m", 
       "precipitation", 
-      "rain", 
       "weather_code", 
       "cloud_cover"
     ],
