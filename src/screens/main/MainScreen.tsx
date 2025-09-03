@@ -57,7 +57,6 @@ export default function MainScreen({ navigation, route }: Props) {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      
       <View style={styles.header_container}>
         <View style={styles.header_main_group}>
           <Text style={styles.title}>{title}</Text>

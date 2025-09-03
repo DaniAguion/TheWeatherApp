@@ -7,7 +7,6 @@ export type CurrentDto = {
   wind_speed_10m: number;
   precipitation: number;
   weather_code: number;
-  cloud_cover: number;
 };
 
 
@@ -20,7 +19,6 @@ export type Current = {
   precipitationMm: number;
   weather_desc: string;
   icon: string;
-  cloudCoverPerc: number;
 };
 
 export type Hour = {

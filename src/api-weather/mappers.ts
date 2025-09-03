@@ -10,6 +10,5 @@ export function currentDtoToEntity(dto: CurrentDto, weatherDesc: string, icon: s
     precipitationMm: dto.precipitation,
     weather_desc: weatherDesc,
     icon: icon,
-    cloudCoverPerc: dto.cloud_cover,
   };
 }

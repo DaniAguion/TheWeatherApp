@@ -11,9 +11,9 @@ import ForecastScreen from "./screens/ForecastScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
-// ----- Home Stack (Hoy -> Pronóstico)
+// ----- Home Stack (Ahora -> Pronóstico)
 type HomeStackParamList = {
-  Hoy: { name?: string; lat: number; lon: number } | undefined;
+  Inicio: { name?: string; lat: number; lon: number } | undefined;
   Pronóstico: { days: any[]; title?: string };
 };
 
@@ -23,9 +23,9 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
-        name="Hoy"
+        name="Inicio"
         component={MainScreen}
-        options={{ title: "Hoy" }}
+        options={{ title: "Inicio" }}
       />
       <HomeStack.Screen
         name="Pronóstico"
@@ -52,6 +52,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
+        initialRouteName="Inicio"
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: { fontSize: 12 },
@@ -64,11 +65,11 @@ export default function AppNavigator() {
             tabBarIcon: () => <Text>⭐</Text>,
           }}
         />
-         <Tab.Screen
+        <Tab.Screen
           name="Inicio"
           component={HomeStackNavigator}
           options={{
-            tabBarLabel: "Hoy",
+            tabBarLabel: "Inicio",
             tabBarIcon: () => <Text>🌤️</Text>,
           }}
         />
