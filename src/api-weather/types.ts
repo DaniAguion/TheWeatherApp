@@ -24,6 +24,7 @@ export type Current = {
   windDirDeg: number;
   precipitationMm: number;
   rainMm: number;
+  weather_desc: string;
   icon: string;
   cloudCoverPerc: number;
 };

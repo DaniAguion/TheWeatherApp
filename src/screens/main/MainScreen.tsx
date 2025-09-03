@@ -58,9 +58,11 @@ export default function MainScreen({ navigation, route }: Props) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.temp}>
-        {Math.round(data.current.tempC)}°
-      </Text>
+      <View style={styles.row}>
+        <Text style={styles.temp}>{Math.round(data.current.tempC)}°</Text>
+        <Text style={styles.icon}>{data.current.icon}</Text>
+      </View>
+      <Text style={styles.desc}>{data.current.weather_desc}</Text>  
       <Text style={styles.wind}>Viento: {Math.round(data.current.windSpeedKmh)} km/h</Text>
       <View style={styles.spacer} />
     </ScrollView>
