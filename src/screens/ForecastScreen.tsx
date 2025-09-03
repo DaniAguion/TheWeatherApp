@@ -16,7 +16,7 @@ export default function ForecastScreen({ route }: Props) {
 
       <SectionList
         sections={days.map(d => ({ title: d.date, data: d.hours }))}
-        keyExtractor={(h) => String(h.dt)}
+        keyExtractor={(h) => String(h.dateTime)}
         renderSectionHeader={({ section }) => (
           <View style={{ padding: 8, backgroundColor: "#eee" }}>
             <Text style={{ fontWeight: "600" }}>{section.title}</Text>
@@ -24,7 +24,7 @@ export default function ForecastScreen({ route }: Props) {
         )}
         renderItem={({ item }) => (
           <View style={{ padding: 12, flexDirection: "row", justifyContent: "space-between" }}>
-            <Text>{new Date(item.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+            <Text>{new Date(item.dateTime * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
             <Text style={{ fontWeight: "600" }}>{Math.round(item.tempC)}°</Text>
           </View>
         )}

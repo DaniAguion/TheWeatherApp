@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl } from "react-native";
 import { getWeather } from "../api-weather/index";
-import type { WeatherPack } from "../api-weather/types";
+import type { WeatherInfo } from "../api-weather/types";
 import { useFocusEffect } from "@react-navigation/native";
 
 type Props = {
@@ -17,7 +17,7 @@ export default function TodayScreen({ navigation, route }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<WeatherPack | null>(null);
+  const [data, setData] = useState<WeatherInfo | null>(null);
 
   const load = async () => {
     try {

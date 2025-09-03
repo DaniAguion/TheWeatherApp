@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl } from "react-native";
 import { getWeather } from "../../api-weather/index";
-import type { WeatherPack } from "../../api-weather/types";
+import type { WeatherInfo } from "../../api-weather/types";
 import { useFocusEffect } from "@react-navigation/native";
 import styles from "./MainScreen.styles";
 
@@ -18,7 +18,7 @@ export default function MainScreen({ navigation, route }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<WeatherPack | null>(null);
+  const [data, setData] = useState<WeatherInfo | null>(null);
 
   const load = async () => {
     try {
@@ -50,7 +50,7 @@ export default function MainScreen({ navigation, route }: Props) {
   );
   if (!data) return null;
 
-  const title = name ?? "Mi ubicación";
+  const location = name ?? "Mi ubicación";
 
   return (
     <ScrollView
@@ -59,7 +59,7 @@ export default function MainScreen({ navigation, route }: Props) {
     >
       <View style={styles.header_container}>
         <View style={styles.header_main_group}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.location}>{location}</Text>
           <View style={styles.temp_icon_group}>
             <Text style={styles.temp}>{Math.round(data.current.tempC)}°</Text>
             <Text style={styles.icon}>{data.current.icon}</Text>

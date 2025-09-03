@@ -38,7 +38,7 @@ export default StyleSheet.create({
   temp: {
     fontSize: 48
   },
-  title: {
+  location: {
     fontSize: 20,
     fontWeight: "600",
   },

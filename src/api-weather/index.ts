@@ -1,13 +1,13 @@
-import { fetchWeatherPack } from "./openmeteo";
-import { WeatherPack } from "./types";
+import { fetchWeatherInfo } from "./openmeteo";
+import { WeatherInfo } from "./types";
 import { getCached, setCached } from "../storage/cache";
 
-export async function getWeather(lat: number, lon: number): Promise<WeatherPack> {
+export async function getWeather(lat: number, lon: number): Promise<WeatherInfo> {
   const key = `openmeteo:${lat.toFixed(3)},${lon.toFixed(3)}`;
   const ttl = 20 * 60 * 1000; // 20 min
-  const cached = await getCached<WeatherPack>(key, ttl);
+  const cached = await getCached<WeatherInfo>(key, ttl);
   if (cached) return cached;
-  const data = await fetchWeatherPack(lat, lon);
+  const data = await fetchWeatherInfo(lat, lon);
   await setCached(key, data);
   return data;
 }
