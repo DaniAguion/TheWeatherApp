@@ -61,7 +61,7 @@ export default function TodayScreen({ navigation, route }: Props) {
       <Text style={{ fontSize: 48, marginVertical: 4 }}>
         {Math.round(data.current.tempC)}°
       </Text>
-      <Text style={{ marginBottom: 12 }}>Viento: {Math.round(data.current.windKmh)} km/h</Text>
+      <Text style={{ marginBottom: 12 }}>Viento: {Math.round(data.current.windSpeedKmh)} km/h</Text>
 
       <Button
         title="Ver pronóstico (5–7 días)"

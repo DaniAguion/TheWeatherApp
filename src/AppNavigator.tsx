@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import TodayScreen from "./screens/TodayScreen";
+import MainScreen from "./screens/main/MainScreen";
 import ForecastScreen from "./screens/ForecastScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -23,7 +24,7 @@ function HomeStackNavigator() {
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="Hoy"
-        component={TodayScreen}
+        component={MainScreen}
         options={{ title: "Hoy" }}
       />
       <HomeStack.Screen

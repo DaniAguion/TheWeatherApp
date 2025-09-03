@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl } from "react-native";
-import { getWeather } from "../api-weather/index";
-import type { WeatherPack } from "../api-weather/types";
+import { getWeather } from "../../api-weather/index";
+import type { WeatherPack } from "../../api-weather/types";
 import { useFocusEffect } from "@react-navigation/native";
+import styles from "./MainScreen.styles";
 
 type Props = {
   navigation: any;
@@ -40,10 +41,10 @@ export default function MainScreen({ navigation, route }: Props) {
 
   const onRefresh = () => { setRefreshing(true); load(); };
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 40 }} />;
+  if (loading) return <ActivityIndicator style={styles.loading} />;
   if (error) return (
-    <View style={{ padding: 16 }}>
-      <Text style={{ marginBottom: 8 }}>{error}</Text>
+    <View style={styles.errorContainer}>
+      <Text style={styles.errorText}>{error}</Text>
       <Button title="Reintentar" onPress={load} />
     </View>
   );
@@ -53,26 +54,15 @@ export default function MainScreen({ navigation, route }: Props) {
 
   return (
     <ScrollView
-      style={{ padding: 16 }}
+      style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      <Text style={{ fontSize: 20, fontWeight: "600" }}>{title}</Text>
-      <Text style={{ fontSize: 48, marginVertical: 4 }}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.temp}>
         {Math.round(data.current.tempC)}°
       </Text>
-      <Text style={{ marginBottom: 12 }}>Viento: {Math.round(data.current.windKmh)} km/h</Text>
-
-      <Button
-        title="Ver pronóstico (5–7 días)"
-        onPress={() => navigation.navigate("Pronóstico", { days: data.days, title })}
-      />
-
-      <View style={{ height: 12 }} />
-
-      <Button
-        title="Añadir a Favoritos"
-        onPress={() => navigation.navigate("Favoritos", { quickAdd: { name: title, lat, lon } })}
-      />
+      <Text style={styles.wind}>Viento: {Math.round(data.current.windSpeedKmh)} km/h</Text>
+      <View style={styles.spacer} />
     </ScrollView>
   );
 }
