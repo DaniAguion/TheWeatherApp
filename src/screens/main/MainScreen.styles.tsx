@@ -58,7 +58,6 @@ export default StyleSheet.create({
     marginTop: 40,
   },
   next_container: {
-    marginTop: 16,
     backgroundColor: "#ffffff",
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -67,14 +66,9 @@ export default StyleSheet.create({
   next_title: {
     fontSize: 18,
     fontWeight: "600",
-    paddingHorizontal: 16,
-    marginBottom: 10,
-  },
-  hourly_container: {
-    paddingHorizontal: 8,
   },
   hour_column: {
-    width: 70,
+    width: 60,
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 4,

@@ -88,7 +88,6 @@ export default function MainScreen({ navigation, route }: Props) {
             keyExtractor={(h) => String(h.dateTime)}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hourly_container}
             renderItem={({ item }) => (
               <View style={styles.hour_column}>
                 <Text style={styles.hourly_time}>
