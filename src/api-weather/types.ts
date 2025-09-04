@@ -53,5 +53,6 @@ export type Day = {
 
 export type WeatherInfo = {
   current: Current;
+  hours: Hour[];
   days: Day[];
 };

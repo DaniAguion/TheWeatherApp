@@ -56,5 +56,41 @@ export default StyleSheet.create({
   },
   loading: {
     marginTop: 40,
+  },
+  next_container: {
+    marginTop: 16,
+    backgroundColor: "#ffffff",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  next_title: {
+    fontSize: 18,
+    fontWeight: "600",
+    paddingHorizontal: 16,
+    marginBottom: 10,
+  },
+  hourly_container: {
+    paddingHorizontal: 8,
+  },
+  hour_column: {
+    width: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 4,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: "#fff"
+  },
+  hourly_time: {
+    fontSize: 14,
+  },
+  hourly_icon: {
+    fontSize: 24,
+    textAlign: "center",
+  },
+  hourly_temp: {
+    fontSize: 16,
+    textAlign: "center",
   }
 });

@@ -72,5 +72,5 @@ export async function fetchWeatherInfo(lat: number, lon: number): Promise<Weathe
     };
   });
 
-  return { current, days };
+  return { current, hours, days };
 }

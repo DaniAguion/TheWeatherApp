@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl } from "react-native";
+import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
 import { getWeather } from "../../api-weather/index";
 import type { WeatherInfo } from "../../api-weather/types";
 import { useFocusEffect } from "@react-navigation/native";
@@ -52,6 +52,15 @@ export default function MainScreen({ navigation, route }: Props) {
 
   const location = name ?? "Mi ubicación";
 
+  // Filter the next 24 hours
+  const now = Date.now();
+  const in24h = now + 24 * 60 * 60 * 1000;
+  const hours = data?.hours ?? [];
+  const next24h = hours.filter(h => {
+    const t = h.dateTime * 1000;
+    return t > now && t < in24h;
+  });
+
   return (
     <ScrollView
       style={styles.container}
@@ -71,6 +80,25 @@ export default function MainScreen({ navigation, route }: Props) {
           <Text style={styles.secondary_text}>🌧️ {Math.round(data.current.precipitationMm)} mm</Text>
           <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
         </View>
+      </View>
+      <View style={styles.next_container}>
+        <Text style={styles.next_title}>Próximas horas</Text>
+          <FlatList
+            data={next24h}
+            keyExtractor={(h) => String(h.dateTime)}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.hourly_container}
+            renderItem={({ item }) => (
+              <View style={styles.hour_column}>
+                <Text style={styles.hourly_time}>
+                  {new Date(item.dateTime * 1000).getHours()}:00
+                </Text>
+                <Text style={styles.hourly_icon}>{item.icon}</Text>
+                <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
+              </View>
+            )}
+          />
       </View>
     </ScrollView>
   );
