@@ -1,4 +1,4 @@
-import { fetchWeatherInfo } from "./openmeteo";
+import { fetchAllWeatherInfo } from "./openmeteo";
 import { WeatherInfo } from "./types";
 import { getCached, setCached } from "../storage/cache";
 
@@ -7,7 +7,7 @@ export async function getWeather(lat: number, lon: number): Promise<WeatherInfo>
   const ttl = 20 * 60 * 1000; // 20 min
   const cached = await getCached<WeatherInfo>(key, ttl);
   if (cached) return cached;
-  const data = await fetchWeatherInfo(lat, lon);
+  const data = await fetchAllWeatherInfo(lat, lon);
   await setCached(key, data);
   return data;
 }

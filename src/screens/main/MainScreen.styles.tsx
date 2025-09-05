@@ -4,7 +4,7 @@ export default StyleSheet.create({
   container: {
     padding: 12,
   },
-  header_container: {
+  current_container: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between", 
@@ -15,34 +15,34 @@ export default StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16
   },
-  header_main_group: {
+  current_main_group: {
     flexDirection: "column",
     flex: 3,
     alignItems: "flex-start",
     justifyContent: "center",  
   },
-  header_sec_group: {
+  current_sec_group: {
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "center",
     paddingVertical: 16,
   },
-  temp_icon_group: {
+  current_subgroup: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4
   },
-  icon: {
+  current_icon: {
     fontSize: 40
   },
-  temp: {
+  current_temp: {
     fontSize: 48
   },
   location: {
     fontSize: 20,
     fontWeight: "600",
   },
-  weather_desc_text: {
+  current_weather_desc: {
     fontSize: 18,
   },
   secondary_text: {
@@ -58,6 +58,7 @@ export default StyleSheet.create({
     marginTop: 40,
   },
   next_container: {
+    marginBottom: 16,
     backgroundColor: "#ffffff",
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -86,5 +87,31 @@ export default StyleSheet.create({
   hourly_temp: {
     fontSize: 16,
     textAlign: "center",
-  }
+  },
+  daily_column: {
+    width: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 4,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: "#fff"
+  },
+  daily_time: {
+    fontSize: 14,
+  },
+  daily_icon: {
+    fontSize: 24,
+    textAlign: "center",
+  },
+    daily_max_temp: {
+    color: "#ff0000",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  daily_min_temp: {
+    color: "#0000ff",
+    fontSize: 16,
+    textAlign: "center",
+  },
 });

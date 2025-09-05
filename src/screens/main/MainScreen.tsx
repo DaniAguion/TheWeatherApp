@@ -54,28 +54,30 @@ export default function MainScreen({ navigation, route }: Props) {
 
   // Filter the next 24 hours
   const now = Date.now();
-  const in24h = now + 24 * 60 * 60 * 1000;
+  const in24h = now + 24 * 60 * 60 * 1000; // 24 hours from now in milliseconds
   const hours = data?.hours ?? [];
   const next24h = hours.filter(h => {
     const t = h.dateTime * 1000;
     return t > now && t < in24h;
   });
 
+  
+
   return (
     <ScrollView
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      <View style={styles.header_container}>
-        <View style={styles.header_main_group}>
+      <View style={styles.current_container}>
+        <View style={styles.current_main_group}>
           <Text style={styles.location}>{location}</Text>
-          <View style={styles.temp_icon_group}>
-            <Text style={styles.temp}>{Math.round(data.current.tempC)}°</Text>
-            <Text style={styles.icon}>{data.current.icon}</Text>
+          <View style={styles.current_subgroup}>
+            <Text style={styles.current_temp}>{Math.round(data.current.tempC)}°</Text>
+            <Text style={styles.current_icon}>{data.current.icon}</Text>
           </View>
-          <Text style={styles.weather_desc_text}>{data.current.weather_desc}</Text>
+          <Text style={styles.current_weather_desc}>{data.current.weather_desc}</Text>
         </View>
-        <View style={styles.header_sec_group}>
+        <View style={styles.current_sec_group}>
           <Text style={styles.secondary_text}>🌫️  {Math.round(data.current.humidity)} %</Text> 
           <Text style={styles.secondary_text}>🌧️ {Math.round(data.current.precipitationMm)} mm</Text>
           <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
@@ -90,14 +92,29 @@ export default function MainScreen({ navigation, route }: Props) {
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <View style={styles.hour_column}>
-                <Text style={styles.hourly_time}>
-                  {new Date(item.dateTime * 1000).getHours()}:00
-                </Text>
+                <Text style={styles.hourly_time}>{new Date(item.dateTime * 1000).getHours()}:00</Text>
                 <Text style={styles.hourly_icon}>{item.icon}</Text>
                 <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
               </View>
             )}
           />
+      </View>
+      <View style={styles.next_container}>
+        <Text style={styles.next_title}>Próximos 7 días</Text>
+        <FlatList
+          data={data.days}
+          keyExtractor={(d) => String(d.dateTime)}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View style={styles.daily_column}>
+              <Text style={styles.daily_time}>{new Date(item.dateTime * 1000).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
+              <Text style={styles.daily_icon}>{item.icon}</Text>
+              <Text style={styles.daily_max_temp}>{Math.round(item.maxC)}°</Text>
+              <Text style={styles.daily_min_temp}>{Math.round(item.minC)}°</Text>
+            </View>
+          )}
+        />
       </View>
     </ScrollView>
   );
