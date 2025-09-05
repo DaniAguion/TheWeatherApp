@@ -52,7 +52,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Inicio"
+        initialRouteName="Principal"
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: { fontSize: 12 },
@@ -66,10 +66,10 @@ export default function AppNavigator() {
           }}
         />
         <Tab.Screen
-          name="Inicio"
+          name="Principal"
           component={HomeStackNavigator}
           options={{
-            tabBarLabel: "Inicio",
+            tabBarLabel: "Principal",
             tabBarIcon: () => <Text>🌤️</Text>,
           }}
         />

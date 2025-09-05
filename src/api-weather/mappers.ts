@@ -1,6 +1,6 @@
-import {Current, CurrentDto} from "./types";
-import { Hour, HourlyDto } from "./types";
-import { Day, DailyDto } from "./types";
+import type {Current, CurrentDto} from "./types";
+import type { Hour, HourlyDto } from "./types";
+import type { Day, DailyDto } from "./types";
 import { weatherCodeToDesc, weatherCodeToIcon } from "./weatherCodeMapper";
 
 
@@ -31,7 +31,7 @@ export function hourlyDtoToEntity(dto: HourlyDto): Hour[] {
   );
   
   return dto.time.slice(0, length).map((t, i) => ({
-    dateTime: new Date(t).getSeconds(),
+    dateTime: new Date(t).getTime(),
     tempC: dto.temperature_2m?.[i] ?? null,
     humidity: dto.relative_humidity_2m?.[i] ?? null,
     windSpeedKmh: dto.wind_speed_10m?.[i] ?? null,
@@ -59,13 +59,13 @@ export function dailyDtoToEntity(dto: DailyDto): Day[] {
   );
 
   return dto.time.slice(0, length).map((t, i) => ({
-    dateTime: new Date(t).getSeconds(),
+    dateTime: new Date(t).getTime(),
     minC: dto.temperature_2m_min?.[i] ?? null,
     maxC: dto.temperature_2m_max?.[i] ?? null,
     windSpeedKmh: dto.wind_speed_10m_max?.[i] ?? null,
     uvIndex: dto.uv_index_max?.[i] ?? null,
-    sunrise: new Date(dto.sunrise?.[i]).getSeconds(),
-    sunset: new Date(dto.sunset?.[i]).getSeconds(),
+    sunrise: new Date(dto.sunrise?.[i]).getTime(),
+    sunset: new Date(dto.sunset?.[i]).getTime(),
     precipitationMm: dto.precipitation_sum?.[i] ?? null,
     precipitationProb: dto.precipitation_probability_max?.[i] ?? null,
     weather_desc: weatherCodeToDesc(dto.weather_code?.[i]) || "Desconocido",

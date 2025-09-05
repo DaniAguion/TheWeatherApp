@@ -57,7 +57,7 @@ export default function MainScreen({ navigation, route }: Props) {
   const in24h = now + 24 * 60 * 60 * 1000; // 24 hours from now in milliseconds
   const hours = data?.hours ?? [];
   const next24h = hours.filter(h => {
-    const t = h.dateTime * 1000;
+    const t = h.dateTime;
     return t > now && t < in24h;
   });
 
@@ -92,7 +92,7 @@ export default function MainScreen({ navigation, route }: Props) {
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <View style={styles.hour_column}>
-                <Text style={styles.hourly_time}>{new Date(item.dateTime * 1000).getHours()}:00</Text>
+                <Text style={styles.hourly_time}>{new Date(item.dateTime).getHours()}:00</Text>
                 <Text style={styles.hourly_icon}>{item.icon}</Text>
                 <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
               </View>
@@ -108,7 +108,7 @@ export default function MainScreen({ navigation, route }: Props) {
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
             <View style={styles.daily_column}>
-              <Text style={styles.daily_time}>{new Date(item.dateTime * 1000).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
+              <Text style={styles.daily_time}>{new Date(item.dateTime).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
               <Text style={styles.daily_icon}>{item.icon}</Text>
               <Text style={styles.daily_max_temp}>{Math.round(item.maxC)}°</Text>
               <Text style={styles.daily_min_temp}>{Math.round(item.minC)}°</Text>
