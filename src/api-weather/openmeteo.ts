@@ -1,23 +1,19 @@
-import { WeatherInfo as WeatherInfo, Day } from "./types";
+import { WeatherInfo as WeatherInfo } from "./types";
 import { Current, CurrentDto }  from "./types";
 import { Hour, HourlyDto }  from "./types";
-import { currentDtoToEntity, hourlyDtoToEntity } from "./mappers";
+import { Day, DailyDto }  from "./types";
+import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
 type OpenMeteoResponse = {
   current: CurrentDto;
   hourly: HourlyDto;
-  daily: {
-    time: string[];
-    temperature_2m_max: number[];
-    temperature_2m_min: number[];
-    weather_code: number[];
-  };
+  daily: DailyDto;
 };
 
 
 
 export async function fetchWeatherInfo(lat: number, lon: number): Promise<WeatherInfo> {
-    const params = {
+  const params = {
     "current": [
       "temperature_2m", 
       "relative_humidity_2m", 
@@ -36,7 +32,13 @@ export async function fetchWeatherInfo(lat: number, lon: number): Promise<Weathe
     ],
     "daily": [
       "temperature_2m_max", 
-      "temperature_2m_min", 
+      "temperature_2m_min",
+      "wind_speed_10m_max",
+      "uv_index_max",
+      "sunrise",
+      "sunset",
+      "precipitation_sum",
+      "precipitation_probability_max",
       "weather_code"
     ],
   };
@@ -56,21 +58,7 @@ export async function fetchWeatherInfo(lat: number, lon: number): Promise<Weathe
 
   const current: Current = currentDtoToEntity(data.current);
   const hours: Hour[] = hourlyDtoToEntity(data.hourly);
-
-  
-  const days: Day[] = data.daily.time.map((d, i) => {
-    const date = d;
-    const dailyHours = hours.filter(
-      (h) => new Date(h.dateTime * 1000).toISOString().slice(0, 10) === date
-    );
-    return {
-      date,
-      minC: data.daily.temperature_2m_min[i],
-      maxC: data.daily.temperature_2m_max[i],
-      icon: "",
-      hours: dailyHours,
-    };
-  });
+  const days: Day[] = dailyDtoToEntity(data.daily);
 
   return { current, hours, days };
 }

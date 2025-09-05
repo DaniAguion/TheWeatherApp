@@ -43,14 +43,37 @@ export type Hour = {
   icon: string;
 };
 
-export type Day = {
-  date: string;
-  minC: number;
-  maxC: number;
-  icon: string;
-  hours: Hour[];
+
+// Types for the daily forecast data from Open-Meteo API
+export type DailyDto = {
+  time: string[];
+  temperature_2m_max: number[];
+  temperature_2m_min: number[];
+  wind_speed_10m_max: number[];
+  uv_index_max: number[];
+  sunrise: string[];
+  sunset: string[];
+  precipitation_sum: number[];
+  precipitation_probability_max: number[];
+  weather_code: number[];
 };
 
+
+export type Day = {
+  dateTime: number;
+  minC: number;
+  maxC: number;
+  windSpeedKmh: number;
+  uvIndex: number;
+  sunrise: number;
+  sunset: number;
+  precipitationMm: number;
+  precipitationProb: number;
+  weather_desc: string;
+  icon: string;
+};
+
+// Combined type for all weather information
 export type WeatherInfo = {
   current: Current;
   hours: Hour[];
