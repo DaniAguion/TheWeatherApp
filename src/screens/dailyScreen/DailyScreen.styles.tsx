@@ -4,7 +4,7 @@ export default StyleSheet.create({
   day_row: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 12,
     marginVertical: 2,
     backgroundColor: "#ffffff"
@@ -17,15 +17,13 @@ export default StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     textAlign: "center",
+    marginBottom: 8
   },
   main_group: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
     width: "100%",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    gap: 12
   },
   first_subgroup: {
     flexDirection: "row",
@@ -41,11 +39,13 @@ export default StyleSheet.create({
   max_temp: {
     color: "#ff0000",
     fontSize: 16,
+    fontWeight: "600",
     textAlign: "center",
   },
   min_temp: {
     color: "#0000ff",
     fontSize: 16,
+    fontWeight: "600",
     textAlign: "center"
   },
   subgroup: {
@@ -55,16 +55,19 @@ export default StyleSheet.create({
   },
   icon_column: {
     flexDirection: "column",
+    justifyContent: "space-around",
     alignItems: "center",
-    justifyContent: "center",
   },
   small_icon: {
-    fontSize: 24,
-    marginRight: 8
+    fontSize: 32,
+    marginRight: 8,
+    marginLeft: 14
   },
   info_column: {
     flexDirection: "column",
-    alignItems: "flex-start"
+    justifyContent: "space-around",
+    alignItems: "flex-start",
+    marginLeft: 4
   },
   info_title: {
     fontSize: 12,

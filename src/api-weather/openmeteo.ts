@@ -19,8 +19,9 @@ const params = {
     "temperature_2m",
     "relative_humidity_2m", 
     "wind_speed_10m",
+    "uv_index",
     "precipitation",
-    "precipitation_probability", 
+    "precipitation_probability",
     "weather_code"
   ],
   "daily": [
@@ -32,6 +33,7 @@ const params = {
     "sunset",
     "precipitation_sum",
     "precipitation_probability_max",
+    "cloud_cover_mean",
     "weather_code"
   ],
 };
