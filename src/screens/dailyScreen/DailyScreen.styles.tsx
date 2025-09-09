@@ -1,39 +1,85 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  container: {
-    padding: 12,
-  },
-  daily_title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
-    paddingHorizontal: 16,
-  },
-  daily_column: {
-    width: 60,
+  day_row: {
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 4,
     paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: "#fff"
+    paddingHorizontal: 12,
+    marginVertical: 2,
+    backgroundColor: "#ffffff"
   },
-  daily_time: {
+  day_desc: {
     fontSize: 14,
+    fontWeight: "500",
   },
-  daily_icon: {
-    fontSize: 24,
+  main_group: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    paddingVertical: 8,
+    gap: 12
+  },
+  weather_desc: {
+    fontSize: 14,
+    fontWeight: "400",
     textAlign: "center",
   },
-    daily_max_temp: {
+  precip_prob_text: {
+    fontSize: 12,
+    fontWeight: "400",
+    textAlign: "center",
+  },
+  first_subgroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: 12
+  },
+  icon: {
+    fontSize: 40,
+    textAlign: "center",
+    marginRight: 8
+  },
+  max_temp: {
     color: "#ff0000",
     fontSize: 16,
     textAlign: "center",
   },
-  daily_min_temp: {
+  min_temp: {
     color: "#0000ff",
     fontSize: 16,
     textAlign: "center",
+  },
+  second_subgroup: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 8
+  },
+  subgroup_row: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 16
+  },
+  info_container: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  info_icon: {
+    fontSize: 24,
+    textAlign: "center",
+    marginRight: 8
+  },
+  info_title: {
+    fontSize: 12,
+  },
+  info_data: {
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
