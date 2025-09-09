@@ -119,10 +119,10 @@ export default function WeatherScreen({ navigation, route }: Props) {
           <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
         </View>
       </View>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
         <GestureDetector gesture={tapHour}>
-          <View style={styles.next_container}>
-            <Text style={styles.next_title}>Próximas horas</Text>
+          <View style={styles.hours_container}>
+            <Text style={styles.hours_title}>Próximas horas</Text>
             <FlatList
               data={next24h}
               keyExtractor={(h) => String(h.dateTime)}
@@ -130,33 +130,36 @@ export default function WeatherScreen({ navigation, route }: Props) {
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
                 <View style={styles.hour_column}>
-                  <Text style={styles.hourly_time}>{new Date(item.dateTime).getHours()}:00</Text>
-                  <Text style={styles.hourly_icon}>{item.icon}</Text>
-                  <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
+                  <Text style={styles.hour_time}>{new Date(item.dateTime).getHours()}:00</Text>
+                  <Text style={styles.hour_weather_icon}>{item.icon}</Text>
+                  <Text style={styles.hour_temp}>{Math.round(item.tempC)}°</Text>
                 </View>
               )}
             />
           </View>
         </GestureDetector>
       </GestureHandlerRootView>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
         <GestureDetector gesture={tapDay}>
-          <View style={styles.next_container}>
-            <Text style={styles.next_title}>Pronóstico 7 días</Text>
-            <FlatList
-              data={data.days}
-              horizontal
-              keyExtractor={(d) => String(d.dateTime)}
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <View style={styles.daily_column}>
-                  <Text style={styles.daily_time}>{new Date(item.dateTime).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
-                  <Text style={styles.daily_icon}>{item.icon}</Text>
-                  <Text style={styles.daily_max_temp}>{Math.round(item.maxC)}°</Text>
-                  <Text style={styles.daily_min_temp}>{Math.round(item.minC)}°</Text>
-                </View>
-              )}
-            />
+          <View style={styles.hours_container}>
+            <Text style={styles.hours_title}>Pronóstico 7 días</Text>
+            <View style={styles.list_container}>
+              <FlatList
+                data={data.days}
+                style={styles.list}
+                horizontal
+                keyExtractor={(d) => String(d.dateTime)}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <View style={styles.day_column}>
+                    <Text style={styles.day_time}>{new Date(item.dateTime).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
+                    <Text style={styles.day_weather_icon}>{item.icon}</Text>
+                    <Text style={styles.day_max_temp}>{Math.round(item.maxC)}°</Text>
+                    <Text style={styles.day_min_temp}>{Math.round(item.minC)}°</Text>
+                  </View>
+                )}
+              />
+            </View>
           </View>
         </GestureDetector>
       </GestureHandlerRootView>
