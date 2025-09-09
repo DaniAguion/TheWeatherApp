@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import WeatherScreen from "./screens/weather/WeatherScreen";
+import HourlyScreen from "./screens/hourlyScreen/HourlyScreen";
 import DailyScreen from "./screens/dailyScreen/DailyScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -13,7 +14,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 // ----- Home Stack (Ahora -> Pronóstico)
 type HomeStackParamList = {
   Tiempo: { name?: string; lat: number; lon: number } | undefined;
-  Pronóstico: { days: any[]; title?: string };
+  Proximas_Horas: { hours: any[]; title?: string };
+  Pronostico_Dias: { days: any[]; title?: string };
 };
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -27,7 +29,14 @@ function HomeStackNavigator() {
         options={{ title: "Tiempo" }}
       />
       <HomeStack.Screen
-        name="Pronóstico"
+        name="Proximas_Horas"
+        component={HourlyScreen}
+        options={({ route }) => ({
+          title: route.params?.title ?? "Próximas horas",
+        })}
+      />
+      <HomeStack.Screen
+        name="Pronostico_Dias"
         component={DailyScreen}
         options={({ route }) => ({
           title: route.params?.title ?? "Pronóstico",

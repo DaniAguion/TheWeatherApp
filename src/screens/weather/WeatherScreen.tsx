@@ -1,11 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
-import { Pressable } from "react-native";
-import { useRef } from "react";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../api-weather/index";
-import type { WeatherInfo } from "../../api-weather/types";
-import { useFocusEffect } from "@react-navigation/native";
+import type { WeatherInfo, Hour } from "../../api-weather/types";
 import styles from "./WeatherScreen.styles";
 
 type Props = {
@@ -65,13 +63,34 @@ export default function WeatherScreen({ navigation, route }: Props) {
   });
 
 
+  const in72h = now + 72 * 60 * 60 * 1000; // 72 hours from now in milliseconds
+  const next72h: Hour[] = hours.filter(h => {
+    const t = h.dateTime;
+    return t > now && t < in72h;
+  });
+
+
   // Handling touch vs scroll on the 7-day forecast
-  const tapDaily = Gesture.Tap()
+  const tapHour = Gesture.Tap()
     .maxDuration(250)
     .maxDistance(10)
     .onEnd((_evt, success) => {
       if (success) {
-        navigation.navigate("Pronóstico", {
+        navigation.navigate("Proximas_Horas", {
+          title: `${location} - Próximas horas`,
+          hours: next72h,
+        });
+      }
+    });
+
+
+  // Handling touch vs scroll on the 7-day forecast
+  const tapDay = Gesture.Tap()
+    .maxDuration(250)
+    .maxDistance(10)
+    .onEnd((_evt, success) => {
+      if (success) {
+        navigation.navigate("Pronostico_Dias", {
           title: `${location} - Pronóstico 7 días`,
           days: data.days,
         });
@@ -100,26 +119,30 @@ export default function WeatherScreen({ navigation, route }: Props) {
           <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
         </View>
       </View>
-      <View style={styles.next_container}>
-        <Text style={styles.next_title}>Próximas horas</Text>
-          <FlatList
-            data={next24h}
-            keyExtractor={(h) => String(h.dateTime)}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.hour_column}>
-                <Text style={styles.hourly_time}>{new Date(item.dateTime).getHours()}:00</Text>
-                <Text style={styles.hourly_icon}>{item.icon}</Text>
-                <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
-              </View>
-            )}
-          />
-      </View>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GestureDetector gesture={tapDaily}>
+        <GestureDetector gesture={tapHour}>
           <View style={styles.next_container}>
-            <Text style={styles.next_title}>Próximos 7 días</Text>
+            <Text style={styles.next_title}>Próximas horas</Text>
+            <FlatList
+              data={next24h}
+              keyExtractor={(h) => String(h.dateTime)}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View style={styles.hour_column}>
+                  <Text style={styles.hourly_time}>{new Date(item.dateTime).getHours()}:00</Text>
+                  <Text style={styles.hourly_icon}>{item.icon}</Text>
+                  <Text style={styles.hourly_temp}>{Math.round(item.tempC)}°</Text>
+                </View>
+              )}
+            />
+          </View>
+        </GestureDetector>
+      </GestureHandlerRootView>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureDetector gesture={tapDay}>
+          <View style={styles.next_container}>
+            <Text style={styles.next_title}>Pronóstico 7 días</Text>
             <FlatList
               data={data.days}
               horizontal
