@@ -27,6 +27,7 @@ export type HourlyDto = {
   temperature_2m: number[];
   relative_humidity_2m: number[];
   wind_speed_10m: number[];
+  uv_index: number[];
   precipitation: number[];
   precipitation_probability: number[];
   weather_code: number[];
@@ -37,6 +38,7 @@ export type Hour = {
   tempC: number;
   humidity: number;
   windSpeedKmh: number;
+  uv_index: number;
   precipitationMm: number;
   precipitationProb: number;
   weather_desc: string;
@@ -55,6 +57,7 @@ export type DailyDto = {
   sunset: string[];
   precipitation_sum: number[];
   precipitation_probability_max: number[];
+  cloud_cover_mean: number[];
   weather_code: number[];
 };
 
@@ -69,6 +72,7 @@ export type Day = {
   sunset: number;
   precipitationMm: number;
   precipitationProb: number;
+  cloudCover: number;
   weather_desc: string;
   icon: string;
 };

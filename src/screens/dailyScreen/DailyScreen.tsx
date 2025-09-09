@@ -33,11 +33,16 @@ export default function DailyScreen({ route }: Props) {
                   <View style={styles.icon_column}>
                     <Text style={styles.small_icon}>🌧️</Text>
                     <View style={styles.spacer} />
+                    <Text style={styles.small_icon}>☁️</Text>
+                    <View style={styles.spacer} />
                     <Text style={styles.small_icon}>💨</Text>
                   </View>
                   <View style={styles.info_column}>
                       <Text style={styles.info_title}>LLuvia</Text>
                       <Text style={styles.info_data}>{Math.round(item.precipitationProb)}% {Math.round(item.precipitationMm)} mm</Text>
+                      <View style={styles.spacer} />
+                      <Text style={styles.info_title}>Nubosidad</Text>
+                      <Text style={styles.info_data}>{Math.round(item.cloudCover)} %</Text>
                       <View style={styles.spacer} />
                       <Text style={styles.info_title}>Viento</Text>
                       <Text style={styles.info_data}>{Math.round(item.windSpeedKmh)} km/h</Text>
@@ -48,13 +53,18 @@ export default function DailyScreen({ route }: Props) {
                     <Text style={styles.small_icon}>☀️</Text>
                     <View style={styles.spacer} />
                     <Text style={styles.small_icon}>🌅</Text>
+                    <View style={styles.spacer} />
+                    <Text style={styles.small_icon}>🌆</Text>
                   </View>
                   <View style={styles.info_column}>
                       <Text style={styles.info_title}>Índice UV</Text>
                       <Text style={styles.info_data}>{Math.round(item.uvIndex)}</Text>
                       <View style={styles.spacer} />
-                      <Text style={styles.info_title}>Horario Solar</Text>
-                      <Text style={styles.info_data}>{new Date(item.sunrise).getHours()}:00/{new Date(item.sunset).getHours()}:00</Text>
+                      <Text style={styles.info_title}>Amanecer</Text>
+                      <Text style={styles.info_data}>{new Date(item.sunrise).getHours()}:00</Text>
+                      <View style={styles.spacer} />
+                      <Text style={styles.info_title}>Ocaso</Text>
+                      <Text style={styles.info_data}>{new Date(item.sunset).getHours()}:00</Text>
                   </View>
                 </View>
               </View>

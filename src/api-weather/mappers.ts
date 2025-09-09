@@ -25,6 +25,7 @@ export function hourlyDtoToEntity(dto: HourlyDto): Hour[] {
     dto.temperature_2m.length,
     dto.relative_humidity_2m.length,
     dto.wind_speed_10m.length,
+    dto.uv_index.length,
     dto.precipitation.length,
     dto.precipitation_probability.length,
     dto.weather_code.length
@@ -35,6 +36,7 @@ export function hourlyDtoToEntity(dto: HourlyDto): Hour[] {
     tempC: dto.temperature_2m?.[i] ?? null,
     humidity: dto.relative_humidity_2m?.[i] ?? null,
     windSpeedKmh: dto.wind_speed_10m?.[i] ?? null,
+    uv_index: dto.uv_index?.[i] ?? null,
     precipitationMm: dto.precipitation?.[i] ?? null,
     precipitationProb: dto.precipitation_probability?.[i] ?? null,
     weather_desc: weatherCodeToDesc(dto.weather_code?.[i]) || "Desconocido",
@@ -55,6 +57,7 @@ export function dailyDtoToEntity(dto: DailyDto): Day[] {
     dto.sunset.length,
     dto.precipitation_sum.length,
     dto.precipitation_probability_max.length,
+    dto.cloud_cover_mean.length,
     dto.weather_code.length
   );
 
@@ -68,6 +71,7 @@ export function dailyDtoToEntity(dto: DailyDto): Day[] {
     sunset: new Date(dto.sunset?.[i]).getTime(),
     precipitationMm: dto.precipitation_sum?.[i] ?? null,
     precipitationProb: dto.precipitation_probability_max?.[i] ?? null,
+    cloudCover: dto.cloud_cover_mean?.[i] ?? null,
     weather_desc: weatherCodeToDesc(dto.weather_code?.[i]) || "Desconocido",
     icon: weatherCodeToIcon(dto.weather_code?.[i]) || "❓"
   }));

@@ -16,6 +16,10 @@ export default function HourlyScreen({ route }: Props) {
           renderItem={({ item }) => (
             <View style={styles.hour_row}>
               <Text style={styles.hour_desc}> {new Date(item.dateTime).getHours()}:00</Text>
+              <Text style={styles.hour_desc}> {item.icon}</Text>
+              <Text style={styles.hour_desc}>🌧️ {Math.round(item.precipitationProb)}% {Math.round(item.precipitationMm)} mm</Text>
+              <Text style={styles.hour_desc}>💨 {Math.round(item.windSpeedKmh)} km/h</Text>
+              <Text style={styles.hour_desc}>💧 {Math.round(item.humidity)}%</Text>
             </View>
           )}
         />
