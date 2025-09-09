@@ -13,31 +13,27 @@ export default StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
   },
-  main_group: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    paddingVertical: 8,
-    gap: 12
-  },
   weather_desc: {
     fontSize: 14,
     fontWeight: "400",
     textAlign: "center",
   },
-  precip_prob_text: {
-    fontSize: 12,
-    fontWeight: "400",
-    textAlign: "center",
+  main_group: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    gap: 12
   },
   first_subgroup: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingLeft: 12
+    paddingRight: 8,
   },
-  icon: {
+  big_icon: {
     fontSize: 40,
     textAlign: "center",
     marginRight: 8
@@ -50,30 +46,25 @@ export default StyleSheet.create({
   min_temp: {
     color: "#0000ff",
     fontSize: 16,
-    textAlign: "center",
+    textAlign: "center"
   },
-  second_subgroup: {
+  subgroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icon_column: {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    paddingRight: 8
   },
-  subgroup_row: {
-    flex: 1,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 16
-  },
-  info_container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  info_icon: {
+  small_icon: {
     fontSize: 24,
-    textAlign: "center",
     marginRight: 8
+  },
+  info_column: {
+    flexDirection: "column",
+    alignItems: "flex-start"
   },
   info_title: {
     fontSize: 12,
@@ -81,5 +72,8 @@ export default StyleSheet.create({
   info_data: {
     fontSize: 12,
     fontWeight: "600",
+  },
+  spacer: { 
+    height: 8 
   },
 });
