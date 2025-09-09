@@ -1,9 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
+import { Pressable } from "react-native";
+import { useRef } from "react";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../api-weather/index";
 import type { WeatherInfo } from "../../api-weather/types";
 import { useFocusEffect } from "@react-navigation/native";
-import styles from "./MainScreen.styles";
+import styles from "./WeatherScreen.styles";
 
 type Props = {
   navigation: any;
@@ -13,7 +16,7 @@ type Props = {
 // Emplear Madrid como ubicación por defecto si no se obtiene la ubicación actual
 const DEFAULT_LOCATION = { name: "Madrid", lat: 40.4168, lon: -3.7038 };
 
-export default function MainScreen({ navigation, route }: Props) {
+export default function WeatherScreen({ navigation, route }: Props) {
   const { name, lat, lon } = route.params ?? DEFAULT_LOCATION;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -33,8 +36,8 @@ export default function MainScreen({ navigation, route }: Props) {
     }
   };
 
+  const listNativeGestureRef = useRef(null);
   useEffect(() => { load(); }, [lat, lon]);
-
   useFocusEffect(useCallback(() => {
     return () => {};
   }, []));
@@ -60,6 +63,20 @@ export default function MainScreen({ navigation, route }: Props) {
     const t = h.dateTime;
     return t > now && t < in24h;
   });
+
+
+  // Handling touch vs scroll on the 7-day forecast
+  const tapDaily = Gesture.Tap()
+    .maxDuration(250)
+    .maxDistance(10)
+    .onEnd((_evt, success) => {
+      if (success) {
+        navigation.navigate("Pronóstico", {
+          title: `${location} - Pronóstico 7 días`,
+          days: data.days,
+        });
+      }
+    });
 
   
 
@@ -99,23 +116,27 @@ export default function MainScreen({ navigation, route }: Props) {
             )}
           />
       </View>
-      <View style={styles.next_container}>
-        <Text style={styles.next_title}>Próximos 7 días</Text>
-        <FlatList
-          data={data.days}
-          keyExtractor={(d) => String(d.dateTime)}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.daily_column}>
-              <Text style={styles.daily_time}>{new Date(item.dateTime).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
-              <Text style={styles.daily_icon}>{item.icon}</Text>
-              <Text style={styles.daily_max_temp}>{Math.round(item.maxC)}°</Text>
-              <Text style={styles.daily_min_temp}>{Math.round(item.minC)}°</Text>
-            </View>
-          )}
-        />
-      </View>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureDetector gesture={tapDaily}>
+          <View style={styles.next_container}>
+            <Text style={styles.next_title}>Próximos 7 días</Text>
+            <FlatList
+              data={data.days}
+              horizontal
+              keyExtractor={(d) => String(d.dateTime)}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View style={styles.daily_column}>
+                  <Text style={styles.daily_time}>{new Date(item.dateTime).toLocaleDateString("es-ES", { weekday: "short" })}</Text>
+                  <Text style={styles.daily_icon}>{item.icon}</Text>
+                  <Text style={styles.daily_max_temp}>{Math.round(item.maxC)}°</Text>
+                  <Text style={styles.daily_min_temp}>{Math.round(item.minC)}°</Text>
+                </View>
+              )}
+            />
+          </View>
+        </GestureDetector>
+      </GestureHandlerRootView>
     </ScrollView>
   );
 }

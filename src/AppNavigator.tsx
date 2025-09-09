@@ -5,15 +5,14 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import TodayScreen from "./screens/TodayScreen";
-import MainScreen from "./screens/main/MainScreen";
-import ForecastScreen from "./screens/ForecastScreen";
+import WeatherScreen from "./screens/weather/WeatherScreen";
+import DailyScreen from "./screens/dailyScreen/DailyScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
 // ----- Home Stack (Ahora -> Pronóstico)
 type HomeStackParamList = {
-  Inicio: { name?: string; lat: number; lon: number } | undefined;
+  Tiempo: { name?: string; lat: number; lon: number } | undefined;
   Pronóstico: { days: any[]; title?: string };
 };
 
@@ -23,13 +22,13 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
-        name="Inicio"
-        component={MainScreen}
-        options={{ title: "Inicio" }}
+        name="Tiempo"
+        component={WeatherScreen}
+        options={{ title: "Tiempo" }}
       />
       <HomeStack.Screen
         name="Pronóstico"
-        component={ForecastScreen}
+        component={DailyScreen}
         options={({ route }) => ({
           title: route.params?.title ?? "Pronóstico",
         })}
@@ -52,7 +51,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Principal"
+        initialRouteName="Inicio"
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: { fontSize: 12 },
@@ -66,10 +65,10 @@ export default function AppNavigator() {
           }}
         />
         <Tab.Screen
-          name="Principal"
+          name="Inicio"
           component={HomeStackNavigator}
           options={{
-            tabBarLabel: "Principal",
+            tabBarLabel: "Inicio",
             tabBarIcon: () => <Text>🌤️</Text>,
           }}
         />
