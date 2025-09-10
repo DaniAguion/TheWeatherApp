@@ -5,8 +5,9 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     marginVertical: 2,
+    marginHorizontal: 2,
     backgroundColor: "#ffffff"
   },
   day_desc: {
@@ -27,9 +28,11 @@ export default StyleSheet.create({
   },
   first_subgroup: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    paddingRight: 8,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    alignContent: "flex-start", 
+    alignItems: "center",
   },
   big_icon: {
     fontSize: 40,
@@ -52,6 +55,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingLeft: 8,
   },
   icon_column: {
     flexDirection: "column",
@@ -60,20 +64,18 @@ export default StyleSheet.create({
   },
   small_icon: {
     fontSize: 32,
-    marginRight: 8,
-    marginLeft: 14
+    marginRight: 4,
   },
   info_column: {
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "flex-start",
-    marginLeft: 4
   },
   info_title: {
-    fontSize: 12,
+    fontSize: 10,
   },
   info_data: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
   spacer: { 
