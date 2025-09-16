@@ -1,21 +1,26 @@
 // src/AppNavigator.tsx
 import * as React from "react";
-import { Text } from "react-native";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { Text, useColorScheme } from "react-native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import WeatherScreen from "./screens/weather/WeatherScreen";
+
+import WeatherScreen from "./screens/weatherScreen/WeatherScreen";
 import HourlyScreen from "./screens/hourlyScreen/HourlyScreen";
 import DailyScreen from "./screens/dailyScreen/DailyScreen";
+import MyWeatherScreen from "./screens/myWeatherScreen/MyWeatherScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
-// ----- Home Stack (Ahora -> Pronóstico)
-type HomeStackParamList = {
-  Tiempo: { name?: string; lat: number; lon: number } | undefined;
-  Proximas_Horas: { hours: any[]; title?: string };
-  Pronostico_Dias: { days: any[]; title?: string };
+
+export type PlaceParams = { name?: string; lat: number; lon: number };
+
+export type HomeStackParamList = {
+  MyWeather: PlaceParams | undefined;
+  Weather: PlaceParams | undefined;
+  NextHours: { hours: any[]; title?: string };
+  NextDays: { days: any[]; title?: string };
 };
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -24,19 +29,24 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
-        name="Tiempo"
+        name="MyWeather"
+        component={MyWeatherScreen}
+        options={{ title: "Mi Tiempo" }}
+      />
+      <HomeStack.Screen
+        name="Weather"
         component={WeatherScreen}
         options={{ title: "Tiempo" }}
       />
       <HomeStack.Screen
-        name="Proximas_Horas"
+        name="NextHours"
         component={HourlyScreen}
         options={({ route }) => ({
           title: route.params?.title ?? "Próximas horas",
         })}
       />
       <HomeStack.Screen
-        name="Pronostico_Dias"
+        name="NextDays"
         component={DailyScreen}
         options={({ route }) => ({
           title: route.params?.title ?? "Pronóstico",
@@ -45,7 +55,6 @@ function HomeStackNavigator() {
     </HomeStack.Navigator>
   );
 }
-
 
 type RootTabParamList = {
   Inicio: undefined;
@@ -56,9 +65,9 @@ type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function AppNavigator() {
-
+  const scheme = useColorScheme();
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={scheme === "dark" ? DarkTheme : DefaultTheme}>
       <Tab.Navigator
         initialRouteName="Inicio"
         screenOptions={{
