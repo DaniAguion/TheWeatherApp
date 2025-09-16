@@ -76,7 +76,7 @@ export default function WeatherScreen({ navigation, route }: Props) {
     .maxDistance(10)
     .onEnd((_evt, success) => {
       if (success) {
-        navigation.navigate("Proximas_Horas", {
+        navigation.navigate("NextHours", {
           title: `${location} - Próximas horas`,
           hours: next72h,
         });
@@ -90,7 +90,7 @@ export default function WeatherScreen({ navigation, route }: Props) {
     .maxDistance(10)
     .onEnd((_evt, success) => {
       if (success) {
-        navigation.navigate("Pronostico_Dias", {
+        navigation.navigate("NextDays", {
           title: `${location} - Pronóstico 7 días`,
           days: data.days,
         });
