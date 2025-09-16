@@ -4,6 +4,7 @@ import WeatherScreen from "../weatherScreen/WeatherScreen";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { HomeStackParamList, PlaceParams } from "../../AppNavigator"
+import styles from "./MyWeatherScreen.styles";
 
 const DEFAULT_LOCATION = { name: "Madrid", lat: 40.4168, lon: -3.7038 };
 
@@ -19,24 +20,28 @@ export default function MyWeatherScreen({ navigation, route } : Props) {
   
   if (!route?.params && loading && !coords) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.main_container}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
+  // Show error message if location permission is denied and no coordinates available
+  // In this case, show weather for default location
   if (error && !coords) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-        <Text style={{ marginBottom: 10, textAlign: "center" }}>{error}</Text>
-        <Text style={{ textAlign: "center" }}>
-            Muestra el tiempo de una ubicación por defecto.
-            </Text>
+      <View style={styles.main_container}>
+        <Text style={styles.error_text}>Mostrando ubicación por defecto</Text>
+        <WeatherScreen
+          navigation={navigation}
+          route={{ params: { name, lat, lon } }}
+        />
         </View>
-        );
+      );
     }
 
 
+  // Render WeatherScreen with the prefixed location or the current location
   return (
     <WeatherScreen
       navigation={navigation}
