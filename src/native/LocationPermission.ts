@@ -13,7 +13,7 @@ export type Status = {
 const { RNLocationPermission } = NativeModules;
 
 if (!RNLocationPermission) {
-  //throw new Error("RNLocationPermission no vinculado (iOS/Android).");
+  throw new Error("RNLocationPermission no vinculado (iOS/Android).");
 }
 
 export const LocationPermission = {

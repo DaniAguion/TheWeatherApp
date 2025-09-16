@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Geolocation from "react-native-geolocation-service";
 import { LocationPermission } from "../native/LocationPermission";
@@ -25,7 +26,9 @@ export function useCurrentLocation(defaultLocation: Coords | null = null) {
         }
 
         // Check location permission and request if not granted
-        const services = await LocationPermission.isLocationEnabled();
+        const services = Platform.OS === "ios"
+          ? true
+          : await LocationPermission.isLocationEnabled();
         if (!services) {
           setError("Servicios de ubicación desactivados");
           setLoading(false);

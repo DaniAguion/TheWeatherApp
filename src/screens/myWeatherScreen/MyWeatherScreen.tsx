@@ -1,10 +1,11 @@
-import React from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { ActivityIndicator, Platform, Text, View } from "react-native";
 import WeatherScreen from "../weatherScreen/WeatherScreen";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { HomeStackParamList, PlaceParams } from "../../AppNavigator"
 import styles from "./MyWeatherScreen.styles";
+import { LocationPermission } from "../../native/LocationPermission";
 
 const DEFAULT_LOCATION = { name: "Madrid", lat: 40.4168, lon: -3.7038 };
 
@@ -12,6 +13,20 @@ type Props = NativeStackScreenProps<HomeStackParamList, "MyWeather">;
 
 export default function MyWeatherScreen({ navigation, route } : Props) {
   const { coords, loading, error } = useCurrentLocation();
+
+  useEffect(() => {
+    if (Platform.OS !== "ios") return;
+    (async () => {
+      try {
+        const status = await LocationPermission.checkStatus();
+        if (status.state !== "granted") {
+          await LocationPermission.requestWhenInUse();
+        }
+      } catch (_err) {
+        // Ignore and let the hook surface the error state.
+      }
+    })();
+  }, []);
 
   // If there is no prefixed location, use current location or default
   const lat = route?.params?.lat ?? coords?.lat ?? DEFAULT_LOCATION.lat;
