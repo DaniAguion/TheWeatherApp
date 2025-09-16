@@ -36,7 +36,7 @@ export function hourlyDtoToEntity(dto: HourlyDto): Hour[] {
     tempC: dto.temperature_2m?.[i] ?? null,
     humidity: dto.relative_humidity_2m?.[i] ?? null,
     windSpeedKmh: dto.wind_speed_10m?.[i] ?? null,
-    uv_index: dto.uv_index?.[i] ?? null,
+    uvIndex: dto.uv_index?.[i] ?? null,
     precipitationMm: dto.precipitation?.[i] ?? null,
     precipitationProb: dto.precipitation_probability?.[i] ?? null,
     weather_desc: weatherCodeToDesc(dto.weather_code?.[i]) || "Desconocido",

@@ -58,7 +58,7 @@ export default function DailyScreen({ route }: Props) {
                   </View>
                   <View style={styles.info_column}>
                       <Text style={styles.info_title}>Índice UV</Text>
-                      <Text style={styles.info_data}>{Math.round(item.uvIndex)}</Text>
+                      <Text style={styles.info_data}>{Math.round(item.uvIndex)}/12</Text>
                       <View style={styles.spacer} />
                       <Text style={styles.info_title}>Amanecer</Text>
                       <Text style={styles.info_data}>{new Date(item.sunrise).getHours()}:00</Text>

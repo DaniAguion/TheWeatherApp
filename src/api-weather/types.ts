@@ -26,6 +26,7 @@ export type HourlyDto = {
   time: string[];
   temperature_2m: number[];
   relative_humidity_2m: number[];
+  is_day: boolean[];
   wind_speed_10m: number[];
   uv_index: number[];
   precipitation: number[];
@@ -38,7 +39,7 @@ export type Hour = {
   tempC: number;
   humidity: number;
   windSpeedKmh: number;
-  uv_index: number;
+  uvIndex: number;
   precipitationMm: number;
   precipitationProb: number;
   weather_desc: string;
