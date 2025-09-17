@@ -9,12 +9,13 @@ import styles from "./WeatherScreen.styles";
 type Props = {
   navigation: any;
   route: { params?: { name?: string; lat: number; lon: number } };
+  refreshLocation?: () => void;
 };
 
 // Emplear Madrid como ubicación por defecto si no se obtiene la ubicación actual
 const DEFAULT_LOCATION = { name: "Madrid", lat: 40.4168, lon: -3.7038 };
 
-export default function WeatherScreen({ navigation, route }: Props) {
+export default function WeatherScreen({ navigation, route, refreshLocation }: Props) {
   const { name, lat, lon } = route.params ?? DEFAULT_LOCATION;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -40,7 +41,11 @@ export default function WeatherScreen({ navigation, route }: Props) {
     return () => {};
   }, []));
 
-  const onRefresh = () => { setRefreshing(true); load(); };
+  const onRefresh = () => {
+    setRefreshing(true);
+    refreshLocation?.();
+    load();
+  };
 
   if (loading) return <ActivityIndicator style={styles.loading} />;
   if (error) return (
