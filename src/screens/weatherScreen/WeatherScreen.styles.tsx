@@ -23,7 +23,7 @@ export default StyleSheet.create({
   current_sec_group: {
     flex: 1,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
   },

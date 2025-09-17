@@ -36,11 +36,14 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   };
 
   const listNativeGestureRef = useRef(null);
+
   useEffect(() => { load(); }, [lat, lon]);
+
   useFocusEffect(useCallback(() => {
     return () => {};
   }, []));
 
+  // Pull to refresh handler
   const onRefresh = () => {
     setRefreshing(true);
     refreshLocation?.();
