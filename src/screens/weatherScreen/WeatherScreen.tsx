@@ -8,15 +8,13 @@ import styles from "./WeatherScreen.styles";
 
 type Props = {
   navigation: any;
-  route: { params?: { name?: string; lat: number; lon: number } };
+  route: { params: { name: string; lat: number; lon: number } };
   refreshLocation?: () => void;
 };
 
-// Emplear Madrid como ubicación por defecto si no se obtiene la ubicación actual
-const DEFAULT_LOCATION = { name: "Madrid", lat: 40.4168, lon: -3.7038 };
 
 export default function WeatherScreen({ navigation, route, refreshLocation }: Props) {
-  const { name, lat, lon } = route.params ?? DEFAULT_LOCATION;
+  const { name, lat, lon } = route.params;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,10 +57,10 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   );
   if (!data) return null;
 
-  const location = name ?? "Mi ubicación";
+  const location = name ?? "Desconocida";
 
-  // Filter the next 24 hours
-  const now = Date.now();
+  // Filter the next 24 hours to show in the "Next Hours" preview
+  const now = data?.current.dateTime;
   const in24h = now + 24 * 60 * 60 * 1000; // 24 hours from now in milliseconds
   const hours = data?.hours ?? [];
   const next24h = hours.filter(h => {
@@ -71,6 +69,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   });
 
 
+  // Filter the next 72 hours to show in the "Next Hours" screen
   const in72h = now + 72 * 60 * 60 * 1000; // 72 hours from now in milliseconds
   const next72h: Hour[] = hours.filter(h => {
     const t = h.dateTime;
