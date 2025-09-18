@@ -23,8 +23,9 @@ export default StyleSheet.create({
   current_sec_group: {
     flex: 1,
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
+    paddingLeft: 16,
     paddingVertical: 16,
   },
   current_subgroup: {

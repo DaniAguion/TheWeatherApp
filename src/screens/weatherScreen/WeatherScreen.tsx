@@ -8,7 +8,7 @@ import styles from "./WeatherScreen.styles";
 
 type Props = {
   navigation: any;
-  route: { params: { name: string; lat: number; lon: number } };
+  route: { params: { name?: string; lat: number; lon: number } };
   refreshLocation?: () => void;
 };
 
@@ -61,7 +61,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
 
   // Filter the next 24 hours to show in the "Next Hours" preview
   const now = data?.current.dateTime;
-  const in24h = now + 24 * 60 * 60 * 1000; // 24 hours from now in milliseconds
+  const in24h = now + 24 * 60 * 60 * 1000;
   const hours = data?.hours ?? [];
   const next24h = hours.filter(h => {
     const t = h.dateTime;
@@ -70,7 +70,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
 
 
   // Filter the next 72 hours to show in the "Next Hours" screen
-  const in72h = now + 72 * 60 * 60 * 1000; // 72 hours from now in milliseconds
+  const in72h = now + 72 * 60 * 60 * 1000;
   const next72h: Hour[] = hours.filter(h => {
     const t = h.dateTime;
     return t > now && t < in72h;

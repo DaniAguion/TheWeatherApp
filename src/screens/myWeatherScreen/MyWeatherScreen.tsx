@@ -14,15 +14,17 @@ type Props = NativeStackScreenProps<HomeStackParamList, "MyWeather">;
 export default function MyWeatherScreen({ navigation, route }: Props) {
   const {
     selectedLocation,
+    savedLocation,
+    usingCurrentLocation,
     loading: selectedLoading,
     error: selectedError,
     clearSelectedLocation,
     saveSelectedLocation,
   } = useSelectedLocation();
-  const shouldUseCurrentLocation = !selectedLoading && !selectedLocation;
+  const shouldUseCurrentLocation = !selectedLoading && usingCurrentLocation;
   const { coords, loading, error, refresh } = useCurrentLocation({ enabled: shouldUseCurrentLocation });
   const isFirstFocus = useRef(true);
-  const isUsingCurrentLocation = !selectedLocation;
+  const isUsingCurrentLocation = usingCurrentLocation;
 
   useFocusEffect(
     useCallback(() => {
@@ -30,25 +32,38 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         isFirstFocus.current = false;
         return;
       }
-      if (!selectedLocation) refresh();
-    }, [refresh, selectedLocation])
+      if (usingCurrentLocation) refresh();
+    }, [refresh, usingCurrentLocation])
   );
 
   const handleRefreshLocation = useCallback(() => {
-    if (!selectedLocation) refresh();
-  }, [refresh, selectedLocation]);
+    if (usingCurrentLocation) refresh();
+  }, [refresh, usingCurrentLocation]);
 
   const handleSelectCurrent = useCallback(() => {
-    clearSelectedLocation();
+    (async () => {
+      if (Platform.OS === "ios") {
+        try {
+          const status = await LocationPermission.checkStatus();
+          if (status.state !== "granted") {
+            await LocationPermission.requestWhenInUse();
+          }
+        } catch (_err) {
+          /* noop */
+        }
+      }
+      try {
+        await clearSelectedLocation();
+      } catch (_err) {
+        /* noop */
+      }
+    })().catch(() => {});
   }, [clearSelectedLocation]);
 
   const handleSelectSaved = useCallback(() => {
-    if (!selectedLocation) {
-      saveSelectedLocation(DEFAULT_SELECTED_LOCATION);
-      return;
-    }
-    saveSelectedLocation(selectedLocation);
-  }, [saveSelectedLocation, selectedLocation]);
+    const target = savedLocation ?? DEFAULT_SELECTED_LOCATION;
+    saveSelectedLocation(target).catch(() => {});
+  }, [saveSelectedLocation, savedLocation]);
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
@@ -65,17 +80,17 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
     })();
   }, [shouldUseCurrentLocation]);
 
-  const fallback = DEFAULT_SELECTED_LOCATION;
+  const fallback = savedLocation ?? DEFAULT_SELECTED_LOCATION;
   const params = route?.params;
   const lat = params?.lat ?? selectedLocation?.lat ?? coords?.lat ?? fallback.lat;
   const lon = params?.lon ?? selectedLocation?.lon ?? coords?.lon ?? fallback.lon;
   const name = params?.name ?? selectedLocation?.name ?? (coords ? "Ubicación" : fallback.name);
-  const savedLocationName = selectedLocation?.name ?? DEFAULT_SELECTED_LOCATION.name;
+  const savedLocationName = savedLocation?.name ?? DEFAULT_SELECTED_LOCATION.name;
   const buttonsDisabled = selectedLoading;
 
   let content: React.ReactNode;
 
-  if (!params && selectedLoading && !selectedLocation) {
+  if (!params && selectedLoading && usingCurrentLocation) {
     content = (
       <View style={styles.state_container}>
         <ActivityIndicator size="large" />
@@ -98,7 +113,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
       <WeatherScreen
         navigation={navigation}
         route={{ params: { name, lat, lon } }}
-        refreshLocation={!selectedLocation ? handleRefreshLocation : undefined}
+        refreshLocation={handleRefreshLocation}
       />
     );
   }
