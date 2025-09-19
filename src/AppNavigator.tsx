@@ -5,17 +5,17 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import type { WeatherScreenParams } from "./ui/weatherScreen/WeatherScreen";
-import type { HourlyScreenParams } from "./ui/hourlyScreen/HourlyScreen";
-import type { DailyScreenParams } from "./ui/dailyScreen/DailyScreen";
+import type { WeatherScreenParams } from "./presentation/weatherScreen/WeatherScreen";
+import type { HourlyScreenParams } from "./presentation/hourlyScreen/HourlyScreen";
+import type { DailyScreenParams } from "./presentation/dailyScreen/DailyScreen";
 
 
-import WeatherScreen from "./ui/weatherScreen/WeatherScreen";
-import HourlyScreen from "./ui/hourlyScreen/HourlyScreen";
-import DailyScreen from "./ui/dailyScreen/DailyScreen";
-import MyWeatherScreen from "./ui/myWeatherScreen/MyWeatherScreen";
-import FavoritesScreen from "./ui/FavoritesScreen";
-import SettingsScreen from "./ui/SettingsScreen";
+import WeatherScreen from "./presentation/weatherScreen/WeatherScreen";
+import HourlyScreen from "./presentation/hourlyScreen/HourlyScreen";
+import DailyScreen from "./presentation/dailyScreen/DailyScreen";
+import MyWeatherScreen from "./presentation/myWeatherScreen/MyWeatherScreen";
+import FavoritesScreen from "./presentation/FavoritesScreen";
+import SettingsScreen from "./presentation/SettingsScreen";
 
 
 export type HomeStackParamList = {
