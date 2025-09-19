@@ -1,5 +1,5 @@
 import { FlatList, Text, View } from "react-native";
-import type { Day } from "../../services/weatherService/types";
+import type { Day } from "../../domain/entities"
 import styles from "./DailyScreen.styles";
 
 type Props = { route: { params: { days: Day[]; title?: string } } };

@@ -1,5 +1,5 @@
 import { fetchAllWeatherInfo } from "./openmeteo";
-import { WeatherInfo } from "./types";
+import { WeatherInfo } from "../../domain/entities";
 import { getCached, setCached } from "../localStorage/cache";
 
 export async function getWeather(lat: number, lon: number): Promise<WeatherInfo> {

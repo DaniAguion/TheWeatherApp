@@ -1,6 +1,5 @@
-import type {Current, CurrentDto} from "./types";
-import type { Hour, HourlyDto } from "./types";
-import type { Day, DailyDto } from "./types";
+import type {CurrentDto, HourlyDto, DailyDto} from "./dto";
+import type { Current, Hour, Day } from "../../domain/entities";
 import { weatherCodeToDesc, weatherCodeToIcon } from "./weatherCodeMapper";
 
 

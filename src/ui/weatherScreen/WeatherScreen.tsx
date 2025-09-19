@@ -2,9 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
-import { getWeather } from "../../services/weatherService/index";
-import { getLocationName } from "../../services/locationService/fetchLocationName";
-import type { WeatherInfo, Hour } from "../../services/weatherService/types";
+import { getWeather } from "../../data/weatherService/index";
+import { getLocationName } from "../../data/locationService/fetchLocationName";
+import type { WeatherInfo, Hour } from "../../domain/entities";
 import styles from "./WeatherScreen.styles";
 
 type Props = {

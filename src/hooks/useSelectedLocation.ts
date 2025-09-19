@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { PlaceParams } from "../AppNavigator";
+import type { Location } from "../domain/entities";
 
-type StoredLocation = Required<Pick<PlaceParams, "lat" | "lon">> & Pick<PlaceParams, "name">;
+type StoredLocation = Required<Pick<Location, "lat" | "lon">> & Pick<Location, "name">;
 
 const SELECTED_LOCATION_KEY = "selectedLocation";
 const CURRENT_SENTINEL = "__CURRENT_LOCATION__";

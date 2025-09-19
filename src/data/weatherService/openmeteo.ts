@@ -1,7 +1,5 @@
-import { WeatherInfo as WeatherInfo } from "./types";
-import { Current, CurrentDto }  from "./types";
-import { Hour, HourlyDto }  from "./types";
-import { Day, DailyDto }  from "./types";
+import { CurrentDto, HourlyDto, DailyDto }  from "./dto";
+import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
 

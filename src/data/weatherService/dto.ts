@@ -10,16 +10,6 @@ export type CurrentDto = {
   weather_code: number;
 };
 
-export type Current = {
-  dateTime: number;
-  tempC: number;
-  humidity: number;
-  windSpeedKmh: number;
-  precipitationMm: number;
-  weather_desc: string;
-  icon: string;
-};
-
 
 // Types for the hourly forecast data from Open-Meteo API
 export type HourlyDto = {
@@ -34,17 +24,6 @@ export type HourlyDto = {
   weather_code: number[];
 };
 
-export type Hour = {
-  dateTime: number;
-  tempC: number;
-  humidity: number;
-  windSpeedKmh: number;
-  uvIndex: number;
-  precipitationMm: number;
-  precipitationProb: number;
-  weather_desc: string;
-  icon: string;
-};
 
 
 // Types for the daily forecast data from Open-Meteo API
@@ -63,24 +42,3 @@ export type DailyDto = {
 };
 
 
-export type Day = {
-  dateTime: number;
-  minC: number;
-  maxC: number;
-  windSpeedKmh: number;
-  uvIndex: number;
-  sunrise: number;
-  sunset: number;
-  precipitationMm: number;
-  precipitationProb: number;
-  cloudCover: number;
-  weather_desc: string;
-  icon: string;
-};
-
-// Combined type for all weather information
-export type WeatherInfo = {
-  current: Current;
-  hours: Hour[];
-  days: Day[];
-};

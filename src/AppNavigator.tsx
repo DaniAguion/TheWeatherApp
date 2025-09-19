@@ -4,6 +4,7 @@ import { Text, useColorScheme } from "react-native";
 import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Location, Hour, Day } from "./domain/entities";
 
 
 import WeatherScreen from "./ui/weatherScreen/WeatherScreen";
@@ -14,13 +15,11 @@ import FavoritesScreen from "./ui/FavoritesScreen";
 import SettingsScreen from "./ui/SettingsScreen";
 
 
-export type PlaceParams = { name?: string; lat: number; lon: number };
-
 export type HomeStackParamList = {
-  MyWeather: PlaceParams | undefined;
-  Weather: PlaceParams | undefined;
-  NextHours: { hours: any[]; title?: string };
-  NextDays: { days: any[]; title?: string };
+  MyWeather: Location | undefined;
+  Weather: Location | undefined;
+  NextHours: { hours: Hour[]; title?: string };
+  NextDays: { days: Day[]; title?: string };
 };
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
