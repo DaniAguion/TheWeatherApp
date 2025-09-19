@@ -14,7 +14,8 @@ type Props = {
 
 
 export default function WeatherScreen({ navigation, route, refreshLocation }: Props) {
-  const { name, lat, lon } = route.params;
+  const locationName = route.params.name ?? "Ubicación actual";
+  const { lat, lon } = route.params;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,8 +58,6 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   );
   if (!data) return null;
 
-  const location = name ?? "Desconocida";
-
   // Filter the next 24 hours to show in the "Next Hours" preview
   const now = data?.current.dateTime;
   const in24h = now + 24 * 60 * 60 * 1000;
@@ -84,7 +83,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextHours", {
-          title: `${location} - Próximas horas`,
+          title: `${locationName} - Próximas horas`,
           hours: next72h,
         });
       }
@@ -98,7 +97,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextDays", {
-          title: `${location} - Pronóstico 7 días`,
+          title: `${locationName} - Pronóstico 7 días`,
           days: data.days,
         });
       }
@@ -113,7 +112,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     >
       <View style={styles.current_container}>
         <View style={styles.current_main_group}>
-          <Text style={styles.location}>{location}</Text>
+          <Text style={styles.location}>{locationName}</Text>
           <View style={styles.current_subgroup}>
             <Text style={styles.current_temp}>{Math.round(data.current.tempC)}°</Text>
             <Text style={styles.current_icon}>{data.current.icon}</Text>
