@@ -3,6 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../api-weather/index";
+import { getLocationName } from "../../api-nominatim/locationName";
 import type { WeatherInfo, Hour } from "../../api-weather/types";
 import styles from "./WeatherScreen.styles";
 
@@ -14,18 +15,34 @@ type Props = {
 
 
 export default function WeatherScreen({ navigation, route, refreshLocation }: Props) {
-  const locationName = route.params.name ?? "Ubicación actual";
   const { lat, lon } = route.params;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<WeatherInfo | null>(null);
+  const [weatherData, setWeatherData] = useState<WeatherInfo | null>(null);
+  const [locationName, setLocationName] = useState<String | null>(null);
 
-  const load = async () => {
+
+  // Fetch weather data when lat/lon changes
+  useEffect(() => { 
+    fetchData();
+  }, [lat, lon]);
+
+
+  // Function to fetch weather data
+  const fetchData = async () => {
     try {
       setError(null);
-      const w = await getWeather(lat, lon);
-      setData(w);
+      const weatherData = await getWeather(lat, lon);
+      const locationData = await getLocationName(lat, lon);
+      if (locationData) {
+        const { city, country } = locationData;
+        setLocationName(city ? (country ? `${city}, ${country}` : city) : country ?? "Desconocido");
+      } else {
+        setLocationName(route.params.name ?? "Desconocido");
+      }
+
+      setWeatherData(weatherData);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando el clima");
     } finally {
@@ -34,10 +51,8 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     }
   };
 
-  const listNativeGestureRef = useRef(null);
 
-  useEffect(() => { load(); }, [lat, lon]);
-
+  // Clear view when navigating away
   useFocusEffect(useCallback(() => {
     return () => {};
   }, []));
@@ -46,22 +61,24 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   const onRefresh = () => {
     setRefreshing(true);
     refreshLocation?.();
-    load();
+    fetchData();
   };
 
+  // Render loading, error
   if (loading) return <ActivityIndicator style={styles.loading} />;
   if (error) return (
     <View style={styles.errorContainer}>
       <Text style={styles.errorText}>{error}</Text>
-      <Button title="Reintentar" onPress={load} />
+      <Button title="Reintentar" onPress={fetchData} />
     </View>
   );
-  if (!data) return null;
+  if (!weatherData) return null;
+
 
   // Filter the next 24 hours to show in the "Next Hours" preview
-  const now = data?.current.dateTime;
+  const now = weatherData?.current.dateTime;
   const in24h = now + 24 * 60 * 60 * 1000;
-  const hours = data?.hours ?? [];
+  const hours = weatherData?.hours ?? [];
   const next24h = hours.filter(h => {
     const t = h.dateTime;
     return t > now && t < in24h;
@@ -98,13 +115,13 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
       if (success) {
         navigation.navigate("NextDays", {
           title: `${locationName} - Pronóstico 7 días`,
-          days: data.days,
+          days: weatherData.days,
         });
       }
     });
 
   
-
+  // Main render
   return (
     <ScrollView
       style={styles.container}
@@ -114,15 +131,15 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
         <View style={styles.current_main_group}>
           <Text style={styles.location}>{locationName}</Text>
           <View style={styles.current_subgroup}>
-            <Text style={styles.current_temp}>{Math.round(data.current.tempC)}°</Text>
-            <Text style={styles.current_icon}>{data.current.icon}</Text>
+            <Text style={styles.current_temp}>{Math.round(weatherData.current.tempC)}°</Text>
+            <Text style={styles.current_icon}>{weatherData.current.icon}</Text>
           </View>
-          <Text style={styles.current_weather_desc}>{data.current.weather_desc}</Text>
+          <Text style={styles.current_weather_desc}>{weatherData.current.weather_desc}</Text>
         </View>
         <View style={styles.current_sec_group}>
-          <Text style={styles.secondary_text}>🌫️  {Math.round(data.current.humidity)} %</Text> 
-          <Text style={styles.secondary_text}>🌧️ {Math.round(data.current.precipitationMm)} mm</Text>
-          <Text style={styles.secondary_text}>💨 {Math.round(data.current.windSpeedKmh)} km/h</Text>
+          <Text style={styles.secondary_text}>🌫️  {Math.round(weatherData.current.humidity)} %</Text> 
+          <Text style={styles.secondary_text}>🌧️ {Math.round(weatherData.current.precipitationMm)} mm</Text>
+          <Text style={styles.secondary_text}>💨 {Math.round(weatherData.current.windSpeedKmh)} km/h</Text>
         </View>
       </View>
       <GestureHandlerRootView>
@@ -151,7 +168,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
             <Text style={styles.hours_title}>Pronóstico 7 días</Text>
             <View style={styles.list_container}>
               <FlatList
-                data={data.days}
+                data={weatherData.days}
                 style={styles.list}
                 horizontal
                 keyExtractor={(d) => String(d.dateTime)}
