@@ -1,22 +1,20 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
+import { View, Text, ActivityIndicator, Button, ScrollView, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../data/weatherService/index";
 import { getLocationName } from "../../data/locationService/fetchLocationName";
 import type { WeatherInfo, Hour } from "../../domain/entities";
+import { Location } from "../../domain/entities";
 import styles from "./WeatherScreen.styles";
 
-type Props = {
-  navigation: any;
-  route: { params: { name?: string; lat: number; lon: number } };
-};
 
+export type WeatherScreenParams = Location;
+type WeatherScreenProps = {navigation: any; route: { params: WeatherScreenParams }};
 
-export default function WeatherScreen({ navigation, route }: Props) {
+export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
   const { lat, lon } = route.params;
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [weatherData, setWeatherData] = useState<WeatherInfo | null>(null);
   const [locationName, setLocationName] = useState<String | null>(null);
@@ -40,7 +38,6 @@ export default function WeatherScreen({ navigation, route }: Props) {
       setError(e?.message ?? "Error cargando el clima");
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 

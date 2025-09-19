@@ -2,9 +2,11 @@ import { FlatList, Text, View } from "react-native";
 import type { Day } from "../../domain/entities"
 import styles from "./DailyScreen.styles";
 
-type Props = { route: { params: { days: Day[]; title?: string } } };
 
-export default function DailyScreen({ route }: Props) {
+export type DailyScreenParams = { days: Day[]; title: string };
+type DailyyScreenProps = { route: { params: DailyScreenParams} };
+
+export default function DailyScreen({ route }: DailyyScreenProps) {
   const { days, title } = route.params;
 
   return (

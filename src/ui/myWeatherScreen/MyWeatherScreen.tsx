@@ -79,9 +79,9 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
 
   const fallback = savedLocation ?? DEFAULT_SELECTED_LOCATION;
   const params = route?.params;
-  const lat = params?.lat ?? selectedLocation?.lat ?? coords?.lat ?? fallback.lat;
-  const lon = params?.lon ?? selectedLocation?.lon ?? coords?.lon ?? fallback.lon;
-  const name = params?.name ?? selectedLocation?.name ?? (coords ? "Ubicación" : fallback.name);
+  const lat = selectedLocation?.lat ?? coords?.lat ?? fallback.lat;
+  const lon = selectedLocation?.lon ?? coords?.lon ?? fallback.lon;
+  const name = selectedLocation?.name ?? (coords ? "Ubicación" : fallback.name);
   const savedLocationName = savedLocation?.name ?? DEFAULT_SELECTED_LOCATION.name;
   const buttonsDisabled = selectedLoading;
 

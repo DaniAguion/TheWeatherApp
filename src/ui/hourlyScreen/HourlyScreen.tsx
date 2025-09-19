@@ -2,10 +2,11 @@ import { FlatList, Text, View } from "react-native";
 import type { Hour } from "../../domain/entities"
 import styles from "./HourlyScreen.styles";
 
-type Props = { route: { params: { hours: Hour[]; title?: string } } };
+export type HourlyScreenParams = { hours: Hour[]; title: string };
+type HourlyScreenProps = { route: { params: HourlyScreenParams} };
 
-export default function HourlyScreen({ route }: Props) {
-  const { hours, title } = route.params;
+export default function HourlyScreen({ route }: HourlyScreenProps) {
+  const hours = route.params.hours;
 
   return (
     <View style={{ flex: 1 }}>

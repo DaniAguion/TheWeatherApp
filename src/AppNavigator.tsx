@@ -4,7 +4,10 @@ import { Text, useColorScheme } from "react-native";
 import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Location, Hour, Day } from "./domain/entities";
+
+import type { WeatherScreenParams } from "./ui/weatherScreen/WeatherScreen";
+import type { HourlyScreenParams } from "./ui/hourlyScreen/HourlyScreen";
+import type { DailyScreenParams } from "./ui/dailyScreen/DailyScreen";
 
 
 import WeatherScreen from "./ui/weatherScreen/WeatherScreen";
@@ -16,10 +19,10 @@ import SettingsScreen from "./ui/SettingsScreen";
 
 
 export type HomeStackParamList = {
-  MyWeather: Location | undefined;
-  Weather: Location;
-  NextHours: { hours: Hour[]; title: string };
-  NextDays: { days: Day[]; title: string };
+  MyWeather: undefined;
+  Weather: WeatherScreenParams;
+  NextHours: HourlyScreenParams;
+  NextDays: DailyScreenParams;
 };
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -40,16 +43,12 @@ function HomeStackNavigator() {
       <HomeStack.Screen
         name="NextHours"
         component={HourlyScreen}
-        options={({ route }) => ({
-          title: route.params.title
-        })}
+        options={({ route }) => ({ title: route.params.title })}
       />
       <HomeStack.Screen
         name="NextDays"
         component={DailyScreen}
-        options={({ route }) => ({
-          title: route.params.title
-        })}
+        options={({ route }) => ({ title: route.params.title })}
       />
     </HomeStack.Navigator>
   );
