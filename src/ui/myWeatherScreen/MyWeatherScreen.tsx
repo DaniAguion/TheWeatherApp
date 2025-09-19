@@ -36,9 +36,6 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
     }, [refresh, usingCurrentLocation])
   );
 
-  const handleRefreshLocation = useCallback(() => {
-    if (usingCurrentLocation) refresh();
-  }, [refresh, usingCurrentLocation]);
 
   const handleSelectCurrent = useCallback(() => {
     (async () => {
@@ -113,7 +110,6 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
       <WeatherScreen
         navigation={navigation}
         route={{ params: { name, lat, lon } }}
-        refreshLocation={handleRefreshLocation}
       />
     );
   }

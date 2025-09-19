@@ -17,9 +17,9 @@ import SettingsScreen from "./ui/SettingsScreen";
 
 export type HomeStackParamList = {
   MyWeather: Location | undefined;
-  Weather: Location | undefined;
-  NextHours: { hours: Hour[]; title?: string };
-  NextDays: { days: Day[]; title?: string };
+  Weather: Location;
+  NextHours: { hours: Hour[]; title: string };
+  NextDays: { days: Day[]; title: string };
 };
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -41,14 +41,14 @@ function HomeStackNavigator() {
         name="NextHours"
         component={HourlyScreen}
         options={({ route }) => ({
-          title: route.params?.title ?? "Próximas horas",
+          title: route.params.title
         })}
       />
       <HomeStack.Screen
         name="NextDays"
         component={DailyScreen}
         options={({ route }) => ({
-          title: route.params?.title ?? "Pronóstico",
+          title: route.params.title
         })}
       />
     </HomeStack.Navigator>

@@ -10,11 +10,10 @@ import styles from "./WeatherScreen.styles";
 type Props = {
   navigation: any;
   route: { params: { name?: string; lat: number; lon: number } };
-  refreshLocation?: () => void;
 };
 
 
-export default function WeatherScreen({ navigation, route, refreshLocation }: Props) {
+export default function WeatherScreen({ navigation, route }: Props) {
   const { lat, lon } = route.params;
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,13 +49,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   useFocusEffect(useCallback(() => {
     return () => {};
   }, []));
-
-  // Pull to refresh handler
-  const onRefresh = () => {
-    setRefreshing(true);
-    refreshLocation?.();
-    fetchData();
-  };
+  
 
   // Render loading, error
   if (loading) return <ActivityIndicator style={styles.loading} />;
@@ -94,7 +87,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextHours", {
-          title: `${locationName} - Próximas horas`,
+          title: locationName && locationName.trim().length > 0 ? `${locationName} - Próximas horas` : "Próximas horas",
           hours: next72h,
         });
       }
@@ -108,7 +101,7 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextDays", {
-          title: `${locationName} - Pronóstico 7 días`,
+          title: locationName && locationName.trim().length > 0 ? `${locationName} - Pronósticos 7 días` : "Pronósticos 7 días",
           days: weatherData.days,
         });
       }
@@ -119,7 +112,6 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.current_container}>
         <View style={styles.current_main_group}>
