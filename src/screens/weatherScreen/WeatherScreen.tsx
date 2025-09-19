@@ -3,7 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, RefreshControl, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../api-weather/index";
-import { getLocationName } from "../../api-nominatim/locationName";
+import { getLocationName } from "../../api-nominatim/index";
 import type { WeatherInfo, Hour } from "../../api-weather/types";
 import styles from "./WeatherScreen.styles";
 
@@ -33,15 +33,9 @@ export default function WeatherScreen({ navigation, route, refreshLocation }: Pr
   const fetchData = async () => {
     try {
       setError(null);
+      const locationName = await getLocationName(lat, lon);
+      setLocationName(locationName ?? route.params.name ?? "Desconocido");
       const weatherData = await getWeather(lat, lon);
-      const locationData = await getLocationName(lat, lon);
-      if (locationData) {
-        const { city, country } = locationData;
-        setLocationName(city ? (country ? `${city}, ${country}` : city) : country ?? "Desconocido");
-      } else {
-        setLocationName(route.params.name ?? "Desconocido");
-      }
-
       setWeatherData(weatherData);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando el clima");
