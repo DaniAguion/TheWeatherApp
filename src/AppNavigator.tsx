@@ -5,15 +5,15 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import type { WeatherScreenParams } from "./presentation/weatherScreen/WeatherScreen";
-import type { HourlyScreenParams } from "./presentation/hourlyScreen/HourlyScreen";
-import type { DailyScreenParams } from "./presentation/dailyScreen/DailyScreen";
+import type { WeatherScreenParams } from "./presentation/weather/WeatherScreen";
+import type { HourlyScreenParams } from "./presentation/hourly/HourlyScreen";
+import type { DailyScreenParams } from "./presentation/daily/DailyScreen";
 
 
-import WeatherScreen from "./presentation/weatherScreen/WeatherScreen";
-import HourlyScreen from "./presentation/hourlyScreen/HourlyScreen";
-import DailyScreen from "./presentation/dailyScreen/DailyScreen";
-import MyWeatherScreen from "./presentation/myWeatherScreen/MyWeatherScreen";
+import WeatherScreen from "./presentation/weather/WeatherScreen";
+import HourlyScreen from "./presentation/hourly/HourlyScreen";
+import DailyScreen from "./presentation/daily/DailyScreen";
+import MyWeatherScreen from "./presentation/myweather/MyWeatherScreen";
 import FavoritesScreen from "./presentation/FavoritesScreen";
 import SettingsScreen from "./presentation/SettingsScreen";
 

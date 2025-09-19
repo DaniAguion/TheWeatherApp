@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import WeatherScreen from "../weatherScreen/WeatherScreen";
+import WeatherScreen from "../weather/WeatherScreen";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { useSelectedLocation, DEFAULT_SELECTED_LOCATION } from "../../hooks/useSelectedLocation";
 import { LocationPermission } from "../../native/LocationPermission";
