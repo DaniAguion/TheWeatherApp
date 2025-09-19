@@ -3,13 +3,14 @@ import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from "react
 import { useFocusEffect } from "@react-navigation/native";
 import WeatherScreen from "../weatherScreen/WeatherScreen";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
+import { useSelectedLocation, DEFAULT_SELECTED_LOCATION } from "../../hooks/useSelectedLocation";
+import { LocationPermission } from "../../native/LocationPermission";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { HomeStackParamList } from "../../AppNavigator";
 import styles from "./MyWeatherScreen.styles";
-import { useSelectedLocation, DEFAULT_SELECTED_LOCATION } from "../../hooks/useSelectedLocation";
-import { LocationPermission } from "../../native/LocationPermission";
 
-type Props = NativeStackScreenProps<HomeStackParamList, "MyWeather">;
+
+type Props = NativeStackScreenProps<HomeStackParamList>;
 
 export default function MyWeatherScreen({ navigation, route }: Props) {
   const {
@@ -22,7 +23,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
     saveSelectedLocation,
   } = useSelectedLocation();
   const shouldUseCurrentLocation = !selectedLoading && usingCurrentLocation;
-  const { coords, loading, error, refresh } = useCurrentLocation({ enabled: shouldUseCurrentLocation });
+  const { coords: currentLocation, loading, error, refresh } = useCurrentLocation({ enabled: shouldUseCurrentLocation });
   const isFirstFocus = useRef(true);
   const isUsingCurrentLocation = usingCurrentLocation;
 
@@ -79,9 +80,9 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
 
   const fallback = savedLocation ?? DEFAULT_SELECTED_LOCATION;
   const params = route?.params;
-  const lat = selectedLocation?.lat ?? coords?.lat ?? fallback.lat;
-  const lon = selectedLocation?.lon ?? coords?.lon ?? fallback.lon;
-  const name = selectedLocation?.name ?? (coords ? "Ubicación" : fallback.name);
+  const lat = (isUsingCurrentLocation? currentLocation?.lat : selectedLocation?.lat) ?? fallback.lat;
+  const lon = (isUsingCurrentLocation? currentLocation?.lon : selectedLocation?.lon) ?? fallback.lat;
+  const name = (isUsingCurrentLocation? "Ubicación" : selectedLocation?.name) ?? fallback.name;
   const savedLocationName = savedLocation?.name ?? DEFAULT_SELECTED_LOCATION.name;
   const buttonsDisabled = selectedLoading;
 
@@ -93,13 +94,13 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         <ActivityIndicator size="large" />
       </View>
     );
-  } else if (!params && shouldUseCurrentLocation && loading && !coords) {
+  } else if (!params && shouldUseCurrentLocation && loading && !currentLocation) {
     content = (
       <View style={styles.state_container}>
         <ActivityIndicator size="large" />
       </View>
     );
-  } else if (!params && shouldUseCurrentLocation && error && !coords) {
+  } else if (!params && shouldUseCurrentLocation && error && !currentLocation) {
     content = (
       <View style={styles.state_container}>
         <Text style={styles.error_text}>No es posible obtener la ubicación actual</Text>

@@ -12,7 +12,7 @@ async function fetchLocationName(lat: number, lon: number): Promise<string> {
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = (await response.json()) as NominatimResponse;
-  return data.name || "";
+  return data.name || "Desconocido";
 }
 
 // Function to get the location name

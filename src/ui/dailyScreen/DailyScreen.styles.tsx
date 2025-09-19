@@ -1,6 +1,10 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
+  view_container: {
+    flex: 1,
+    backgroundColor: "#f0f0f0",
+  },
   day_row: {
     alignItems: "center",
     justifyContent: "center",

@@ -4,13 +4,15 @@ import { View, Text, ActivityIndicator, Button, ScrollView, FlatList } from "rea
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { getWeather } from "../../data/weatherService/index";
 import { getLocationName } from "../../data/locationService/fetchLocationName";
-import type { WeatherInfo, Hour } from "../../domain/entities";
-import { Location } from "../../domain/entities";
+import type { Location, WeatherInfo, Hour } from "../../domain/entities";
 import styles from "./WeatherScreen.styles";
 
 
 export type WeatherScreenParams = Location;
-type WeatherScreenProps = {navigation: any; route: { params: WeatherScreenParams }};
+type WeatherScreenProps = {
+  navigation: any;
+  route: { params: WeatherScreenParams };
+};
 
 export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
   const { lat, lon } = route.params;
@@ -20,18 +22,17 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   const [locationName, setLocationName] = useState<String | null>(null);
 
 
+  // Clear view when navigating away
+  useFocusEffect(useCallback(() => { return () => {} }, []));
+
   // Fetch weather data when lat/lon changes
-  useEffect(() => { 
-    fetchData();
-  }, [lat, lon]);
+  useEffect(() => { fetchData() }, [lat, lon]);
 
-
-  // Function to fetch weather data
   const fetchData = async () => {
     try {
       setError(null);
       const locationName = await getLocationName(lat, lon);
-      setLocationName(locationName ?? route.params.name ?? "Desconocido");
+      setLocationName(locationName ?? route.params.name);
       const weatherData = await getWeather(lat, lon);
       setWeatherData(weatherData);
     } catch (e: any) {
@@ -41,12 +42,6 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     }
   };
 
-
-  // Clear view when navigating away
-  useFocusEffect(useCallback(() => {
-    return () => {};
-  }, []));
-  
 
   // Render loading, error
   if (loading) return <ActivityIndicator style={styles.loading} />;

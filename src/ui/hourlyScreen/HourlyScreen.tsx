@@ -2,6 +2,7 @@ import { FlatList, Text, View } from "react-native";
 import type { Hour } from "../../domain/entities"
 import styles from "./HourlyScreen.styles";
 
+
 export type HourlyScreenParams = { hours: Hour[]; title: string };
 type HourlyScreenProps = { route: { params: HourlyScreenParams} };
 
@@ -9,7 +10,7 @@ export default function HourlyScreen({ route }: HourlyScreenProps) {
   const hours = route.params.hours;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={ styles.view_container }>
         <FlatList
           data={hours}
           keyExtractor={(d) => String(d.dateTime)}
@@ -50,19 +51,6 @@ export default function HourlyScreen({ route }: HourlyScreenProps) {
                 </View>
               </View>
             </View>
-            /*
-            <View style={styles.hour_row}>
-              <Text style={styles.hour_desc}> {new Date(item.dateTime).getHours()}:00</Text>
-              <Text style={styles.medium_icon}> {item.icon}</Text>
-              <View style={styles.info_column}>
-                  <Text style={styles.info_title}>Lluvia</Text>
-                  <Text style={styles.info_data}>{Math.round(item.precipitationProb)}% {Math.round(item.precipitationMm)} mm</Text>
-              </View>
-              <Text style={styles.hour_desc}>🌧️ {Math.round(item.precipitationProb)}% {Math.round(item.precipitationMm)} mm</Text>
-              <Text style={styles.hour_desc}>💨 {Math.round(item.windSpeedKmh)} km/h</Text>
-              <Text style={styles.hour_desc}>💧 {Math.round(item.humidity)}%</Text>
-            </View>
-            */
           )}
         />
     </View>

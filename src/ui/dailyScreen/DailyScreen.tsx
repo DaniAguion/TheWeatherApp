@@ -10,7 +10,7 @@ export default function DailyScreen({ route }: DailyyScreenProps) {
   const { days, title } = route.params;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={ styles.view_container }>
         <FlatList
           data={days}
           keyExtractor={(d) => String(d.dateTime)}
