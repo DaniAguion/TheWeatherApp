@@ -19,7 +19,7 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
         setError(null);
         try {
             const [locationName, weatherData] = await Promise.all([
-                getLocationName(lat, lon).catch(() => null),
+                getLocationName(lat, lon),
                 getWeather(lat, lon),
             ]);
             setLocationName(locationName ?? fallbackName ?? null);
