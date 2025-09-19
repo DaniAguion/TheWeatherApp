@@ -1,5 +1,5 @@
 import { FlatList, Text, View } from "react-native";
-import type { Hour } from "../../api-weather/types";
+import type { Hour } from "../../services/weatherService/types";
 import styles from "./HourlyScreen.styles";
 
 type Props = { route: { params: { hours: Hour[]; title?: string } } };

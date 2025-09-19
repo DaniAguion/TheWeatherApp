@@ -1,6 +1,6 @@
 import { fetchAllWeatherInfo } from "./openmeteo";
 import { WeatherInfo } from "./types";
-import { getCached, setCached } from "../storage/cache";
+import { getCached, setCached } from "../localStorage/cache";
 
 export async function getWeather(lat: number, lon: number): Promise<WeatherInfo> {
   const key = `openmeteo:${lat.toFixed(3)},${lon.toFixed(3)}`;

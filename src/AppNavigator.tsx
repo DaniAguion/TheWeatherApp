@@ -6,12 +6,12 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 
-import WeatherScreen from "./screens/weatherScreen/WeatherScreen";
-import HourlyScreen from "./screens/hourlyScreen/HourlyScreen";
-import DailyScreen from "./screens/dailyScreen/DailyScreen";
-import MyWeatherScreen from "./screens/myWeatherScreen/MyWeatherScreen";
-import FavoritesScreen from "./screens/FavoritesScreen";
-import SettingsScreen from "./screens/SettingsScreen";
+import WeatherScreen from "./ui/weatherScreen/WeatherScreen";
+import HourlyScreen from "./ui/hourlyScreen/HourlyScreen";
+import DailyScreen from "./ui/dailyScreen/DailyScreen";
+import MyWeatherScreen from "./ui/myWeatherScreen/MyWeatherScreen";
+import FavoritesScreen from "./ui/FavoritesScreen";
+import SettingsScreen from "./ui/SettingsScreen";
 
 
 export type PlaceParams = { name?: string; lat: number; lon: number };
