@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { IWeatherService } from "../../domain/ports";
-import { getLocationName } from "../../data/locationService/fetchLocationName";
+import { IWeatherService, IReverseGeoService } from "../../domain/ports";
 import type { Current, Hour, Day, WeatherInfo } from "../../domain/entities";
 
 type UseWeatherVMDeps = {
     weatherService: IWeatherService;
+    reverseGeoService:  IReverseGeoService;
 };
 
 export function useWeatherVM(
@@ -13,7 +13,7 @@ export function useWeatherVM(
     deps: UseWeatherVMDeps,
     fallbackName?: string,
 ) {
-    const { weatherService } = deps;
+    const { weatherService, reverseGeoService } = deps;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [locationName, setLocationName] = useState<string | null>(fallbackName ?? null);
@@ -29,7 +29,7 @@ export function useWeatherVM(
         setLoading(true);
         setError(null);
         try {
-            const locationName = fallbackName ?? await getLocationName(lat, lon);
+            const locationName = fallbackName ?? await reverseGeoService.getLocationName({ lat, lon });
             const weatherData = await weatherService.getWeather({ lat, lon });
             setLocationName(locationName);
             setCurrent(weatherData.current);

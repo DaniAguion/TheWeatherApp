@@ -5,6 +5,6 @@ export interface IWeatherService {
   getWeather(params: { lat: number; lon: number }): Promise<WeatherInfo>;
 }
 
-export interface IReverseGeocoder {
-  getLocationName(params: { lat: number; lon: number}): Promise<string | null>;
+export interface IReverseGeoService {
+  getLocationName(params: { lat: number; lon: number}): Promise<string>;
 }

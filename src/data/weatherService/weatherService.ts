@@ -6,17 +6,17 @@ import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappe
 
 
 export class WeatherService implements IWeatherService {
-  constructor(private baseUrl = "https://api.open-meteo.com/v1/forecast") {}
 
   async getWeather({ lat, lon }: { lat: number; lon: number }): Promise<WeatherInfo> {
+
     // Check cache first
-    const ttl = 20 * 60 * 1000; // 20 min
+    const ttl = 10 * 60 * 1000; // Weather data valid for 10 min
     const cacheKey = `openmeteo:${lat.toFixed(3)},${lon.toFixed(3)}`;
     const cached = await getCached<WeatherInfo>(cacheKey, ttl);
     if (cached) return cached;
 
     // Fetch from API if not in cache or expired
-    const base = `${this.baseUrl}?latitude=${lat}&longitude=${lon}&timezone=auto`;
+    const base = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
     const url = base + currentOptions + hourlyOptions + dailyOptions;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -26,19 +26,15 @@ export class WeatherService implements IWeatherService {
     const hours: Hour[] = hourlyDtoToEntity(data.hourly);
     const days: Day[] = dailyDtoToEntity(data.daily);
 
+    await setCached(cacheKey, {
+      current: current,
+      hours: hours,
+      days: days
+    });
+
     return { current, hours, days };
   }
-}
 
-// Function to fetch only the current weather data
-export async function fetchCurrentWeather(lat: number, lon: number): Promise<Current> {
-  const basicUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
-  const url = basicUrl + currentOptions;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const data = (await response.json()) as OpenMeteoResponse;
-
-  return currentDtoToEntity(data.current);
 }
 
 // Parameters to request from Open-Meteo API
