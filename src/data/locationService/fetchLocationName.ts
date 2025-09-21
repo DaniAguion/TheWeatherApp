@@ -1,7 +1,5 @@
-import type { NominatimResponse } from "./types";
+import type { NominatimResponse } from "./dto";
 import { getCached, setCached } from "../localStorage/cache";
-import type { IWeatherService } from "../../domain/ports";
-
 
 
 // Function to get the location name

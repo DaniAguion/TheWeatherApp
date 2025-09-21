@@ -1,5 +1,6 @@
 import type { IWeatherService } from "../../domain/ports";
 import { OpenMeteoResponse }  from "./dto";
+import { getCached, setCached } from "../localStorage/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
@@ -8,8 +9,15 @@ export class WeatherServive implements IWeatherService {
   constructor(private baseUrl = "https://api.open-meteo.com/v1/forecast") {}
 
   async getWeather({ lat, lon }: { lat: number; lon: number }): Promise<WeatherInfo> {
-    const basicUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
-    const url = basicUrl + currentOptions + hourlyOptions + dailyOptions;
+    // Check cache first
+    const ttl = 20 * 60 * 1000; // 20 min
+    const cacheKey = `openmeteo:${lat.toFixed(3)},${lon.toFixed(3)}`;
+    const cached = await getCached<WeatherInfo>(cacheKey, ttl);
+    if (cached) return cached;
+
+    // Fetch from API if not in cache or expired
+    const base = `${this.baseUrl}?latitude=${lat}&longitude=${lon}&timezone=auto`;
+    const url = base + currentOptions + hourlyOptions + dailyOptions;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = (await response.json()) as OpenMeteoResponse;

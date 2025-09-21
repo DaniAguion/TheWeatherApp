@@ -1,9 +1,17 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { getWeather } from "../../data/weatherService/index";
-import { LocationNameServiceImpl } from "../../data/locationService/fetchLocationName";
+import { IWeatherService } from "../../domain/ports";
+import { getLocationName } from "../../data/locationService/fetchLocationName";
 import type { Current, Hour, Day, WeatherInfo } from "../../domain/entities";
 
-export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
+export function useWeatherVM(
+  lat: number,
+  lon: number,
+  deps: {
+    weatherService: IWeatherService;
+    fallbackName?: string;
+  }
+) {
+    const { weatherService, fallbackName } = deps;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [locationName, setLocationName] = useState<string | null>(fallbackName ?? null);
@@ -20,7 +28,7 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
         setError(null);
         try {
             const locationName = fallbackName ?? await getLocationName(lat, lon);
-            const weatherData = await getWeather(lat, lon);
+            const weatherData = await weatherService.getWeather({ lat, lon });
             setLocationName(locationName);
             setCurrent(weatherData.current);
             setHours(weatherData.hours ?? []);
