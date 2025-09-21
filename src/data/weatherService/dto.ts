@@ -42,3 +42,9 @@ export type DailyDto = {
 };
 
 
+// Type for the complete response from Open-Meteo API
+export type OpenMeteoResponse = {
+  current: CurrentDto;
+  hourly: HourlyDto;
+  daily: DailyDto;
+};

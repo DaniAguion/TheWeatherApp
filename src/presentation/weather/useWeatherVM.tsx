@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { getWeather } from "../../data/weatherService/index";
-import { getLocationName } from "../../data/locationService/fetchLocationName";
+import { LocationNameServiceImpl } from "../../data/locationService/fetchLocationName";
 import type { Current, Hour, Day, WeatherInfo } from "../../domain/entities";
 
 export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
@@ -49,5 +49,13 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
         return hours.filter(h => h.dateTime > now && h.dateTime < in72h);
     }, [current, hours]);
 
-    return { loading, error, locationName, current, next24h, next72h, days, refetch: fetchData };
+    return { 
+        loading, 
+        error, 
+        locationName, 
+        current, 
+        next24h, 
+        next72h, 
+        days, 
+        refetch: fetchData };
 }
