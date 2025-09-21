@@ -1,6 +1,6 @@
 import type { IReverseGeoService } from "../../domain/ports";
 import type { NominatimResponse } from "./dto";
-import { getCached, setCached } from "../localStorage/cache";
+import { getCached, setCached } from "../storage/cache";
 
 
 export class ReverseGeoService implements IReverseGeoService {

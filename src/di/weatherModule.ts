@@ -1,5 +1,5 @@
-import { WeatherService } from "../data/weatherService/weatherService";
-import { ReverseGeoService } from "../data/locationService/reverseGeoService";
+import { WeatherService } from "../data/weather/weatherService";
+import { ReverseGeoService } from "../data/geocoding/reverseGeoService";
 import { IWeatherService, IReverseGeoService } from "../domain/ports";
 
 export type WeatherModule = {

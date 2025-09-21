@@ -1,6 +1,6 @@
 import type { IWeatherService } from "../../domain/ports";
 import { OpenMeteoResponse }  from "./dto";
-import { getCached, setCached } from "../localStorage/cache";
+import { getCached, setCached } from "../storage/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 

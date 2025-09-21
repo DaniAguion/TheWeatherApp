@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { IWeatherService, IReverseGeoService } from "../../domain/ports";
-import type { Current, Hour, Day, WeatherInfo } from "../../domain/entities";
+import type { Current, Hour, Day } from "../../domain/entities";
 
 type UseWeatherVMDeps = {
     weatherService: IWeatherService;
