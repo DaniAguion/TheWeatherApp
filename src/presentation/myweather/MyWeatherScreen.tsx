@@ -13,19 +13,25 @@ import styles from "./MyWeatherScreen.styles";
 type Props = NativeStackScreenProps<HomeStackParamList>;
 
 export default function MyWeatherScreen({ navigation, route }: Props) {
+
   const {
     selectedLocation,
     savedLocation,
     usingCurrentLocation,
-    loading: selectedLoading,
-    error: selectedError,
+    loading: loadingSelected,
+    error: errorSelected,
     clearSelectedLocation,
     saveSelectedLocation,
   } = useSelectedLocation();
-  const shouldUseCurrentLocation = !selectedLoading && usingCurrentLocation;
-  const { coords: currentLocation, loading, error, refresh } = useCurrentLocation({ enabled: shouldUseCurrentLocation });
+
+  const { 
+    coords: currentLocation, 
+    loading: loadingCurrent, 
+    error: errorCurrent, refresh 
+  } = useCurrentLocation();
+
   const isFirstFocus = useRef(true);
-  const isUsingCurrentLocation = usingCurrentLocation;
+  const selectedButtonText = savedLocation?.name ?? "Favorita";
 
   useFocusEffect(
     useCallback(() => {
@@ -65,7 +71,6 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
-    if (!shouldUseCurrentLocation) return;
     (async () => {
       try {
         const status = await LocationPermission.checkStatus();
@@ -76,31 +81,25 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         // Ignore and let the hooks handle state.
       }
     })();
-  }, [shouldUseCurrentLocation]);
+  }, []);
 
-  const fallback = savedLocation ?? DEFAULT_SELECTED_LOCATION;
-  const params = route?.params;
-  const lat = (isUsingCurrentLocation? currentLocation?.lat : selectedLocation?.lat) ?? fallback.lat;
-  const lon = (isUsingCurrentLocation? currentLocation?.lon : selectedLocation?.lon) ?? fallback.lat;
-  const name = (isUsingCurrentLocation? "Ubicación" : selectedLocation?.name) ?? fallback.name;
-  const savedLocationName = savedLocation?.name ?? DEFAULT_SELECTED_LOCATION.name;
-  const buttonsDisabled = selectedLoading;
+
+  // Determine variables for WeatherScreen depending button selection
+  const lat = usingCurrentLocation? currentLocation?.lat : selectedLocation?.lat;
+  const lon = usingCurrentLocation? currentLocation?.lon : selectedLocation?.lon;
+  const locationName = usingCurrentLocation? undefined : selectedLocation?.name;
+  const loading = usingCurrentLocation? loadingCurrent : loadingSelected;
+  const error = usingCurrentLocation? errorCurrent : errorSelected;
 
   let content: React.ReactNode;
 
-  if (!params && selectedLoading && usingCurrentLocation) {
+  if (loading){
     content = (
       <View style={styles.state_container}>
         <ActivityIndicator size="large" />
       </View>
     );
-  } else if (!params && shouldUseCurrentLocation && loading && !currentLocation) {
-    content = (
-      <View style={styles.state_container}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  } else if (!params && shouldUseCurrentLocation && error && !currentLocation) {
+  } else if (error || !lat || !lon) {
     content = (
       <View style={styles.state_container}>
         <Text style={styles.error_text}>No es posible obtener la ubicación actual</Text>
@@ -110,7 +109,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
     content = (
       <WeatherScreen
         navigation={navigation}
-        route={{ params: { name, lat, lon } }}
+        route={{ params: { name: locationName, lat, lon } }}
       />
     );
   }
@@ -121,17 +120,17 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         <TouchableOpacity
           accessibilityRole="button"
           onPress={handleSelectCurrent}
-          disabled={isUsingCurrentLocation || buttonsDisabled}
+          disabled={usingCurrentLocation}
           style={[
             styles.selector_button,
             styles.selector_button_left,
-            isUsingCurrentLocation && styles.selector_button_active,
+            usingCurrentLocation && styles.selector_button_active,
           ]}
         >
           <Text
             style={[
               styles.selector_button_text,
-              isUsingCurrentLocation && styles.selector_button_text_active,
+              usingCurrentLocation && styles.selector_button_text_active,
             ]}
           >
             Mi ubicación
@@ -140,24 +139,24 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         <TouchableOpacity
           accessibilityRole="button"
           onPress={handleSelectSaved}
-          disabled={!isUsingCurrentLocation || buttonsDisabled}
+          disabled={!usingCurrentLocation}
           style={[
             styles.selector_button,
             styles.selector_button_right,
-            !isUsingCurrentLocation && styles.selector_button_active,
+            !usingCurrentLocation && styles.selector_button_active,
           ]}
         >
           <Text
             style={[
               styles.selector_button_text,
-              !isUsingCurrentLocation && styles.selector_button_text_active,
+              !usingCurrentLocation && styles.selector_button_text_active,
             ]}
           >
-            {savedLocationName}
+            {selectedButtonText}
           </Text>
         </TouchableOpacity>
       </View>
-      {selectedError ? <Text style={styles.error_text}>{selectedError}</Text> : null}
+      {errorSelected ? <Text style={styles.error_text}>{errorSelected}</Text> : null}
       <View style={styles.content_container}>
         {content}
       </View>

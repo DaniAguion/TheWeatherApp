@@ -14,15 +14,14 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
     // Fetch weather data when lat/lon changes
     useEffect(() => { fetchData() }, [lat, lon]);
 
+    // Function to fetch location and weather data
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const [locationName, weatherData] = await Promise.all([
-                getLocationName(lat, lon),
-                getWeather(lat, lon),
-            ]);
-            setLocationName(locationName ?? fallbackName ?? null);
+            const locationName = fallbackName ?? await getLocationName(lat, lon);
+            const weatherData = await getWeather(lat, lon);
+            setLocationName(locationName);
             setCurrent(weatherData.current);
             setHours(weatherData.hours ?? []);
             setDays(weatherData.days ?? []);
@@ -33,6 +32,8 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
         }
     }, [lat, lon, fallbackName]);
 
+
+    // Memorized next 24h and 72h forecasts
     const next24h = useMemo<Hour[]>(() => {
         if (!current || !hours) return [];
         const now = current.dateTime;
@@ -40,6 +41,7 @@ export function useWeatherVM(lat: number, lon: number, fallbackName?: string) {
         return hours.filter(h => h.dateTime > now && h.dateTime < in24h);
     }, [current, hours]);
 
+    
     const next72h = useMemo<Hour[]>(() => {
         if (!current || !hours) return [];
         const now = current.dateTime;

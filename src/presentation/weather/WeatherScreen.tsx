@@ -37,7 +37,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextHours", {
-          title: locationName && locationName.trim().length > 0 ? `${locationName} - Próximas horas` : "Próximas horas",
+          title: (locationName && locationName.trim().length > 0) ? `${locationName} - Próximas horas` : "Próximas horas",
           hours: next72h,
         });
       }
@@ -51,7 +51,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     .onEnd((_evt, success) => {
       if (success) {
         navigation.navigate("NextDays", {
-          title: locationName && locationName.trim().length > 0 ? `${locationName} - Pronósticos 7 días` : "Pronósticos 7 días",
+          title: (locationName && locationName.trim().length > 0) ? `${locationName} - Pronósticos 7 días` : "Pronósticos 7 días",
           days: days,
         });
       }
@@ -65,7 +65,9 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     >
       <View style={styles.current_container}>
         <View style={styles.current_main_group}>
-          <Text style={styles.location}>{locationName}</Text>
+          <Text style={styles.location}>{
+            (locationName && locationName.trim().length > 0) ? locationName : "Desconocida"
+            }</Text>
           <View style={styles.current_subgroup}>
             <Text style={styles.current_temp}>{Math.round(current.tempC)}°</Text>
             <Text style={styles.current_icon}>{current.icon}</Text>
