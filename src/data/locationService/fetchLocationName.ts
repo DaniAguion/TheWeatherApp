@@ -4,7 +4,7 @@ import { getCached, setCached } from "../localStorage/cache";
 
 // Function to get the location name
 // It first checks the cache, and if not found or expired, it fetches from Nominatim
-async function getLocationName(lat: number, lon: number): Promise<string> {
+export async function getLocationName(lat: number, lon: number): Promise<string> {
   const LOCATION_TTL_MS = 10 * 60 * 1000; // Location valid for 10 minutes
   const key = `location:${lat.toFixed(3)},${lon.toFixed(3)}`;
   const cached = await getCached<string>(key, LOCATION_TTL_MS);

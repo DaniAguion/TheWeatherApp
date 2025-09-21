@@ -5,7 +5,7 @@ import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
 
-export class WeatherServive implements IWeatherService {
+export class WeatherService implements IWeatherService {
   constructor(private baseUrl = "https://api.open-meteo.com/v1/forecast") {}
 
   async getWeather({ lat, lon }: { lat: number; lon: number }): Promise<WeatherInfo> {

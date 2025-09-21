@@ -3,15 +3,17 @@ import { IWeatherService } from "../../domain/ports";
 import { getLocationName } from "../../data/locationService/fetchLocationName";
 import type { Current, Hour, Day, WeatherInfo } from "../../domain/entities";
 
-export function useWeatherVM(
-  lat: number,
-  lon: number,
-  deps: {
+type UseWeatherVMDeps = {
     weatherService: IWeatherService;
-    fallbackName?: string;
-  }
+};
+
+export function useWeatherVM(
+    lat: number,
+    lon: number,
+    deps: UseWeatherVMDeps,
+    fallbackName?: string,
 ) {
-    const { weatherService, fallbackName } = deps;
+    const { weatherService } = deps;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [locationName, setLocationName] = useState<string | null>(fallbackName ?? null);

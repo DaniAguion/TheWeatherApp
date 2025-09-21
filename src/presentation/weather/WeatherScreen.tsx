@@ -1,10 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import type { Location } from "../../domain/entities";
 import { useWeatherVM } from "./useWeatherVM";
+import { makeWeatherModule } from "../../di/weatherModule";
 import styles from "./WeatherScreen.styles";
+
 
 
 export type WeatherScreenParams = Location;
@@ -14,15 +16,16 @@ type WeatherScreenProps = {
 };
 
 export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
+  const deps = useMemo(() => makeWeatherModule(), []);
   const { lat, lon, name } = route.params;
-  const { loading, error, locationName, current, next24h, next72h, days, refetch } = useWeatherVM(lat, lon, name);
+  const { loading, error, locationName, current, next24h, next72h, days, refetch } = useWeatherVM(lat, lon, deps, name);
 
   // Clear view when navigating away
   useFocusEffect(useCallback(() => { return () => {} }, []));
 
   // Render loading, error
   if (loading) return <ActivityIndicator style={styles.loading} />;
-  if (error || !current) return (
+  if (error || (!current || !next24h || !next72h || !days)) return (
     <View style={styles.errorContainer}>
       <Text style={styles.errorText}>{error}</Text>
       <Button title="Reintentar" onPress={refetch} />
