@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import { LocationPermission } from "../infraestructure/LocationPermission";
-import type { Coordinates } from "../domain/entities";
+import type { Coordinates } from "../domain/entities/LocationEntities";
 
 type Coords = { coordinates: Coordinates; accuracy?: number };
 

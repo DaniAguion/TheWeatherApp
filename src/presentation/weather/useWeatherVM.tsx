@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { WeatherService } from "../../domain/ports/WeatherService";
 import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
-import type { Current, Hour, Day, Coordinates } from "../../domain/entities";
+import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
+import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { toUIErrorMessage } from "../errorMessages";
 
 type UseWeatherVMDeps = {

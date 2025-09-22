@@ -1,4 +1,5 @@
-import type { WeatherInfo, Coordinates } from "../entities";
+import type { WeatherInfo } from "../entities/WeatherEntities";
+import type { Coordinates } from "../entities/LocationEntities";
 import { Result } from "../errors/Result";
 
 export interface WeatherService {

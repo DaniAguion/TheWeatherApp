@@ -1,5 +1,5 @@
 import { FlatList, Text, View } from "react-native";
-import type { Hour } from "../../domain/entities"
+import type { Hour } from "../../domain/entities/WeatherEntities"
 import styles from "./HourlyScreen.styles";
 
 

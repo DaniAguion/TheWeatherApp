@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Location } from "../domain/entities";
+import type { Location } from "../domain/entities/LocationEntities";
 
 const SELECTED_LOCATION_KEY = "selectedLocation";
 const CURRENT_SENTINEL = "__CURRENT_LOCATION__";

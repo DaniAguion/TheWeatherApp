@@ -1,5 +1,5 @@
 import { FlatList, Text, View } from "react-native";
-import type { Day } from "../../domain/entities"
+import type { Day } from "../../domain/entities/WeatherEntities"
 import styles from "./DailyScreen.styles";
 
 

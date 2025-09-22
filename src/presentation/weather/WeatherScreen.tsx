@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, FlatList } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
-import type { Location } from "../../domain/entities";
+import type { Location } from "../../domain/entities/LocationEntities";
 import { useWeatherVM } from "./useWeatherVM";
 import { makeWeatherModule } from "../../di/weatherModule";
 import styles from "./WeatherScreen.styles";

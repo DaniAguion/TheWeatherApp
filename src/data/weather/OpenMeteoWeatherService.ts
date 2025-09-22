@@ -1,7 +1,8 @@
 import type { WeatherService } from "../../domain/ports/WeatherService";
 import { OpenMeteoResponse }  from "./dto";
 import { getCached, setCached } from "../storage/cache";
-import { WeatherInfo, Current, Hour, Day, Coordinates } from "../../domain/entities";
+import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEntities";
+import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 import { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
