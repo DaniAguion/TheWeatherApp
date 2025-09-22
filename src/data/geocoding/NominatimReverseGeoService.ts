@@ -26,7 +26,7 @@ export class NominatimReverseGeoService implements ReverseGeoService {
       try { 
         await setCached(cacheKey, data.name); 
       } catch (error) {
-        return { success:false, error: DataError.cacheWriteFailed(error)};
+        console.warn("Failed to cache the location name:", error);
       }
       return { success: true, value: data.name};
     } catch (error) {

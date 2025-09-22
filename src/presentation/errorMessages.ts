@@ -1,7 +1,6 @@
 import { DataErrorKind, isDataError } from "../domain/errors/DataError";
 
 const dataErrorMessages: Record<DataErrorKind, string> = {
-  "data.cache.writeFailed": "No se ha podido guardar la información.",
   "data.http": "Error externo:",
   "data.network": "No se ha podido establecer conexión.",
   "data.unknown": "Ha ocurrido un error inesperado.",

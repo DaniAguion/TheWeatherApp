@@ -1,5 +1,4 @@
 export type DataErrorKind =
-  | "data.cache.writeFailed"
   | "data.http"
   | "data.network"
   | "data.unknown";
@@ -15,10 +14,6 @@ export class DataError extends Error {
     if (options?.cause !== undefined) {
       (this as any).cause = options.cause;
     }
-  }
-
-  static cacheWriteFailed(cause?: unknown) {
-    return new DataError("data.cache.writeFailed", { cause });
   }
 
   static http(status: number) {

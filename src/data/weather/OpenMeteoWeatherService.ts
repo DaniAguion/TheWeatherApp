@@ -37,7 +37,7 @@ export class OpenMeteoWeatherService implements WeatherService {
           days: days
         });
       } catch (error) {
-        return { success:false, error: DataError.cacheWriteFailed(error)};
+        console.warn("Failed to cache weather data:", error);
       }
       return { success: true, value: { current, hours, days }};
 
