@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { WeatherService } from "../../domain/ports/WeatherService";
 import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import type { Current, Hour, Day, Coordinates } from "../../domain/entities";
+import { toUIErrorMessage } from "../errorMessages";
 
 type UseWeatherVMDeps = {
     weatherService: WeatherService;
@@ -28,18 +29,29 @@ export function useWeatherVM(
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
-        try {
-            const locationName = fallbackName ?? await reverseGeoService.getLocationName(coordinates);
-            const weatherData = await weatherService.getWeather(coordinates);
-            setLocationName(locationName);
-            setCurrent(weatherData.current);
-            setHours(weatherData.hours ?? []);
-            setDays(weatherData.days ?? []);
-        } catch (e: any) {
-            setError(e?.message ?? "Error cargando el clima");
-        } finally {
-            setLoading(false);
-        }
+        if (fallbackName) {
+                setLocationName(fallbackName);
+        } else {
+            await reverseGeoService.getLocationName(coordinates).then(result => {
+                if (result.success) {
+                    setLocationName(result.value);
+                } else {
+                    console.log("Failed to get location name:", result.error);
+                    setLocationName("")
+                }
+            });
+        };
+        await weatherService.getWeather(coordinates).then(result => {
+            if (result.success) {
+                    setCurrent(result.value.current);
+                    setHours(result.value.hours ?? []);
+                    setDays(result.value.days ?? []);
+            } else {
+                console.log("Failed to get weather from location:", result.error);
+                setError(toUIErrorMessage(result.error));
+            }
+        });
+        setLoading(false);
     }, [coordinates, fallbackName]);
 
 
