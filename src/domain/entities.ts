@@ -44,6 +44,7 @@ export type WeatherInfo = {
   days: Day[];
 };
 
+
 export type Location = {
   name?: string;
   lat: number;

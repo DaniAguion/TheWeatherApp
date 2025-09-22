@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import WeatherScreen from "../weather/WeatherScreen";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { useSelectedLocation, DEFAULT_SELECTED_LOCATION } from "../../hooks/useSelectedLocation";
-import { LocationPermission } from "../../native/LocationPermission";
+import { LocationPermission } from "../../infraestructure/LocationPermission";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { HomeStackParamList } from "../../AppNavigator";
 import styles from "./MyWeatherScreen.styles";

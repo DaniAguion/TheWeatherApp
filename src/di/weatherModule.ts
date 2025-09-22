@@ -1,14 +1,15 @@
-import { WeatherService } from "../data/weather/weatherService";
-import { ReverseGeoService } from "../data/geocoding/reverseGeoService";
-import { IWeatherService, IReverseGeoService } from "../domain/ports";
+import { WeatherService } from "../domain/ports/WeatherService";
+import { ReverseGeoService } from "../domain/ports/ReverseGeoService";
+import { OpenMeteoWeatherService } from "../data/weather/OpenMeteoWeatherService";
+import { NominatimReverseGeoService } from "../data/geocoding/NominatimReverseGeoService";
 
 export type WeatherModule = {
-  weatherService: IWeatherService;
-  reverseGeoService: IReverseGeoService;
+  weatherService: WeatherService;
+  reverseGeoService: ReverseGeoService;
 };
 
 export function makeWeatherModule(): WeatherModule {
-  const weatherService = new WeatherService();
-  const reverseGeoService = new ReverseGeoService();
+  const weatherService = new OpenMeteoWeatherService();
+  const reverseGeoService = new NominatimReverseGeoService();
   return { weatherService, reverseGeoService };
 }

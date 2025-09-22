@@ -1,11 +1,11 @@
-import type { IWeatherService } from "../../domain/ports";
+import type { WeatherService } from "../../domain/ports/WeatherService";
 import { OpenMeteoResponse }  from "./dto";
 import { getCached, setCached } from "../storage/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
 
-export class WeatherService implements IWeatherService {
+export class OpenMeteoWeatherService implements WeatherService {
 
   async getWeather({ lat, lon }: { lat: number; lon: number }): Promise<WeatherInfo> {
 

@@ -1,9 +1,9 @@
-import type { IReverseGeoService } from "../../domain/ports";
+import type { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import type { NominatimResponse } from "./dto";
 import { getCached, setCached } from "../storage/cache";
 
 
-export class ReverseGeoService implements IReverseGeoService {
+export class NominatimReverseGeoService implements ReverseGeoService {
 
   async getLocationName({ lat, lon }: { lat: number; lon: number }): Promise<string> {
     // Check cache first

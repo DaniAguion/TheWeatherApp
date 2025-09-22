@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { IWeatherService, IReverseGeoService } from "../../domain/ports";
+import { WeatherService } from "../../domain/ports/WeatherService";
+import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import type { Current, Hour, Day } from "../../domain/entities";
 
 type UseWeatherVMDeps = {
-    weatherService: IWeatherService;
-    reverseGeoService:  IReverseGeoService;
+    weatherService: WeatherService;
+    reverseGeoService:  ReverseGeoService;
 };
 
 export function useWeatherVM(
