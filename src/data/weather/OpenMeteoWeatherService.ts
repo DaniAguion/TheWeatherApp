@@ -1,13 +1,13 @@
 import type { WeatherService } from "../../domain/ports/WeatherService";
 import { OpenMeteoResponse }  from "./dto";
 import { getCached, setCached } from "../storage/cache";
-import { WeatherInfo, Current, Hour, Day } from "../../domain/entities";
+import { WeatherInfo, Current, Hour, Day, Coordinates } from "../../domain/entities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
 
 
 export class OpenMeteoWeatherService implements WeatherService {
 
-  async getWeather({ lat, lon }: { lat: number; lon: number }): Promise<WeatherInfo> {
+  async getWeather({ lat, lon }: Coordinates): Promise<WeatherInfo> {
 
     // Check cache first
     const ttl = 10 * 60 * 1000; // Weather data valid for 10 min

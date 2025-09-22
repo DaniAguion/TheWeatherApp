@@ -17,7 +17,7 @@ type WeatherScreenProps = {
 
 export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
   const deps = useMemo(() => makeWeatherModule(), []);
-  const { lat, lon, name } = route.params;
+  const { coordinates, name } = route.params;
   const { 
     loading,
     error, 
@@ -27,7 +27,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     next72h, 
     days, 
     refetch 
-  } = useWeatherVM(lat, lon, deps, name);
+  } = useWeatherVM(coordinates, deps, name);
 
   const showLocationName = locationName && locationName.length > 0;
 

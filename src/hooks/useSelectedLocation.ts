@@ -2,32 +2,30 @@ import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Location } from "../domain/entities";
 
-type StoredLocation = Required<Pick<Location, "lat" | "lon">> & Pick<Location, "name">;
-
 const SELECTED_LOCATION_KEY = "selectedLocation";
 const CURRENT_SENTINEL = "__CURRENT_LOCATION__";
 const STORAGE_VERSION = 1;
 
 type StoredPreferences = {
   version: number;
-  savedLocation: StoredLocation;
+  savedLocation: Location;
   useCurrent: boolean;
 };
 
 const DEFAULT_PREFS: StoredPreferences = {
   version: STORAGE_VERSION,
-  savedLocation: { name: "Madrid", lat: 40.4168, lon: -3.7038 },
+  savedLocation: { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } },
   useCurrent: false,
 };
 
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
 
-const sanitizeLocation = (candidate: unknown): StoredLocation | null => {
+const sanitizeLocation = (candidate: unknown): Location | null => {
   if (!candidate || typeof candidate !== "object") {
     return null;
   }
-  const maybe = candidate as Partial<StoredLocation> & { lat?: unknown; lon?: unknown };
+  const maybe = candidate as Partial<Location> & { lat?: unknown; lon?: unknown };
   const lat = isFiniteNumber(maybe.lat) ? maybe.lat : Number(maybe.lat);
   const lon = isFiniteNumber(maybe.lon) ? maybe.lon : Number(maybe.lon);
   if (!isFiniteNumber(lat) || !isFiniteNumber(lon)) {
@@ -36,10 +34,10 @@ const sanitizeLocation = (candidate: unknown): StoredLocation | null => {
   const name = typeof maybe.name === "string" && maybe.name.trim().length > 0
     ? maybe.name
     : DEFAULT_PREFS.savedLocation.name;
-  return { lat, lon, name };
+  return { name, coordinates: { lat, lon } };
 };
 
-const toPrefsPayload = (savedLocation: StoredLocation, useCurrent: boolean): StoredPreferences => ({
+const toPrefsPayload = (savedLocation: Location, useCurrent: boolean): StoredPreferences => ({
   version: STORAGE_VERSION,
   savedLocation,
   useCurrent,
@@ -53,10 +51,10 @@ const isStoredPreferences = (input: unknown): input is StoredPreferences => {
   return "savedLocation" in asPrefs && "useCurrent" in asPrefs;
 };
 
-export const DEFAULT_SELECTED_LOCATION: StoredLocation = DEFAULT_PREFS.savedLocation;
+export const DEFAULT_SELECTED_LOCATION: Location = DEFAULT_PREFS.savedLocation;
 
 export function useSelectedLocation() {
-  const [savedLocation, setSavedLocation] = useState<StoredLocation>(DEFAULT_SELECTED_LOCATION);
+  const [savedLocation, setSavedLocation] = useState<Location>(DEFAULT_SELECTED_LOCATION);
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,13 +84,13 @@ export function useSelectedLocation() {
             const normalized = sanitizeLocation(parsed.savedLocation);
             if (normalized) {
               prefs = toPrefsPayload(normalized, Boolean(parsed.useCurrent));
-              const original = parsed.savedLocation as Partial<StoredLocation> | null | undefined;
+              const original = parsed.savedLocation as Partial<Location> | null | undefined;
               const originalMatches =
                 !!original &&
                 typeof original === "object" &&
-                (original as StoredLocation).lat === normalized.lat &&
-                (original as StoredLocation).lon === normalized.lon &&
-                (original as StoredLocation).name === normalized.name;
+                (original as Location).coordinates.lat === normalized.coordinates.lat &&
+                (original as Location).coordinates.lon === normalized.coordinates.lon &&
+                (original as Location).name === normalized.name;
               needsPersist = parsed.version !== STORAGE_VERSION || !originalMatches;
             } else {
               needsPersist = true;
@@ -130,7 +128,7 @@ export function useSelectedLocation() {
     load();
   }, [load]);
 
-  const saveSelectedLocation = useCallback(async (location: StoredLocation) => {
+  const saveSelectedLocation = useCallback(async (location: Location) => {
     try {
       setError(null);
       const normalized = sanitizeLocation(location) ?? DEFAULT_PREFS.savedLocation;

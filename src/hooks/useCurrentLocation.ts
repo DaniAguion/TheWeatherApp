@@ -2,15 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import { LocationPermission } from "../infraestructure/LocationPermission";
+import type { Coordinates } from "../domain/entities";
 
-type Coords = { lat: number; lon: number; accuracy?: number };
+type Coords = { coordinates: Coordinates; accuracy?: number };
 
 type UseCurrentLocationOptions = {
   enabled?: boolean;
 };
 
 export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions = {}) {
-  const [coords, setCoords] = useState<Coords | null>(null);
+  const [coords, setCoords] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(false);
@@ -46,11 +47,10 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
           (pos) => {
             if (!mounted.current) return resolve();
             const fresh: Coords = {
-              lat: pos.coords.latitude,
-              lon: pos.coords.longitude,
+              coordinates: { lat: pos.coords.latitude, lon: pos.coords.longitude},
               accuracy: pos.coords.accuracy,
             };
-            setCoords(fresh);
+            setCoords(fresh.coordinates);
             resolve();
           },
           (err) => {

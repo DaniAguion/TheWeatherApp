@@ -1,3 +1,5 @@
+import { Coordinates } from "../entities";
+
 export interface ReverseGeoService {
-  getLocationName(params: { lat: number; lon: number}): Promise<string>;
+  getLocationName(coordinates: Coordinates): Promise<string | null>;
 }

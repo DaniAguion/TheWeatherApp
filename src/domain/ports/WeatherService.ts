@@ -1,5 +1,5 @@
-import type { WeatherInfo } from "../entities";
+import type { WeatherInfo, Coordinates } from "../entities";
 
 export interface WeatherService {
-  getWeather(params: { lat: number; lon: number }): Promise<WeatherInfo>;
+  getWeather(coordinates: Coordinates): Promise<WeatherInfo>;
 }

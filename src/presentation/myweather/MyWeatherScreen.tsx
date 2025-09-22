@@ -25,7 +25,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
   } = useSelectedLocation();
 
   const { 
-    coords: currentLocation, 
+    coords: currentCoords, 
     loading: loadingCurrent, 
     error: errorCurrent, refresh 
   } = useCurrentLocation();
@@ -85,8 +85,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
 
 
   // Determine variables for WeatherScreen depending button selection
-  const lat = usingCurrentLocation? currentLocation?.lat : selectedLocation?.lat;
-  const lon = usingCurrentLocation? currentLocation?.lon : selectedLocation?.lon;
+  const coords = usingCurrentLocation? currentCoords : selectedLocation?.coordinates;
   const locationName = usingCurrentLocation? undefined : selectedLocation?.name;
   const loading = usingCurrentLocation? loadingCurrent : loadingSelected;
   const error = usingCurrentLocation? errorCurrent : errorSelected;
@@ -99,7 +98,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
         <ActivityIndicator size="large" />
       </View>
     );
-  } else if (error || !lat || !lon) {
+  } else if (error || !coords) {
     content = (
       <View style={styles.state_container}>
         <Text style={styles.error_text}>No es posible obtener la ubicación actual</Text>
@@ -109,7 +108,7 @@ export default function MyWeatherScreen({ navigation, route }: Props) {
     content = (
       <WeatherScreen
         navigation={navigation}
-        route={{ params: { name: locationName, lat, lon } }}
+        route={{ params: { name: locationName, coordinates: coords} }}
       />
     );
   }

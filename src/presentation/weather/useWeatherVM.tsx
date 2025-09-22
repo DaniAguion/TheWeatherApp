@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { WeatherService } from "../../domain/ports/WeatherService";
 import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
-import type { Current, Hour, Day } from "../../domain/entities";
+import type { Current, Hour, Day, Coordinates } from "../../domain/entities";
 
 type UseWeatherVMDeps = {
     weatherService: WeatherService;
@@ -9,8 +9,7 @@ type UseWeatherVMDeps = {
 };
 
 export function useWeatherVM(
-    lat: number,
-    lon: number,
+    coordinates: Coordinates,
     deps: UseWeatherVMDeps,
     fallbackName?: string,
 ) {
@@ -23,15 +22,15 @@ export function useWeatherVM(
     const [days, setDays] = useState<Day[] | null>(null);
 
     // Fetch weather data when lat/lon changes
-    useEffect(() => { fetchData() }, [lat, lon]);
+    useEffect(() => { fetchData() }, [coordinates]);
 
     // Function to fetch location and weather data
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const locationName = fallbackName ?? await reverseGeoService.getLocationName({ lat, lon });
-            const weatherData = await weatherService.getWeather({ lat, lon });
+            const locationName = fallbackName ?? await reverseGeoService.getLocationName(coordinates);
+            const weatherData = await weatherService.getWeather(coordinates);
             setLocationName(locationName);
             setCurrent(weatherData.current);
             setHours(weatherData.hours ?? []);
@@ -41,7 +40,7 @@ export function useWeatherVM(
         } finally {
             setLoading(false);
         }
-    }, [lat, lon, fallbackName]);
+    }, [coordinates, fallbackName]);
 
 
     // Memorized next 24h and 72h forecasts
