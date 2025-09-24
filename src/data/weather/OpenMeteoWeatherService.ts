@@ -19,9 +19,9 @@ export class OpenMeteoWeatherService implements WeatherService {
 
     // Fetch from API if not in cache or expired
     try {
-      const base = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
-      const url = base + currentOptions + hourlyOptions + dailyOptions;
-      const response = await fetch(url);
+      const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
+      const apiRequestUrl = baseUrl + currentOptions + hourlyOptions + dailyOptions;
+      const response = await fetch(apiRequestUrl);
       if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
       if (!response.ok) return {success:false, error: DataError.http(response.status)};
 
