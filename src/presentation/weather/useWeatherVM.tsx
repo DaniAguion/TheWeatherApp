@@ -5,7 +5,7 @@ import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { toUIErrorMessage } from "../errorMessages";
 
-type UseWeatherVMDeps = {
+export type UseWeatherVMDeps = {
     weatherService: WeatherService;
     reverseGeoService:  ReverseGeoService;
 };
