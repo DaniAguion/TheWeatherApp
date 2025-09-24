@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Location } from "../domain/entities/LocationEntities";
 import type { UserPreferences } from "../domain/entities/UserPreferences";
-import { DEFAULT_USER_PREFERENCES, DEFAULT_SELECTED_LOCATION } from "../data/preferences/UserPrefsServiceImpl";
 import { useServices } from "../di/ServicesProvider";
 
-export { DEFAULT_SELECTED_LOCATION } from "../data/preferences/UserPrefsServiceImpl";
+const DEFAULT_SELECTED_LOCATION: Location = { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } };
+const DEFAULT_USER_PREFERENCES: UserPreferences = { useCurrentLocation: false, selectedLocation: DEFAULT_SELECTED_LOCATION };
 
 function cloneLocation(location: Location): Location {
   return {
@@ -95,3 +95,4 @@ export function useSelectedLocation() {
     reloadSelectedLocation,
   };
 }
+
