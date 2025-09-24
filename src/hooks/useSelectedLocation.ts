@@ -1,167 +1,97 @@
 import { useCallback, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Location } from "../domain/entities/LocationEntities";
+import type { UserPreferences } from "../domain/entities/UserPreferences";
+import { DEFAULT_USER_PREFERENCES, DEFAULT_SELECTED_LOCATION } from "../data/preferences/AsyncStorageUserPreferencesService";
+import { useServices } from "../di/ServicesProvider";
 
-const SELECTED_LOCATION_KEY = "selectedLocation";
-const CURRENT_SENTINEL = "__CURRENT_LOCATION__";
-const STORAGE_VERSION = 1;
+export { DEFAULT_SELECTED_LOCATION } from "../data/preferences/AsyncStorageUserPreferencesService";
 
-type StoredPreferences = {
-  version: number;
-  savedLocation: Location;
-  useCurrent: boolean;
-};
+function cloneLocation(location: Location): Location {
+  return {
+    name: location.name,
+    coordinates: {
+      lat: location.coordinates.lat,
+      lon: location.coordinates.lon,
+    },
+  };
+}
 
-const DEFAULT_PREFS: StoredPreferences = {
-  version: STORAGE_VERSION,
-  savedLocation: { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } },
-  useCurrent: false,
-};
-
-const isFiniteNumber = (value: unknown): value is number =>
-  typeof value === "number" && Number.isFinite(value);
-
-const sanitizeLocation = (candidate: unknown): Location | null => {
-  if (!candidate || typeof candidate !== "object") {
-    return null;
-  }
-  const maybe = candidate as Partial<Location> & { lat?: unknown; lon?: unknown };
-  const lat = isFiniteNumber(maybe.lat) ? maybe.lat : Number(maybe.lat);
-  const lon = isFiniteNumber(maybe.lon) ? maybe.lon : Number(maybe.lon);
-  if (!isFiniteNumber(lat) || !isFiniteNumber(lon)) {
-    return null;
-  }
-  const name = typeof maybe.name === "string" && maybe.name.trim().length > 0
-    ? maybe.name
-    : DEFAULT_PREFS.savedLocation.name;
-  return { name, coordinates: { lat, lon } };
-};
-
-const toPrefsPayload = (savedLocation: Location, useCurrent: boolean): StoredPreferences => ({
-  version: STORAGE_VERSION,
-  savedLocation,
-  useCurrent,
-});
-
-const isStoredPreferences = (input: unknown): input is StoredPreferences => {
-  if (!input || typeof input !== "object") {
-    return false;
-  }
-  const asPrefs = input as Partial<StoredPreferences> & { savedLocation?: unknown };
-  return "savedLocation" in asPrefs && "useCurrent" in asPrefs;
-};
-
-export const DEFAULT_SELECTED_LOCATION: Location = DEFAULT_PREFS.savedLocation;
+function clonePreferences(prefs: UserPreferences): UserPreferences {
+  return {
+    useCurrentLocation: prefs.useCurrentLocation,
+    selectedLocation: cloneLocation(prefs.selectedLocation),
+  };
+}
 
 export function useSelectedLocation() {
-  const [savedLocation, setSavedLocation] = useState<Location>(DEFAULT_SELECTED_LOCATION);
-  const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+  const { userPreferencesService } = useServices();
+  const [preferences, setPreferences] = useState<UserPreferences>(() => clonePreferences(DEFAULT_USER_PREFERENCES));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const persist = useCallback(async (prefs: StoredPreferences) => {
-    await AsyncStorage.setItem(SELECTED_LOCATION_KEY, JSON.stringify(prefs));
-  }, []);
-
-  const load = useCallback(async () => {
+  const fetchPreferences = useCallback(async (withSpinner: boolean = true) => {
+    if (withSpinner) setLoading(true);
     try {
-      setLoading(true);
+      const stored = await userPreferencesService.load();
+      setPreferences(clonePreferences(stored));
       setError(null);
-
-      const raw = await AsyncStorage.getItem(SELECTED_LOCATION_KEY);
-      let prefs = DEFAULT_PREFS;
-      let needsPersist = false;
-
-      if (!raw) {
-        needsPersist = true;
-      } else if (raw === CURRENT_SENTINEL) {
-        prefs = toPrefsPayload(DEFAULT_PREFS.savedLocation, true);
-        needsPersist = true;
-      } else {
-        try {
-          const parsed = JSON.parse(raw);
-          if (isStoredPreferences(parsed)) {
-            const normalized = sanitizeLocation(parsed.savedLocation);
-            if (normalized) {
-              prefs = toPrefsPayload(normalized, Boolean(parsed.useCurrent));
-              const original = parsed.savedLocation as Partial<Location> | null | undefined;
-              const originalMatches =
-                !!original &&
-                typeof original === "object" &&
-                (original as Location).coordinates.lat === normalized.coordinates.lat &&
-                (original as Location).coordinates.lon === normalized.coordinates.lon &&
-                (original as Location).name === normalized.name;
-              needsPersist = parsed.version !== STORAGE_VERSION || !originalMatches;
-            } else {
-              needsPersist = true;
-            }
-          } else {
-            const normalized = sanitizeLocation(parsed);
-            if (normalized) {
-              prefs = toPrefsPayload(normalized, false);
-            }
-            needsPersist = true;
-          }
-        } catch (_parseErr) {
-          needsPersist = true;
-        }
-      }
-
-      setSavedLocation(prefs.savedLocation);
-      setUseCurrentLocation(prefs.useCurrent);
-
-      if (needsPersist) {
-        await persist(prefs);
-      }
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando la ubicación guardada");
-      const fallback = DEFAULT_PREFS;
-      setSavedLocation(fallback.savedLocation);
-      setUseCurrentLocation(fallback.useCurrent);
-      await persist(fallback);
+      const message = e?.message ?? "Error cargando la ubicación guardada";
+      setError(message);
+      const fallback = clonePreferences(DEFAULT_USER_PREFERENCES);
+      setPreferences(fallback);
+      try {
+        await userPreferencesService.save(fallback);
+      } catch (persistError) {
+        console.warn("Failed to persist fallback user preferences:", persistError);
+      }
     } finally {
-      setLoading(false);
+      if (withSpinner) setLoading(false);
     }
-  }, [persist]);
+  }, [userPreferencesService]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    void fetchPreferences(true);
+  }, [fetchPreferences]);
 
   const saveSelectedLocation = useCallback(async (location: Location) => {
     try {
       setError(null);
-      const normalized = sanitizeLocation(location) ?? DEFAULT_PREFS.savedLocation;
-      const prefs = toPrefsPayload(normalized, false);
-      setSavedLocation(normalized);
-      setUseCurrentLocation(false);
-      await persist(prefs);
+      await userPreferencesService.save({
+        useCurrentLocation: false,
+        selectedLocation: location,
+      });
+      await fetchPreferences(false);
     } catch (e: any) {
       setError(e?.message ?? "Error guardando la ubicación");
       throw e;
     }
-  }, [persist]);
+  }, [fetchPreferences, userPreferencesService]);
 
   const clearSelectedLocation = useCallback(async () => {
     try {
       setError(null);
-      setUseCurrentLocation(true);
-      const prefs = toPrefsPayload(savedLocation, true);
-      await persist(prefs);
+      await userPreferencesService.save({
+        useCurrentLocation: true,
+        selectedLocation: preferences.selectedLocation,
+      });
+      await fetchPreferences(false);
     } catch (e: any) {
       setError(e?.message ?? "Error guardando la ubicación");
       throw e;
     }
-  }, [persist, savedLocation]);
+  }, [fetchPreferences, preferences.selectedLocation, userPreferencesService]);
+
+  const reloadSelectedLocation = useCallback(() => fetchPreferences(true), [fetchPreferences]);
 
   return {
-    selectedLocation: useCurrentLocation ? null : savedLocation,
-    savedLocation,
-    usingCurrentLocation: useCurrentLocation,
+    selectedLocation: preferences.useCurrentLocation ? null : preferences.selectedLocation,
+    savedLocation: preferences.selectedLocation,
+    usingCurrentLocation: preferences.useCurrentLocation,
     loading,
     error,
     saveSelectedLocation,
     clearSelectedLocation,
-    reloadSelectedLocation: load,
+    reloadSelectedLocation,
   };
 }
