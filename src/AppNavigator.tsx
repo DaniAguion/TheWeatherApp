@@ -13,13 +13,13 @@ import type { DailyScreenParams } from "./presentation/daily/DailyScreen";
 import WeatherScreen from "./presentation/weather/WeatherScreen";
 import HourlyScreen from "./presentation/hourly/HourlyScreen";
 import DailyScreen from "./presentation/daily/DailyScreen";
-import MyWeatherScreen from "./presentation/myweather/MyWeatherScreen";
+import MainScreen from "./presentation/main/MainScreen";
 import FavoritesScreen from "./presentation/FavoritesScreen";
 import SettingsScreen from "./presentation/SettingsScreen";
 
 
 export type HomeStackParamList = {
-  MyWeather: undefined;
+  MainScreen: undefined;
   Weather: WeatherScreenParams;
   NextHours: HourlyScreenParams;
   NextDays: DailyScreenParams;
@@ -31,9 +31,9 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
-        name="MyWeather"
-        component={MyWeatherScreen}
-        options={{ title: "Mi Tiempo" }}
+        name="MainScreen"
+        component={MainScreen}
+        options={{ title: "Principal" }}
       />
       <HomeStack.Screen
         name="Weather"
@@ -55,9 +55,9 @@ function HomeStackNavigator() {
 }
 
 type RootTabParamList = {
-  Inicio: undefined;
-  Favoritos: undefined;
-  Ajustes: undefined;
+  Home: undefined;
+  Favorites: undefined;
+  Settings: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -67,29 +67,29 @@ export default function AppNavigator() {
   return (
     <NavigationContainer theme={scheme === "dark" ? DarkTheme : DefaultTheme}>
       <Tab.Navigator
-        initialRouteName="Inicio"
+        initialRouteName="Home"
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: { fontSize: 12 },
         }}
       >
         <Tab.Screen
-          name="Favoritos"
+          name="Favorites"
           component={FavoritesScreen}
           options={{
             tabBarIcon: () => <Text>⭐</Text>,
           }}
         />
         <Tab.Screen
-          name="Inicio"
+          name="Home"
           component={HomeStackNavigator}
           options={{
-            tabBarLabel: "Inicio",
+            tabBarLabel: "Principal",
             tabBarIcon: () => <Text>🌤️</Text>,
           }}
         />
         <Tab.Screen
-          name="Ajustes"
+          name="Settings"
           component={SettingsScreen}
           options={{
             tabBarIcon: () => <Text>⚙️</Text>,

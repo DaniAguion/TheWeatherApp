@@ -7,12 +7,12 @@ import { useSelectedLocation, DEFAULT_SELECTED_LOCATION } from "../../hooks/useS
 import { LocationPermission } from "../../infraestructure/LocationPermission";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { HomeStackParamList } from "../../AppNavigator";
-import styles from "./MyWeatherScreen.styles";
+import styles from "./MainScreen.styles";
 
 
 type Props = NativeStackScreenProps<HomeStackParamList>;
 
-export default function MyWeatherScreen({ navigation, route }: Props) {
+export default function MainScreen({ navigation, route }: Props) {
 
   const {
     selectedLocation,
