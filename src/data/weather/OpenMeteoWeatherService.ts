@@ -12,8 +12,8 @@ export class OpenMeteoWeatherService implements WeatherService {
 
   async getWeather({ lat, lon }: Coordinates): Promise<Result<WeatherInfo>> {
     // Check cache first
-    const ttl = 10 * 60 * 1000; // Weather data valid for 10 min
-    const cacheKey = `openmeteo:${lat.toFixed(3)},${lon.toFixed(3)}`;
+    const ttl = 30 * 60 * 1000; // Weather data valid for 30 min
+    const cacheKey = `weatherInfo:${lat.toFixed(3)},${lon.toFixed(3)}`;
     const cached = await getCached<WeatherInfo>(cacheKey, ttl);
     if (cached) return { success: true, value: cached };
 

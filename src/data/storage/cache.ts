@@ -5,10 +5,10 @@ export async function setCached<T>(key: string, data: T) {
 }
 
 export async function getCached<T>(key: string, ttlMs: number): Promise<T | null> {
-  const raw = await AsyncStorage.getItem(key);
-  if (!raw) return null;
+  const item = await AsyncStorage.getItem(key);
+  if (!item) return null;
   try {
-    const { ts, data } = JSON.parse(raw);
+    const { ts, data } = JSON.parse(item);
     if (Date.now() - ts < ttlMs) return data as T;
     // If expired, remove from cache
     await AsyncStorage.removeItem(key);
