@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Location } from "../domain/entities/LocationEntities";
 import type { UserPreferences } from "../domain/entities/UserPreferences";
-import { DEFAULT_USER_PREFERENCES, DEFAULT_SELECTED_LOCATION } from "../data/preferences/AsyncStorageUserPreferencesService";
+import { DEFAULT_USER_PREFERENCES, DEFAULT_SELECTED_LOCATION } from "../data/preferences/UserPrefsServiceImpl";
 import { useServices } from "../di/ServicesProvider";
 
-export { DEFAULT_SELECTED_LOCATION } from "../data/preferences/AsyncStorageUserPreferencesService";
+export { DEFAULT_SELECTED_LOCATION } from "../data/preferences/UserPrefsServiceImpl";
 
 function cloneLocation(location: Location): Location {
   return {

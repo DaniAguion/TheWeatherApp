@@ -105,7 +105,7 @@ function createPreferences(location: Location, useCurrent: boolean): UserPrefere
   };
 }
 
-export class AsyncStorageUserPreferencesService implements UserPreferencesService {
+export class UserPreferencesServiceImpl implements UserPreferencesService {
 
   async load(): Promise<UserPreferences> {
     try {

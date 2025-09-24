@@ -3,7 +3,7 @@ import { ReverseGeoService } from "../domain/ports/ReverseGeoService";
 import { UserPreferencesService } from "../domain/ports/UserPreferencesService";
 import { OpenMeteoWeatherService } from "../data/weather/OpenMeteoWeatherService";
 import { NominatimReverseGeoService } from "../data/geocoding/NominatimReverseGeoService";
-import { AsyncStorageUserPreferencesService } from "../data/preferences/AsyncStorageUserPreferencesService";
+import { UserPreferencesServiceImpl } from "../data/preferences/UserPrefsServiceImpl";
 
 export type Services = {
   weatherService: WeatherService;
@@ -15,6 +15,6 @@ export type Services = {
 export function createServices(): Services {
   const weatherService = new OpenMeteoWeatherService();
   const reverseGeoService = new NominatimReverseGeoService();
-  const userPreferencesService = new AsyncStorageUserPreferencesService();
+  const userPreferencesService = new UserPreferencesServiceImpl();
   return { weatherService, reverseGeoService, userPreferencesService };
 }
