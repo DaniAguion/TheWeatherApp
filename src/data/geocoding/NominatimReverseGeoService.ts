@@ -9,9 +9,8 @@ export class NominatimReverseGeoService implements ReverseGeoService {
 
   async getLocationName({ lat, lon }: Coordinates): Promise<Result<string>> {
     // Check cache first
-    const ttl = 10 * 60 * 1000; // Weather data valid for 10 min
     const cacheKey = `locationName:${lat.toFixed(3)},${lon.toFixed(3)}`;
-    const cached = await getCached<string>(cacheKey, ttl);
+    const cached = await getCached<string>(cacheKey);
     if (cached) return { success: true, value: cached };
 
     // Fetch from API if not in cache or expired
