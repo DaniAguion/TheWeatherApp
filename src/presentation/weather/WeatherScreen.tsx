@@ -9,6 +9,7 @@ import styles from "./WeatherScreen.styles";
 
 
 export type WeatherScreenParams = Location;
+
 type WeatherScreenProps = {
   navigation: any;
   route: { params: WeatherScreenParams };

@@ -10,15 +10,29 @@ export type UseWeatherVMDeps = {
     reverseGeoService:  ReverseGeoService;
 };
 
+type VMState = {
+    loading: boolean;
+    error: string | null;
+    locationName: string | null;
+    current: Current | null;
+    next24h: Hour[] | null;
+    next72h: Hour[] | null;
+    days: Day[] | null;
+};
+
+type VMFunctions = {
+    refetch: () => void;
+};
+
 export function useWeatherVM(
     coordinates: Coordinates,
     deps: UseWeatherVMDeps,
-    fallbackName?: string,
-) {
+    routeLocationName?: string,
+) : VMState & VMFunctions {
     const { weatherService, reverseGeoService } = deps;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [locationName, setLocationName] = useState<string | null>(fallbackName ?? null);
+    const [locationName, setLocationName] = useState<string | null>(routeLocationName ?? null);
     const [current, setCurrent] = useState<Current | null>(null);
     const [hours, setHours] = useState<Hour[] | null>(null);
     const [days, setDays] = useState<Day[] | null>(null);
@@ -30,8 +44,8 @@ export function useWeatherVM(
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
-        if (fallbackName) {
-                setLocationName(fallbackName);
+        if (routeLocationName) {
+            setLocationName(routeLocationName);
         } else {
             await reverseGeoService.getLocationName(coordinates).then(result => {
                 if (result.success) {
@@ -52,7 +66,7 @@ export function useWeatherVM(
             }
         });
         setLoading(false);
-    }, [coordinates, fallbackName]);
+    }, [coordinates, routeLocationName]);
 
 
     // Memorized next 24h and 72h forecasts
