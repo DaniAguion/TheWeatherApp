@@ -1,6 +1,7 @@
 export type DataErrorKind =
   | "data.http"
   | "data.network"
+  | "data.invalidData"
   | "data.unknown";
 
 export class DataError extends Error {
@@ -22,6 +23,10 @@ export class DataError extends Error {
 
   static network(cause?: unknown) {
     return new DataError("data.network", { cause });
+  }
+
+  static invalidData(cause?: unknown) {
+    return new DataError("data.invalidData", { cause });
   }
 
   static unknown(cause?: unknown) {

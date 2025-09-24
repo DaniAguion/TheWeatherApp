@@ -4,7 +4,7 @@ import { getCached, setCached } from "../storage/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
-import { Result } from "../../domain/errors/Result";
+import type { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
 
 

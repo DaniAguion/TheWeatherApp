@@ -12,6 +12,7 @@ import styles from "./MainScreen.styles";
 
 type Props = NativeStackScreenProps<HomeStackParamList>;
 
+
 export default function MainScreen({ navigation, route }: Props) {
 
   const {

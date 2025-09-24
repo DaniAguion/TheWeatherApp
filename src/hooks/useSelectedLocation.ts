@@ -3,7 +3,7 @@ import type { Location } from "../domain/entities/LocationEntities";
 import type { UserPreferences } from "../domain/entities/UserPreferences";
 import { useServices } from "../di/ServicesProvider";
 
-const DEFAULT_SELECTED_LOCATION: Location = { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } };
+export const DEFAULT_SELECTED_LOCATION: Location = { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } };
 const DEFAULT_USER_PREFERENCES: UserPreferences = { useCurrentLocation: false, selectedLocation: DEFAULT_SELECTED_LOCATION };
 
 function cloneLocation(location: Location): Location {
@@ -32,7 +32,7 @@ export function useSelectedLocation() {
   const fetchPreferences = useCallback(async (withSpinner: boolean = true) => {
     if (withSpinner) setLoading(true);
     try {
-      const stored = await userPreferencesService.load();
+      const stored = await userPreferencesService.loadPreferences();
       setPreferences(clonePreferences(stored));
       setError(null);
     } catch (e: any) {
@@ -41,7 +41,7 @@ export function useSelectedLocation() {
       const fallback = clonePreferences(DEFAULT_USER_PREFERENCES);
       setPreferences(fallback);
       try {
-        await userPreferencesService.save(fallback);
+        await userPreferencesService.savePreferences(fallback);
       } catch (persistError) {
         console.warn("Failed to persist fallback user preferences:", persistError);
       }
@@ -57,7 +57,7 @@ export function useSelectedLocation() {
   const saveSelectedLocation = useCallback(async (location: Location) => {
     try {
       setError(null);
-      await userPreferencesService.save({
+      await userPreferencesService.savePreferences({
         useCurrentLocation: false,
         selectedLocation: location,
       });
@@ -71,7 +71,7 @@ export function useSelectedLocation() {
   const clearSelectedLocation = useCallback(async () => {
     try {
       setError(null);
-      await userPreferencesService.save({
+      await userPreferencesService.savePreferences({
         useCurrentLocation: true,
         selectedLocation: preferences.selectedLocation,
       });

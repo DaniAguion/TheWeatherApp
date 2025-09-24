@@ -37,7 +37,6 @@ export function useWeatherVM(
                 if (result.success) {
                     setLocationName(result.value);
                 } else {
-                    console.log("Failed to get location name:", result.error);
                     setLocationName("")
                 }
             });

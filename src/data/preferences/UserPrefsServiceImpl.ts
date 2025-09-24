@@ -1,47 +1,78 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { UserPreferences } from "../../domain/entities/UserPreferences";
+import type { UserPreferencesService } from "../../domain/ports/UserPreferencesService";
+import type { Result } from "../../domain/errors/Result";
+import { DataError } from "../../domain/errors/DataError";
 
-const STORAGE_KEY = "selectedLocation";
+const STORAGE_KEY = "userPreferences";
 
 const DEFAULT : UserPreferences  = {
   useCurrentLocation: false,
   selectedLocation: { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } },
 };
 
-type storedUserPreferences = {
-  savedLocation: { name: string; coordinates: { lat: number; lon: number } };
-  useCurrent: boolean;
-};
-
 const isFiniteNum = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
-const validLoc = (x: any) =>
-  x && typeof x.name === "string" &&
-  isFiniteNum(x.coordinates?.lat) && isFiniteNum(x.coordinates?.lon);
+function validLocation(loc: any): boolean {
+  return (
+    loc &&
+    typeof loc === "object" &&
+    typeof loc.name === "string" &&
+    isFiniteNum(loc.coordinates?.lat) &&
+    isFiniteNum(loc.coordinates?.lon)
+  );
+}
 
-export class UserPreferencesServiceImpl {
-  async load() {
+
+
+export class UserPreferencesServiceImpl implements UserPreferencesService {
+
+  // Load preferences
+  async loadPreferences(): Promise<UserPreferences> {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (!raw) return DEFAULT;
-      const parsed = JSON.parse(raw) as storedUserPreferences;
-      if (parsed && validLoc(parsed.savedLocation)) {
+      const parsed = JSON.parse(raw) as UserPreferences;
+      if (parsed && validLocation(parsed.selectedLocation)) {
         return {
-          useCurrentLocation: !!parsed.useCurrent,
-          selectedLocation: parsed.savedLocation,
+          useCurrentLocation: !!parsed.useCurrentLocation,
+          selectedLocation: parsed.selectedLocation,
         };
       }
-    } catch (_) {}
+      console.warn("[UserPrefs] No valid preferences found, using default.");
+    } catch (e) {
+      console.error("[UserPrefs] Error loading preferences:", e);
+    }
     return DEFAULT;
   }
 
-  async save(prefs: { useCurrentLocation: boolean; selectedLocation: { name: string; coordinates: { lat: number; lon: number } } }) {
-    const { selectedLocation } = prefs;
-    if (!validLoc(selectedLocation)) throw new Error("Invalid location");
-    const payload: storedUserPreferences = { savedLocation: selectedLocation, useCurrent: !!prefs.useCurrentLocation };
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+
+  // Save preferences
+  async savePreferences(prefs: UserPreferences): Promise<Result<void>> {
+    try {
+      if (!validLocation(prefs.selectedLocation)) {
+        console.error("[UserPrefs] Invalid location format:", prefs.selectedLocation);
+        return {
+          success: false,
+          error: DataError.invalidData(new Error("Invalid selectedLocation")),
+        };
+      }
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      return { success: true, value: undefined };
+    } catch (e) {
+      console.error("[UserPrefs] Error saving preferences:", e);
+      return { success: false, error: DataError.unknown(e) };
+    }
   }
 
-  async clearPreferences() {
-    await AsyncStorage.removeItem(STORAGE_KEY);
+
+  // Clear all preferences
+  async clearPreferences(): Promise<Result<void>> {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      return { success: true, value: undefined };
+    } catch (e) {
+      console.error("[UserPrefs] Error clearing preferences:", e);
+      return { success: false, error: DataError.unknown(e) };
+    }
   }
 }

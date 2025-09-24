@@ -2,7 +2,7 @@ import type { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import type { NominatimResponse } from "./dto";
 import { getCached, setCached } from "../storage/cache";
 import { Coordinates } from "../../domain/entities/LocationEntities";
-import { Result } from "../../domain/errors/Result";
+import type { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
 
 export class NominatimReverseGeoService implements ReverseGeoService {
@@ -21,15 +21,19 @@ export class NominatimReverseGeoService implements ReverseGeoService {
       if (!response.ok) return {success:false, error: DataError.http(response.status)};
       
       const data = (await response.json()) as NominatimResponse;
-
-      try { 
-        await setCached(cacheKey, data.name); 
-      } catch (error) {
-        console.warn("Failed to cache the location name:", error);
+      if (data.name && typeof data.name === "string" && data.name.length > 0) {
+        try {
+          await setCached(cacheKey, data.name);
+        } catch (error) {
+          console.error("[ReverseGeoService] Failed to cache the location name:", error);
+        }
+        return { success: true, value: data.name};
       }
-      return { success: true, value: data.name};
     } catch (error) {
+      console.error("[ReverseGeoService] Failed to get location name:", error);
       return { success:false, error: DataError.unknown(error)};
     }
+    console.error("[ReverseGeoService] Failed to get location name.");
+    return { success:false, error: DataError.unknown()};
   }
 }
