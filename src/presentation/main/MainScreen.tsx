@@ -13,14 +13,13 @@ type Props = NativeStackScreenProps<HomeStackParamList>;
 export default function MainScreen({ navigation, route }: Props) {
   const deps: UseMainVMDeps = useServices();
   const {
-    usingCurrentLocation,
-    coords,
-    locationName,
     loading,
     error,
-    selectedButtonText,
+    usingCurrentLocation,
+    location,
+    favouriteLocationName,
     handleSelectCurrent,
-    handleSelectSaved,
+    handleSelectFavourite,
   } = useMainVM(deps);
 
 
@@ -49,7 +48,7 @@ export default function MainScreen({ navigation, route }: Props) {
 
         <TouchableOpacity
           accessibilityRole="button"
-          onPress={handleSelectSaved}
+          onPress={handleSelectFavourite}
           disabled={!usingCurrentLocation}
           style={[
             styles.selector_button,
@@ -63,7 +62,7 @@ export default function MainScreen({ navigation, route }: Props) {
               !usingCurrentLocation && styles.selector_button_text_active,
             ]}
           >
-            {selectedButtonText}
+            {favouriteLocationName}
           </Text>
         </TouchableOpacity>
       </View>
@@ -75,14 +74,18 @@ export default function MainScreen({ navigation, route }: Props) {
           <View style={styles.state_container}>
             <ActivityIndicator size="large" />
           </View>
-        ) : !coords ? (
+        ) : error ? (
           <View style={styles.state_container}>
-            <Text style={styles.error_text}>No es posible obtener la ubicación actual</Text>
+            <Text style={styles.error_text}>{error}</Text>
+          </View>
+        ) : !location ? (
+          <View style={styles.state_container}>
+            <Text style={styles.error_text}>No ha sido posible obtener la localización</Text>
           </View>
         ) : (
           <WeatherScreen
             navigation={navigation}
-            route={{ params: { name: locationName, coordinates: coords } }}
+            route={{ params: { name: location.name, coordinates: location.coordinates } }}
           />
         )}
       </View>

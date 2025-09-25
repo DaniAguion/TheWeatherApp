@@ -11,7 +11,7 @@ type UseCurrentLocationOptions = {
 };
 
 export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions = {}) {
-  const [coords, setCoords] = useState<Coordinates | null>(null);
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(false);
@@ -50,7 +50,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
               coordinates: { lat: pos.coords.latitude, lon: pos.coords.longitude},
               accuracy: pos.coords.accuracy,
             };
-            setCoords(fresh.coordinates);
+            setCoordinates(fresh.coordinates);
             resolve();
           },
           (err) => {
@@ -76,7 +76,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
 
   const refresh = useCallback(() => {
     if (!enabled) {
-      setCoords(null);
+      setCoordinates(null);
       setLoading(false);
       setError(null);
       return;
@@ -89,7 +89,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
     if (enabled) {
       void getCurrentLocation();
     } else {
-      setCoords(null);
+      setCoordinates(null);
       setLoading(false);
       setError(null);
     }
@@ -99,5 +99,5 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
     };
   }, [enabled, getCurrentLocation]);
 
-  return { coords, loading, error, refresh };
+  return { coords: coordinates, loading, error, refresh };
 }

@@ -8,7 +8,7 @@ const STORAGE_KEY = "userPreferences";
 
 const DEFAULT : UserPreferences  = {
   useCurrentLocation: false,
-  selectedLocation: { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } },
+  favouriteLocation: { name: "Madrid", coordinates: { lat: 40.4168, lon: -3.7038 } },
 };
 
 const isFiniteNum = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
@@ -32,10 +32,10 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (!raw) return DEFAULT;
       const parsed = JSON.parse(raw) as UserPreferences;
-      if (parsed && validLocation(parsed.selectedLocation)) {
+      if (parsed && validLocation(parsed.favouriteLocation)) {
         return {
           useCurrentLocation: !!parsed.useCurrentLocation,
-          selectedLocation: parsed.selectedLocation,
+          favouriteLocation: parsed.favouriteLocation,
         };
       }
       console.warn("[UserPrefs] No valid preferences found, using default.");
@@ -47,10 +47,10 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
 
 
   // Save preferences
-  async savePreferences(prefs: UserPreferences): Promise<Result<void>> {
+  async savePreferences(prefs: Partial<UserPreferences>): Promise<Result<void>> {
     try {
-      if (!validLocation(prefs.selectedLocation)) {
-        console.error("[UserPrefs] Invalid location format:", prefs.selectedLocation);
+      if (prefs.favouriteLocation && !validLocation(prefs.favouriteLocation)) {
+        console.error("[UserPrefs] Invalid location format:", prefs.favouriteLocation);
         return {
           success: false,
           error: DataError.invalidData(new Error("Invalid selectedLocation")),
@@ -69,6 +69,7 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
   async clearPreferences(): Promise<Result<void>> {
     try {
       await AsyncStorage.removeItem(STORAGE_KEY);
+      await this.savePreferences(DEFAULT);
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error clearing preferences:", e);

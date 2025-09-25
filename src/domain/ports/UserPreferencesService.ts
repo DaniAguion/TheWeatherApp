@@ -3,6 +3,6 @@ import type { Result } from "../errors/Result.ts";
 
 export interface UserPreferencesService {
     loadPreferences(): Promise<UserPreferences>;
-    savePreferences(prefs: UserPreferences): Promise<Result<void>>
+    savePreferences(prefs: Partial<UserPreferences>): Promise<Result<void>>
     clearPreferences(): Promise<Result<void>>;
 }
