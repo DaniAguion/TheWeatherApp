@@ -12,6 +12,7 @@ const DEFAULT : UserPreferences  = {
 };
 
 const isFiniteNum = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
+
 function validLocation(loc: any): boolean {
   return (
     loc &&
@@ -23,22 +24,24 @@ function validLocation(loc: any): boolean {
 }
 
 
-
 export class UserPreferencesServiceImpl implements UserPreferencesService {
 
   // Load preferences
   async loadPreferences(): Promise<UserPreferences> {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      if (!raw) return DEFAULT;
-      const parsed = JSON.parse(raw) as UserPreferences;
-      if (parsed && validLocation(parsed.favouriteLocation)) {
-        return {
-          useCurrentLocation: !!parsed.useCurrentLocation,
-          favouriteLocation: parsed.favouriteLocation,
-        };
+      if (raw) {
+        const parsed = JSON.parse(raw) as UserPreferences;
+        if (parsed && validLocation(parsed.favouriteLocation)) {
+          return {
+            useCurrentLocation: !!parsed.useCurrentLocation,
+            favouriteLocation: parsed.favouriteLocation,
+          };
+        } 
       }
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT));
       console.warn("[UserPrefs] No valid preferences found, using default.");
+      return DEFAULT;
     } catch (e) {
       console.error("[UserPrefs] Error loading preferences:", e);
     }
@@ -56,7 +59,25 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
           error: DataError.invalidData(new Error("Invalid selectedLocation")),
         };
       }
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+
+      let base: UserPreferences = DEFAULT;
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        base = {
+            useCurrentLocation: !!parsed.useCurrentLocation,
+            favouriteLocation: parsed.favouriteLocation,
+        };
+      }
+
+      const merged: UserPreferences = {
+        useCurrentLocation: prefs.useCurrentLocation !== undefined ?
+          prefs.useCurrentLocation : base.useCurrentLocation,
+        favouriteLocation: (prefs.favouriteLocation && (validLocation(prefs.favouriteLocation))) ?
+          prefs.favouriteLocation : base.favouriteLocation,
+      };
+
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving preferences:", e);
