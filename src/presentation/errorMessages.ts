@@ -1,6 +1,7 @@
 import { DataErrorKind, isDataError } from "../domain/errors/DataError";
 
 const dataErrorMessages: Record<DataErrorKind, string> = {
+  "data.invalidData": "Los datos recibidos no son correctos.",
   "data.http": "Error externo:",
   "data.network": "No se ha podido establecer conexión.",
   "data.unknown": "Ha ocurrido un error inesperado.",
