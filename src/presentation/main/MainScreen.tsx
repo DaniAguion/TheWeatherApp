@@ -65,8 +65,6 @@ export default function MainScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {error ? <Text style={styles.error_text}>{error}</Text> : null}
-
       <View style={styles.content_container}>
         {loading ? (
           <View style={styles.state_container}>
