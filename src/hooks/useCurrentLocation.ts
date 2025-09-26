@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
-import { LocationPermission } from "../infraestructure/LocationPermission";
+import { LocationPermission, type Status } from "../infraestructure/LocationPermission";
 import type { Coordinates } from "../domain/entities/LocationEntities";
 
 type Coords = { coordinates: Coordinates; accuracy?: number };
@@ -16,6 +16,58 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(false);
 
+  const ensurePermission = useCallback(async (): Promise<boolean> => {
+    let servicesAvailable = true;
+
+    try {
+      servicesAvailable = await LocationPermission.isLocationEnabled();
+    } catch (err) {
+      // On some iOS versions the native helper might reject; fall back to system platform default.
+      servicesAvailable = Platform.OS === "ios";
+    }
+
+    if (!servicesAvailable) {
+      if (mounted.current) {
+        setError("Servicios de ubicación desactivados");
+      }
+      return false;
+    }
+
+    let status: Status;
+
+    try {
+      status = await LocationPermission.checkStatus();
+    } catch (_err) {
+      status = {
+        state: "denied",
+        accuracy: "unknown",
+        scope: "none",
+      };
+    }
+
+    if (status.state !== "granted") {
+      try {
+        status = await LocationPermission.requestWhenInUse();
+      } catch (requestError: any) {
+        if (mounted.current) {
+          setError(requestError?.message ?? "No se pudo solicitar el permiso de ubicación");
+        }
+        return false;
+      }
+    }
+
+    if (status.state !== "granted") {
+      if (mounted.current) {
+        setError(status.state === "blocked"
+          ? "Permiso de ubicación bloqueado, habilítalo en Ajustes"
+          : "Permiso de ubicación no concedido");
+      }
+      return false;
+    }
+
+    return true;
+  }, []);
+
   const getCurrentLocation = useCallback(async () => {
     if (!enabled || !mounted.current) {
       return;
@@ -25,20 +77,9 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
     setError(null);
 
     try {
-      const services = Platform.OS === "ios"
-        ? true
-        : await LocationPermission.isLocationEnabled();
-      if (!services) {
-        if (mounted.current) setError("Servicios de ubicación desactivados");
-        return;
-      }
-
-      let status = await LocationPermission.checkStatus();
-      if (status.state !== "granted") {
-        status = await LocationPermission.requestWhenInUse();
-      }
-      if (status.state !== "granted") {
-        if (mounted.current) setError("Permiso de ubicación no concedido");
+      const authorized = await ensurePermission();
+      if (!authorized) {
+        if (mounted.current) setCoordinates(null);
         return;
       }
 
@@ -72,7 +113,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [enabled]);
+  }, [enabled, ensurePermission]);
 
   const refresh = useCallback(() => {
     if (!enabled) {
