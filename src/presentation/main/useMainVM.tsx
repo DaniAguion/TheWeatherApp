@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { UserPreferencesService } from "../../domain/ports/UserPreferencesService";
 import type { Coordinates, Location } from "../../domain/entities/LocationEntities";
@@ -10,10 +10,10 @@ export type UseMainVMDeps = {
 
 type VMState = {
     loading: boolean;
-    error?: string | null;
+    error: string | null;
     usingCurrentLocation: boolean;
-    location: Location | null;
-    favouriteLocationName: string;
+    currentLocation: Location | null;
+    favouriteLocation: Location;
 };
 
 type VMFunctions = {
@@ -21,109 +21,119 @@ type VMFunctions = {
     handleSelectFavourite: () => void;
 };
 
-export function useMainVM(
-    deps: UseMainVMDeps,
-) : VMState & VMFunctions {
+export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     const { userPreferencesService } = deps;
-    const [ usingCurrentLocation, setUsingCurrentLocation ] = useState <boolean>(false);
-    const [ favouriteLocation, setFavouriteLocation ] = useState <Location | null>(null);
-    const [ location, setLocation ] = useState <Location | null>(null);
-    const [ loadingPreferences, setLoadingPreferences] = useState(true);
-    const [ error, setError ] = useState<string | null>(null);
+
+    const [state, setState] = useState<VMState>({
+        loading: true,
+        error: null,
+        usingCurrentLocation: false,
+        currentLocation: null,
+        favouriteLocation: { name: "Favorita", coordinates: { lat: 0, lon: 0 } },
+    });
+
+    const mounted = useRef(true);
 
     const {
         coords,
         loading: loadingLocation,
         error: locationError,
         refresh: refreshCurrent
-    } = useCurrentLocation({ enabled: usingCurrentLocation });
+    } = useCurrentLocation({ enabled: state.usingCurrentLocation });
 
-    // Hook to get the preferences of the user
+
+    // Get the preferences of the user when the component is mounted
     useEffect(() => {
-        let mounted = true;
+        mounted.current = true;
         (async () => {
             try {
                 const prefs = await userPreferencesService.loadPreferences();
-                if (!mounted) return;
-                setUsingCurrentLocation(prefs.useCurrentLocation);
-                setFavouriteLocation(prefs.favouriteLocation);
-                setError(null);
-                if (!prefs.useCurrentLocation) {
-                    setLocation(prefs.favouriteLocation);
-                } else {
-                    if (coords) {
-                        setLocation({ coordinates: coords });
-                    }
-                }
+                if (!mounted.current) return;
+                const usingCurrent = !!prefs.useCurrentLocation;
+                const favourite = prefs.favouriteLocation;
+                setState(st => ({ ...st, 
+                    loading: false, 
+                    error: null,
+                    usingCurrentLocation: usingCurrent,
+                    favouriteLocation: favourite,
+                }));
             } catch (err) {
-                if (!mounted) return;
-                setError("Error cargando las preferencias de usuario");
-            } finally {
-                if (!mounted) return;
-                setLoadingPreferences(false);
+                if (!mounted.current) return;
+                setState(st => ({ ...st, 
+                    loading: false, 
+                    error: "Error cargando las preferencias de usuario" 
+                }));
             }
         })();
-        return () => { mounted = false; };
-    }, []);
+        return () => { mounted.current = false; };
+    }, [userPreferencesService]);
 
 
-    // Actualizar location cuando cambian coords (modo actual)
+    // Update state when location or usingCurrentLocation changes
     useEffect(() => {
-        if (usingCurrentLocation) {
-            if (coords) {
-                setLocation({ coordinates: coords });
-            } else if (locationError) {
-                setError(locationError);
-            }
-        }
-    }, [usingCurrentLocation, coords, locationError]);
+        if (!state.usingCurrentLocation) return;
+        if (coords) setState(st => ({ ...st,
+            currentLocation: { coordinates: coords },
+            error: null
+        }));
+        else if (locationError) setState(st => ({ ...st, error: locationError }));
+    }, [state.usingCurrentLocation, coords, locationError]);
 
 
-    // Handlers
-    const handleSelectCurrent = useCallback(async () => {
-        if (usingCurrentLocation) return;
-        setError(null);
-        setUsingCurrentLocation(true);
-        setLocation(prev => prev && prev.name === "Mi ubicación" ? prev : null);
-        try {
-        await userPreferencesService.savePreferences({ useCurrentLocation: true });
-        refreshCurrent();
-        } catch {
-        setUsingCurrentLocation(false);
-        if (favouriteLocation) setLocation(favouriteLocation);
-        setError("No se pudo activar la ubicación actual");
-        }
-    }, [usingCurrentLocation, userPreferencesService, favouriteLocation, refreshCurrent]);
-
-
+    // Select favourite location
     const handleSelectFavourite = useCallback(async () => {
-        if (!usingCurrentLocation) return;
-        if (!favouriteLocation) {
-        setError("No hay ubicación favorita");
-        return;
-        }
-        setError(null);
-        setUsingCurrentLocation(false);
-        setLocation(favouriteLocation);
-        try {
-        await userPreferencesService.savePreferences({ useCurrentLocation: false });
-        } catch {
-        // Revertir
-        setUsingCurrentLocation(true);
-        setLocation(prev => prev?.name === "Mi ubicación" ? prev : null);
-        setError("No se pudo activar la ubicación favorita");
-        }
-    }, [usingCurrentLocation, favouriteLocation, userPreferencesService]);
+        if (!state.usingCurrentLocation) return;
 
-    const loading = loadingPreferences || loadingLocation;
-    const favouriteLocationName = favouriteLocation?.name?.trim() || "Favorita";
+        if (!state.favouriteLocation) {
+            setState(st => ({ ...st, error: "No hay ubicación favorita" }));
+            return;
+        }
+
+        setState(st => ({ ...st,
+             error: null, 
+             usingCurrentLocation: false, 
+             favouriteLocation: st.favouriteLocation
+        }));
+        try {
+            await userPreferencesService.savePreferences({ useCurrentLocation: false });
+        } catch {
+            setState(st => ({ ...st,
+                usingCurrentLocation: true,
+                error: "No se pudo activar la ubicación favorita" 
+            }));
+        }
+    }, [state.usingCurrentLocation, state.favouriteLocation, userPreferencesService]);
+
+
+    // Select current location
+    const handleSelectCurrent = useCallback(async () => {
+        if (state.usingCurrentLocation) return;
+
+        setState(st => ({ ...st,
+            error: null, 
+            usingCurrentLocation: true
+        }));
+
+        try {
+            await userPreferencesService.savePreferences({ useCurrentLocation: true });
+            await refreshCurrent();
+        } catch {
+            setState(st => ({ ...st,
+                usingCurrentLocation: false,
+                favouriteLocation: state.favouriteLocation,
+                error: "No se pudo activar la ubicación actual",
+            }));
+        }
+    }, [state.usingCurrentLocation, userPreferencesService, refreshCurrent]);
+    
+    const loading = state.loading || loadingLocation;
 
     return {
         loading,
-        error,
-        usingCurrentLocation,
-        location,
-        favouriteLocationName,
+        error: state.error,
+        usingCurrentLocation: state.usingCurrentLocation,
+        currentLocation: state.currentLocation,
+        favouriteLocation: state.favouriteLocation,
         handleSelectCurrent,
         handleSelectFavourite,
     };

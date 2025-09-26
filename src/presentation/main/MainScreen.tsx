@@ -16,8 +16,8 @@ export default function MainScreen({ navigation, route }: Props) {
     loading,
     error,
     usingCurrentLocation,
-    location,
-    favouriteLocationName,
+    currentLocation,
+    favouriteLocation,
     handleSelectCurrent,
     handleSelectFavourite,
   } = useMainVM(deps);
@@ -29,7 +29,6 @@ export default function MainScreen({ navigation, route }: Props) {
         <TouchableOpacity
           accessibilityRole="button"
           onPress={handleSelectCurrent}
-          disabled={usingCurrentLocation}
           style={[
             styles.selector_button,
             styles.selector_button_left,
@@ -49,7 +48,6 @@ export default function MainScreen({ navigation, route }: Props) {
         <TouchableOpacity
           accessibilityRole="button"
           onPress={handleSelectFavourite}
-          disabled={!usingCurrentLocation}
           style={[
             styles.selector_button,
             styles.selector_button_right,
@@ -62,7 +60,7 @@ export default function MainScreen({ navigation, route }: Props) {
               !usingCurrentLocation && styles.selector_button_text_active,
             ]}
           >
-            {favouriteLocationName}
+            {favouriteLocation?.name ?? "Favorita"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -78,15 +76,26 @@ export default function MainScreen({ navigation, route }: Props) {
           <View style={styles.state_container}>
             <Text style={styles.error_text}>{error}</Text>
           </View>
-        ) : !location ? (
-          <View style={styles.state_container}>
-            <Text style={styles.error_text}>No ha sido posible obtener la localización</Text>
-          </View>
-        ) : (
+        ) : (usingCurrentLocation && currentLocation != null) ? (
           <WeatherScreen
             navigation={navigation}
-            route={{ params: { name: location.name, coordinates: location.coordinates } }}
+            route={{ params: { 
+              name: currentLocation.name, 
+              coordinates: currentLocation.coordinates
+            } }}
           />
+        ) : (!usingCurrentLocation && favouriteLocation != null) ? (
+          <WeatherScreen
+            navigation={navigation}
+            route={{ params: { 
+              name: favouriteLocation.name, 
+              coordinates: favouriteLocation.coordinates
+            } }}
+          />
+        ) : (
+          <View style={styles.state_container}>
+            <Text style={styles.error_text}>No ha sido posible cargar la localización</Text>
+          </View>
         )}
       </View>
     </View>
