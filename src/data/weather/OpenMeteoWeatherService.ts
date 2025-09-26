@@ -1,9 +1,9 @@
 import type { WeatherService } from "../../domain/ports/WeatherService";
-import { OpenMeteoResponse }  from "./dto";
+import { OpenMeteoResponse, OpenMeteoGeocodingResponse }  from "./dto";
 import { getCached, setCached } from "../storage/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEntities";
-import type { Coordinates } from "../../domain/entities/LocationEntities";
-import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity } from "./mappers";
+import type { Coordinates, Location } from "../../domain/entities/LocationEntities";
+import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity, locationSuggestionDtoToEntity } from "./mappers";
 import type { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
 
@@ -41,6 +41,35 @@ export class OpenMeteoWeatherService implements WeatherService {
       }
       return { success: true, value: { current, hours, days }};
 
+    } catch (error) {
+      return { success:false, error: DataError.unknown(error)};
+    }
+  }
+
+
+  // Search for locations using Open-Meteo Geocoding API
+  async searchLocations(query: string): Promise<Result<Location[]>> {
+    const trimmed = query.trim();
+    if (!trimmed) return { success: true, value: [] };
+
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(trimmed)}&count=10&language=es&format=json`;
+
+    try {
+      const response = await fetch(url);
+      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
+      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+
+      const data = (await response.json()) as OpenMeteoGeocodingResponse;
+ 
+      if (data.results === undefined) return { success: true, value: [] };
+      if (!Array.isArray(data.results)) return { success: false, error: DataError.invalidData(new Error("Malformed geocoding response")) };
+
+
+      const locations: Location[] = data.results
+        .filter(entry => entry != null)
+        .map(locationSuggestionDtoToEntity);
+
+      return { success: true, value: locations };
     } catch (error) {
       return { success:false, error: DataError.unknown(error)};
     }

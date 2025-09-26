@@ -1,7 +1,7 @@
 // src/AppNavigator.tsx
 import * as React from "react";
 import { Text, useColorScheme } from "react-native";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme, NavigatorScreenParams } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -14,7 +14,7 @@ import WeatherScreen from "./presentation/weather/WeatherScreen";
 import HourlyScreen from "./presentation/hourly/HourlyScreen";
 import DailyScreen from "./presentation/daily/DailyScreen";
 import MainScreen from "./presentation/main/MainScreen";
-import FavoritesScreen from "./presentation/FavoritesScreen";
+import FavoriteScreen from "./presentation/favorite/FavoriteScreen";
 import SettingsScreen from "./presentation/SettingsScreen";
 
 
@@ -54,8 +54,8 @@ function HomeStackNavigator() {
   );
 }
 
-type RootTabParamList = {
-  Home: undefined;
+export type RootTabParamList = {
+  Home: NavigatorScreenParams<HomeStackParamList>;
   Favorites: undefined;
   Settings: undefined;
 };
@@ -75,7 +75,7 @@ export default function AppNavigator() {
       >
         <Tab.Screen
           name="Favorites"
-          component={FavoritesScreen}
+          component={FavoriteScreen}
           options={{
             tabBarIcon: () => <Text>⭐</Text>,
           }}
