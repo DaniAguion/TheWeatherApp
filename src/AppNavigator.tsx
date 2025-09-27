@@ -34,19 +34,26 @@ export type TabParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
+const tabBarIconFontSize = { fontSize: 24 };
+
 function TabsNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="HomeMain"
       backBehavior="history"
-      screenOptions={{ tabBarLabelStyle: { fontSize: 12 } }}
+      screenOptions={{
+        tabBarStyle: { height: 100, paddingTop: 8, paddingBottom: 8 },
+        tabBarItemStyle: { paddingVertical: 4},
+        tabBarLabelStyle: { fontSize: 14, fontWeight: "600" },
+        tabBarIconStyle: { width: 40, height: 40},
+      }}
     >
       <Tab.Screen
         name="ExploreMain"
         component={ExploreScreen}
         options={{
           title: "Explorar",
-          tabBarIcon: () => <Text>🧭</Text>,
+          tabBarIcon: () => <Text style={tabBarIconFontSize}>🧭</Text>,
         }}
       />
       <Tab.Screen
@@ -54,7 +61,8 @@ function TabsNavigator() {
         component={MainScreen}
         options={{
           title: "Principal",
-          tabBarIcon: () => <Text>🌤️</Text>,
+          tabBarIcon: () => <Text style={tabBarIconFontSize}>🌤️</Text>,
+        
         }}
       />
       <Tab.Screen
@@ -62,7 +70,7 @@ function TabsNavigator() {
         component={SettingsScreen}
         options={{
           title: "Ajustes",
-          tabBarIcon: () => <Text>⚙️</Text>,
+          tabBarIcon: () => <Text style={tabBarIconFontSize}>⚙️</Text>,
         }}
       />
     </Tab.Navigator>
