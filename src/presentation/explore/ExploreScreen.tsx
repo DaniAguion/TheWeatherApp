@@ -36,11 +36,11 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
   const renderSuggestion = useCallback(({ item } : { item: Location }) => (
     <Pressable
       onPress={() => handleSelect(item)}
-      style={styles.suggestionCard}
+      style={styles.location_card}
     >
-      <Text style={styles.suggestionTitle}>{item.name}</Text>
+      <Text style={styles.location_title}>{item.name}</Text>
       {(item.administration || item.country) ? (
-        <Text style={styles.suggestionSubtitle}>
+        <Text style={styles.location_country}>
           {[item.administration, item.country].filter(Boolean).join(", ")}
         </Text>
       ) : null}
@@ -55,7 +55,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
           Consulta el clima en otras partes del mundo.
         </Text>
       </View>
-      <View style={styles.finder_contaner}>
+      <View style={styles.search_contaner}>
         <TextInput
           value={query}
           onChangeText={setQuery}
@@ -66,26 +66,28 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
           onSubmitEditing={handleSearch}
           style={styles.input}
         />
-        <Pressable onPress={handleSearch} style={styles.findButton}>
-          <Text style={styles.findButtonText}>Buscar</Text>
+        <Pressable onPress={handleSearch} style={styles.search_button}>
+          <Text style={styles.search_button_text}>Buscar</Text>
         </Pressable>
       </View>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {loading ? <ActivityIndicator style={styles.loadingIndicator} /> : null}
-
-      <Text style={styles.resultsTitle}>Resultados</Text>
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.coordinates.lat + "," + item.coordinates.lon}
-        renderItem={renderSuggestion}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={!loading && !error ? (
-          <Text style={styles.emptyText}>
-            Sin resultados. Prueba con otra ciudad.
-          </Text>
-        ) : null}
-      />
+      <View style={styles.results_container}>
+        <Text style={styles.results_title}>Resultados</Text>
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.coordinates.lat + "," + item.coordinates.lon}
+          renderItem={renderSuggestion}
+          contentContainerStyle={styles.results_list}
+          ListEmptyComponent={
+            loading ? (
+              <ActivityIndicator style={styles.loading_indication} />
+            ) : error ? (
+              <Text style={styles.error_text}>{error}</Text>
+            ) : <Text style={styles.no_result_text}>
+              No se han encontrado resultados.
+            </Text>}
+        />
+      </View>
     </View>
   );
 }

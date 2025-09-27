@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   screen_container: {
     flex: 1,
     backgroundColor: "#ffffff",
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
   },
-  finder_contaner: {
+  search_contaner: {
     flexDirection: "row",
     marginBottom: 24,
     gap: 8,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
   },
-  findButton: {
+  search_button: {
     flex: 0.25,
     paddingVertical: 10,
     justifyContent: "center",
@@ -46,46 +46,48 @@ const styles = StyleSheet.create({
     borderColor: "#1273de",
     borderRadius: 8
   },
-  findButtonText: {
+  search_button_text: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 15,
   },
-  errorText: {
+  error_text: {
     color: "#c00",
     fontSize: 14,
   },
-  resultsTitle: {
+  results_container: {
+    flex: 1,
+  },
+  results_title: {
     fontSize: 16,
     fontWeight: "600",
+    paddingBottom: 12,
   },
-  listContent: {
-    gap: 10,
+  results_list: {
+    gap: 8,
   },
-  suggestionCard: {
+  location_card: {
     padding: 14,
     borderRadius: 12,
     backgroundColor: "#f4f4f4",
   },
-  suggestionTitle: {
-    fontSize: 16,
+  location_title: {
+    fontSize: 14,
     fontWeight: "600",
-    color: "#222",
   },
-  suggestionSubtitle: {
+  location_country: {
     fontSize: 12,
     color: "#666",
     marginTop: 4,
   },
-  emptyText: {
+  no_result_text: {
     textAlign: "center",
     marginTop: 24,
     color: "#666",
     fontSize: 14,
   },
-  loadingIndicator: {
+  loading_indication: {
     marginTop: 16,
   },
 });
 
-export default styles;
