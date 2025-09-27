@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "react-native";
-import type { CompositeScreenProps } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-
+import type { CompositeScreenProps } from "@react-navigation/native";
 import type { TabParamList, RootStackParamsList } from "../../AppNavigator";
-import { useServices } from "../../di/ServicesProvider";
 import type { Location } from "../../domain/entities/LocationEntities";
+import { useServices } from "../../di/ServicesProvider";
 import { useExploreVM, UseExploreVMDeps } from "./useExploreVM";
 import styles from "./ExploreScreen.styles";
 
@@ -24,8 +24,22 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
     results,
     setQuery,
     handleSearch,
+    resetSearch
   } = useExploreVM(deps);
 
+  // Clear the input adn the results when the user navigates away from this tab
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        const parent = navigation.getParent();
+        if (parent?.getState()?.index === 0) {
+          resetSearch();
+        }
+      };
+    }, [navigation, resetSearch])
+  );
+
+  // Navigate to the Weather screen when selecting a location
   const handleSelect = useCallback((suggestion: Location) => {
     navigation.navigate("Weather", {
       name: suggestion.name,
@@ -33,6 +47,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
     });
   }, [navigation]);
 
+  // Render a location suggestion
   const renderSuggestion = useCallback(({ item } : { item: Location }) => (
     <Pressable
       onPress={() => handleSelect(item)}

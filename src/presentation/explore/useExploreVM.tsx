@@ -18,6 +18,7 @@ type VMFunctions = {
   setQuery: (value: string) => void;
   handleSearch: () => Promise<void>;
   clearResults: () => void;
+  resetSearch: () => void;
 };
 
 function getErrorMessage(error: Error): string {
@@ -57,6 +58,13 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
   const clearResults = useCallback(() => {
     setResults([]);
     setError(null);
+  }, []);
+
+  const resetSearch = useCallback(() => {
+    setQueryState("");
+    setResults([]);
+    setError(null);
+    setLoading(false);
   }, []);
 
   const handleSearch = useCallback(async () => {
@@ -100,5 +108,6 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
     setQuery,
     handleSearch,
     clearResults,
+    resetSearch
   };
 }
