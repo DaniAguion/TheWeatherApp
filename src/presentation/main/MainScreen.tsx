@@ -1,16 +1,21 @@
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { HomeStackParamList } from "../../AppNavigator";
+import type { CompositeScreenProps } from "@react-navigation/native";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import type { RootStackParamsList, TabParamList } from "../../AppNavigator";
 import { useServices } from "../../di/ServicesProvider";
 import WeatherScreen from "../weather/WeatherScreen";
 import { useMainVM, UseMainVMDeps } from "./useMainVM";
 import styles from "./MainScreen.styles";
 
-type Props = NativeStackScreenProps<HomeStackParamList>;
 
+type MainScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, "HomeMain">,
+  NativeStackScreenProps<RootStackParamsList>
+>;
 
-export default function MainScreen({ navigation, route }: Props) {
+export default function MainScreen({ navigation, route }: MainScreenProps) {
   const deps: UseMainVMDeps = useServices();
   const {
     loading,

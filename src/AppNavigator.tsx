@@ -1,7 +1,7 @@
 // src/AppNavigator.tsx
 import * as React from "react";
 import { Text, useColorScheme } from "react-native";
-import { NavigationContainer, DefaultTheme, DarkTheme, NavigatorScreenParams } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -18,86 +18,84 @@ import ExploreScreen from "./presentation/explore/ExploreScreen";
 import SettingsScreen from "./presentation/SettingsScreen";
 
 
-export type HomeStackParamList = {
-  MainScreen: undefined;
+export type RootStackParamsList = {
+  Tabs: undefined;
   Weather: WeatherScreenParams;
   NextHours: HourlyScreenParams;
   NextDays: DailyScreenParams;
 };
 
-const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+export type TabParamList = {
+  HomeMain: undefined;
+  ExploreMain: undefined;
+  SettingsMain: undefined;
+};
 
-function HomeStackNavigator() {
+const RootStack = createNativeStackNavigator<RootStackParamsList>();
+const Tab = createBottomTabNavigator<TabParamList>();
+
+function TabsNavigator() {
   return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen
-        name="MainScreen"
+    <Tab.Navigator
+      initialRouteName="HomeMain"
+      backBehavior="history"
+      screenOptions={{ tabBarLabelStyle: { fontSize: 12 } }}
+    >
+      <Tab.Screen
+        name="ExploreMain"
+        component={ExploreScreen}
+        options={{
+          title: "Explorar",
+          tabBarIcon: () => <Text>🧭</Text>,
+        }}
+      />
+      <Tab.Screen
+        name="HomeMain"
         component={MainScreen}
-        options={{ title: "Principal" }}
+        options={{
+          title: "Principal",
+          tabBarIcon: () => <Text>🌤️</Text>,
+        }}
       />
-      <HomeStack.Screen
-        name="Weather"
-        component={WeatherScreen}
-        options={{ title: "Tiempo" }}
+      <Tab.Screen
+        name="SettingsMain"
+        component={SettingsScreen}
+        options={{
+          title: "Ajustes",
+          tabBarIcon: () => <Text>⚙️</Text>,
+        }}
       />
-      <HomeStack.Screen
-        name="NextHours"
-        component={HourlyScreen}
-        options={({ route }) => ({ title: route.params.title })}
-      />
-      <HomeStack.Screen
-        name="NextDays"
-        component={DailyScreen}
-        options={({ route }) => ({ title: route.params.title })}
-      />
-    </HomeStack.Navigator>
+    </Tab.Navigator>
   );
 }
 
-export type RootTabParamList = {
-  Home: NavigatorScreenParams<HomeStackParamList>;
-  Explore: undefined;
-  Settings: undefined;
-};
-
-const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export default function AppNavigator() {
   const scheme = useColorScheme();
   return (
     <NavigationContainer theme={scheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          tabBarLabelStyle: { fontSize: 12 },
-        }}
-      >
-        <Tab.Screen
-          name="Explore"
-          component={ExploreScreen}
-          options={{
-            title: "Explorar",
-            tabBarIcon: () => <Text>⭐</Text>,
-          }}
+      <RootStack.Navigator>
+        <RootStack.Screen
+          name="Tabs"
+          component={TabsNavigator}
+          options={{ headerShown: false }}
         />
-        <Tab.Screen
-          name="Home"
-          component={HomeStackNavigator}
-          options={{
-            headerShown: false,
-            tabBarLabel: "Principal",
-            tabBarIcon: () => <Text>🌤️</Text>,
-          }}
+        <RootStack.Screen
+          name="Weather"
+          component={WeatherScreen}
+          options={({ route }) => ({ title: route.params.name })}
         />
-        <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            title: "Ajustes",
-            tabBarIcon: () => <Text>⚙️</Text>,
-          }}
+        <RootStack.Screen
+          name="NextHours"
+          component={HourlyScreen}
+          options={({ route }) => ({ title: route.params.title })}
         />
-      </Tab.Navigator>
+        <RootStack.Screen
+          name="NextDays"
+          component={DailyScreen}
+          options={({ route }) => ({ title: route.params.title })}
+        />
+      </RootStack.Navigator>
     </NavigationContainer>
   );
 }

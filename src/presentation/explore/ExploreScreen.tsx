@@ -4,15 +4,15 @@ import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import type { RootTabParamList, HomeStackParamList } from "../../AppNavigator";
+import type { TabParamList, RootStackParamsList } from "../../AppNavigator";
 import { useServices } from "../../di/ServicesProvider";
 import type { Location } from "../../domain/entities/LocationEntities";
 import { DataError } from "../../domain/errors/DataError";
 import styles from "./ExploreScreen.styles";
 
-export type FavoriteScreenProps = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, "Explore">,
-  NativeStackScreenProps<HomeStackParamList>
+export type ExploreScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, "ExploreMain">,
+  NativeStackScreenProps<RootStackParamsList>
 >;
 
 function getErrorMessage(error: Error): string {
@@ -31,7 +31,7 @@ function getErrorMessage(error: Error): string {
   return error.message || "No se pudo buscar ubicaciones";
 }
 
-export default function FavoriteScreen({ navigation }: FavoriteScreenProps) {
+export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
   const { weatherService } = useServices();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,12 +80,9 @@ export default function FavoriteScreen({ navigation }: FavoriteScreenProps) {
   }, [query, weatherService]);
 
   const handleSelect = useCallback((suggestion: Location) => {
-    navigation.navigate("Home", {
-      screen: "Weather",
-      params: {
-        name: suggestion.name,
-        coordinates: suggestion.coordinates,
-      },
+    navigation.navigate("Weather", {
+      name: suggestion.name,
+      coordinates: suggestion.coordinates,
     });
   }, [navigation]);
 
