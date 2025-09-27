@@ -14,7 +14,7 @@ import WeatherScreen from "./presentation/weather/WeatherScreen";
 import HourlyScreen from "./presentation/hourly/HourlyScreen";
 import DailyScreen from "./presentation/daily/DailyScreen";
 import MainScreen from "./presentation/main/MainScreen";
-import FavoriteScreen from "./presentation/favorite/FavoriteScreen";
+import ExploreScreen from "./presentation/explore/ExploreScreen";
 import SettingsScreen from "./presentation/SettingsScreen";
 
 
@@ -56,7 +56,7 @@ function HomeStackNavigator() {
 
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
-  Favorites: undefined;
+  Explore: undefined;
   Settings: undefined;
 };
 
@@ -69,14 +69,14 @@ export default function AppNavigator() {
       <Tab.Navigator
         initialRouteName="Home"
         screenOptions={{
-          headerShown: false,
           tabBarLabelStyle: { fontSize: 12 },
         }}
       >
         <Tab.Screen
-          name="Favorites"
-          component={FavoriteScreen}
+          name="Explore"
+          component={ExploreScreen}
           options={{
+            title: "Explorar",
             tabBarIcon: () => <Text>⭐</Text>,
           }}
         />
@@ -84,6 +84,7 @@ export default function AppNavigator() {
           name="Home"
           component={HomeStackNavigator}
           options={{
+            headerShown: false,
             tabBarLabel: "Principal",
             tabBarIcon: () => <Text>🌤️</Text>,
           }}
@@ -92,6 +93,7 @@ export default function AppNavigator() {
           name="Settings"
           component={SettingsScreen}
           options={{
+            title: "Ajustes",
             tabBarIcon: () => <Text>⚙️</Text>,
           }}
         />

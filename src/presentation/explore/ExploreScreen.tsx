@@ -8,10 +8,10 @@ import type { RootTabParamList, HomeStackParamList } from "../../AppNavigator";
 import { useServices } from "../../di/ServicesProvider";
 import type { Location } from "../../domain/entities/LocationEntities";
 import { DataError } from "../../domain/errors/DataError";
-import styles from "./FavoriteScreen.styles";
+import styles from "./ExploreScreen.styles";
 
 export type FavoriteScreenProps = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, "Favorites">,
+  BottomTabScreenProps<RootTabParamList, "Explore">,
   NativeStackScreenProps<HomeStackParamList>
 >;
 
@@ -104,7 +104,7 @@ export default function FavoriteScreen({ navigation }: FavoriteScreenProps) {
   ), [handleSelect]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.screen_container}>
       <Text style={styles.heading}>Buscar ubicaciones</Text>
       <Text style={styles.description}>
         Encuentra una ciudad y consulta su pronóstico con un toque.
