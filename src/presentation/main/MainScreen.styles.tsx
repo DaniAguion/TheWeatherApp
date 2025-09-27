@@ -4,7 +4,7 @@ export default StyleSheet.create({
     screen_container: {
         flex: 1,
         paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingTop: 16,
     },
     selector_container: {
         flexDirection: "row",

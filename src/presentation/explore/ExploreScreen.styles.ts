@@ -3,20 +3,31 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   screen_container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    backgroundColor: "#ffffff",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    marginHorizontal: 16,
+    marginVertical: 16,
+    borderRadius: 8,
   },
-  heading: {
-    fontSize: 22,
-    fontWeight: "700",
+  header_container: {
+    alignItems: "flex-start",
+    marginTop: 8,
+    marginBottom: 16,
   },
-  description: {
+  header_title: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  header_desc: {
     fontSize: 14,
     color: "#555",
   },
-  formRow: {
+  finder_contaner: {
     flexDirection: "row",
-    gap: 12,
+    marginBottom: 24,
+    gap: 8,
   },
   input: {
     flex: 1,
@@ -24,17 +35,18 @@ const styles = StyleSheet.create({
     borderColor: "#d0d0d0",
     borderRadius: 12,
     paddingHorizontal: 16,
-    height: 44,
   },
-  submitButton: {
-    height: 44,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: "center",
+  findButton: {
+    flex: 0.25,
+    paddingVertical: 10,
     justifyContent: "center",
-    backgroundColor: "#0a7",
+    alignItems: "center",
+    backgroundColor: "#1273de",
+    borderWidth: 2,
+    borderColor: "#1273de",
+    borderRadius: 8
   },
-  submitButtonText: {
+  findButtonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 15,
