@@ -27,7 +27,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
     resetSearch
   } = useExploreVM(deps);
 
-  // Clear the input adn the results when the user navigates away from this tab
+  // Clear the location finder field and the results when the user navigates away from this tab
   useFocusEffect(
     useCallback(() => {
       return () => {

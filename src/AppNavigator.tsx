@@ -15,7 +15,7 @@ import HourlyScreen from "./presentation/hourly/HourlyScreen";
 import DailyScreen from "./presentation/daily/DailyScreen";
 import MainScreen from "./presentation/main/MainScreen";
 import ExploreScreen from "./presentation/explore/ExploreScreen";
-import SettingsScreen from "./presentation/SettingsScreen";
+import SavedScreen from "./presentation/saved/SavedScreen";
 
 
 export type RootStackParamsList = {
@@ -28,7 +28,7 @@ export type RootStackParamsList = {
 export type TabParamList = {
   HomeMain: undefined;
   ExploreMain: undefined;
-  SettingsMain: undefined;
+  SavedMain: undefined;
 };
 
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
@@ -68,12 +68,12 @@ function TabsNavigator() {
         }}
       />
       <Tab.Screen
-        name="SettingsMain"
-        component={SettingsScreen}
+        name="SavedMain"
+        component={SavedScreen}
         options={{
-          title: "Ajustes",
+          title: "Guardadas",
           headerTitleAlign: "center",
-          tabBarIcon: () => <Text style={tabBarIconFontSize}>⚙️</Text>,
+          tabBarIcon: () => <Text style={tabBarIconFontSize}>📌</Text>,
         }}
       />
     </Tab.Navigator>
