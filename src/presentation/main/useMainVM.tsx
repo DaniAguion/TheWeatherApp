@@ -48,9 +48,9 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         (async () => {
             try {
                 const prefs = await userPreferencesService.loadPreferences();
+                const favourite = await userPreferencesService.loadFavouriteLocation();
                 if (!mounted.current) return;
                 const usingCurrent = !!prefs.useCurrentLocation;
-                const favourite = prefs.favouriteLocation;
                 setState(st => ({ ...st, 
                     loading: false, 
                     error: null,
