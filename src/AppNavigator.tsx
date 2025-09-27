@@ -53,6 +53,7 @@ function TabsNavigator() {
         component={ExploreScreen}
         options={{
           title: "Explorar",
+          headerTitleAlign: "center",
           tabBarIcon: () => <Text style={tabBarIconFontSize}>🧭</Text>,
         }}
       />
@@ -61,6 +62,7 @@ function TabsNavigator() {
         component={MainScreen}
         options={{
           title: "Principal",
+          headerTitleAlign: "center",
           tabBarIcon: () => <Text style={tabBarIconFontSize}>🌤️</Text>,
         
         }}
@@ -70,6 +72,7 @@ function TabsNavigator() {
         component={SettingsScreen}
         options={{
           title: "Ajustes",
+          headerTitleAlign: "center",
           tabBarIcon: () => <Text style={tabBarIconFontSize}>⚙️</Text>,
         }}
       />

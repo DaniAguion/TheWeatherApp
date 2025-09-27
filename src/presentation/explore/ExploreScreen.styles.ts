@@ -16,7 +16,7 @@ export default StyleSheet.create({
     marginBottom: 16,
   },
   header_title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
     marginBottom: 4,
   },
@@ -37,7 +37,7 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
   },
   search_button: {
-    flex: 0.25,
+    flex: 0.4,
     paddingVertical: 10,
     justifyContent: "center",
     alignItems: "center",
