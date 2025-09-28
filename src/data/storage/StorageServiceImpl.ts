@@ -50,7 +50,6 @@ export class StorageServiceImpl implements StorageService {
         return { useCurrentLocation: parsed.useCurrentLocation };
       }
       await AsyncStorage.setItem(KEYS.preferences, JSON.stringify(DEFAULT_VALUES.preferences));
-      console.warn("[UserPrefs] No valid preferences found, using default.");
       return DEFAULT_VALUES.preferences;
     } catch (e) {
       console.error("[UserPrefs] Error loading preferences:", e);
@@ -83,7 +82,6 @@ export class StorageServiceImpl implements StorageService {
         } 
       }
       await AsyncStorage.setItem(KEYS.favouriteLocation, JSON.stringify(DEFAULT_VALUES.favouriteLocation));
-      console.warn("[UserPrefs] No valid favourite location found, using default.");
       return DEFAULT_VALUES.favouriteLocation;
     } catch (e) {
       console.error("[UserPrefs] Error loading favourite location:", e);

@@ -84,7 +84,7 @@ export default StyleSheet.create({
   },
   action_button_icon: {
     fontSize: 28,
-    color: "#C2C2C2",
+    color: "#1273de",
   },
   hours_container: {
     marginBottom: 12,

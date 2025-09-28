@@ -123,7 +123,7 @@ export function useWeatherVM(
     const toggleFavourite = useCallback(async () => {
         const location = { coordinates, name: locationName ?? "Unknown" };
         try {
-            if (!isFavourite) {
+            if (isFavourite) {
                 const res = await storageService.removeFavouriteLocation(location);
                 if (res.success) setIsFavourite(false);
             } else {
