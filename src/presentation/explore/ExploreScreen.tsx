@@ -90,7 +90,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
         <Text style={styles.results_title}>Resultados</Text>
         <FlatList
           data={results}
-          keyExtractor={(item) => item.coordinates.lat + "," + item.coordinates.lon}
+          keyExtractor={(item) => `${item.coordinates.lat},${item.coordinates.lon}`}
           renderItem={renderSuggestion}
           contentContainerStyle={styles.results_list}
           ListEmptyComponent={

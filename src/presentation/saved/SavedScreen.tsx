@@ -90,7 +90,7 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
           data={savedLocations}
           keyExtractor={(item) => `${item.coordinates.lat},${item.coordinates.lon}`}
           renderItem={renderLocation}
-          contentContainerStyle={styles.list_content}
+          contentContainerStyle={styles.locations_list}
           showsVerticalScrollIndicator={false}
         />
       )}

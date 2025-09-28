@@ -1,14 +1,16 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  screen_container: {
+    screen_container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
     backgroundColor: "#ffffff",
+    paddingTop: 32,
+    paddingHorizontal: 32,
+    borderRadius: 8,
   },
   header_container: {
-    marginBottom: 16,
+    alignItems: "flex-start",
+    marginBottom: 32,
   },
   header_title: {
     fontSize: 18,
@@ -16,15 +18,15 @@ export default StyleSheet.create({
     marginBottom: 4,
   },
   header_desc: {
-    fontSize: 14,
-    color: "#555555",
+    fontSize: 16,
+    color: "#555",
   },
   loading_container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  list_content: {
+  locations_list: {
     paddingBottom: 24,
     gap: 12,
   },

@@ -4,16 +4,13 @@ export default StyleSheet.create({
   screen_container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    marginHorizontal: 16,
-    marginVertical: 16,
+    paddingTop: 32,
+    paddingHorizontal: 32,
     borderRadius: 8,
   },
   header_container: {
     alignItems: "flex-start",
-    marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 32,
   },
   header_title: {
     fontSize: 18,
@@ -21,7 +18,7 @@ export default StyleSheet.create({
     marginBottom: 4,
   },
   header_desc: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#555",
   },
   search_contaner: {
