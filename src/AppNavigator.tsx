@@ -35,18 +35,36 @@ export type TabParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamsList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const tabBarIconFontSize = { fontSize: 24 };
-
 function TabsNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="HomeMain"
       backBehavior="history"
-      screenOptions={{
-        tabBarStyle: { height: 100, paddingTop: 8, paddingBottom: 8 },
-        tabBarItemStyle: { paddingVertical: 4},
-        tabBarLabelStyle: { fontSize: 14, fontWeight: "600" },
-        tabBarIconStyle: { width: 40, height: 40},
+      screenOptions={({ route }) => {
+        const ICON_SIZE = 24;
+        return {
+          tabBarStyle: { paddingTop: 6, paddingBottom: 6 },
+            tabBarLabelStyle: { fontSize: 14, fontWeight: "600" },
+          tabBarActiveTintColor: "#1273de",
+          tabBarInactiveTintColor: "#7a7a7a",
+          tabBarIcon: ({ color, focused }) => {
+            let name: string;
+            switch (route.name) {
+              case "ExploreMain":
+                name = focused ? "compass" : "compass-outline";
+                break;
+              case "HomeMain":
+                name = focused ? "sunny" : "sunny-outline";
+                break;
+              case "SavedMain":
+                name = focused ? "bookmark" : "bookmark-outline";
+                break;
+              default:
+                name = "ellipse";
+            }
+            return <Ionicons name={name as any} size={ICON_SIZE} color={color} />;
+          },
+        };
       }}
     >
       <Tab.Screen
@@ -54,8 +72,7 @@ function TabsNavigator() {
         component={ExploreScreen}
         options={{
           title: "Explorar",
-          headerTitleAlign: "center",
-          tabBarIcon: () =>  <Ionicons name={"compass-outline"} size={32} color={"gray"} />,
+          headerTitleAlign: "center"
         }}
       />
       <Tab.Screen
@@ -63,8 +80,7 @@ function TabsNavigator() {
         component={MainScreen}
         options={{
           title: "Principal",
-          headerTitleAlign: "center",
-          tabBarIcon: () =>  <Ionicons name={"sunny-outline"} size={32} color={"gray"} />,
+          headerTitleAlign: "center"
         }}
       />
       <Tab.Screen
@@ -72,8 +88,7 @@ function TabsNavigator() {
         component={SavedScreen}
         options={{
           title: "Guardado",
-          headerTitleAlign: "center",
-          tabBarIcon: () =>  <Ionicons name={"bookmark-outline"} size={32} color={"gray"} />,
+          headerTitleAlign: "center"
         }}
       />
     </Tab.Navigator>
