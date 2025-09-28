@@ -1,7 +1,7 @@
 // src/AppNavigator.tsx
 import * as React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { Text, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";

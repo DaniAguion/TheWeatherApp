@@ -1,13 +1,15 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { WeatherService } from "../../domain/ports/WeatherService";
 import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
+import { StorageService } from "../../domain/ports/StorageService";
 import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { toUIErrorMessage } from "../errorMessages";
 
 export type UseWeatherVMDeps = {
     weatherService: WeatherService;
-    reverseGeoService:  ReverseGeoService;
+    reverseGeoService: ReverseGeoService;
+    storageService: StorageService;
 };
 
 type VMState = {
@@ -18,10 +20,14 @@ type VMState = {
     next24h: Hour[] | null;
     next72h: Hour[] | null;
     days: Day[] | null;
+    isFavourite: boolean;
+    isSaved: boolean;
 };
 
 type VMFunctions = {
-    refetch: () => void;
+    fetchWeather: () => void;
+    toggleFavourite: () => void;
+    toggleSaved: () => void;
 };
 
 export function useWeatherVM(
@@ -36,12 +42,14 @@ export function useWeatherVM(
     const [current, setCurrent] = useState<Current | null>(null);
     const [hours, setHours] = useState<Hour[] | null>(null);
     const [days, setDays] = useState<Day[] | null>(null);
+    const [isFavourite, setIsFavourite] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
 
     // Fetch weather data when lat/lon changes
-    useEffect(() => { fetchData() }, [coordinates]);
+    useEffect(() => { fetchWeather() }, [coordinates]);
 
     // Function to fetch location and weather data
-    const fetchData = useCallback(async () => {
+    const fetchWeather = useCallback(async () => {
         setLoading(true);
         setError(null);
         if (routeLocationName) {
@@ -85,6 +93,25 @@ export function useWeatherVM(
         return hours.filter(h => h.dateTime > now && h.dateTime < in72h);
     }, [current, hours]);
 
+
+    //
+    // TO DO: Implement favourite and saved logic
+    //
+    const toggleFavourite = useCallback(() => {
+        // Placeholder
+        const newValue = !isFavourite;
+        setIsFavourite(newValue);
+    }, [, ]);
+
+    const toggleSaved = useCallback(() => {
+        // Placeholder
+        const newValue = !isSaved;
+        setIsSaved(newValue);
+    }, [, ]);
+
+
+
+    
     return { 
         loading, 
         error, 
@@ -93,5 +120,10 @@ export function useWeatherVM(
         next24h, 
         next72h, 
         days, 
-        refetch: fetchData };
+        isFavourite,
+        isSaved,
+        fetchWeather,
+        toggleFavourite,
+        toggleSaved
+    };
 }

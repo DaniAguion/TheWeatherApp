@@ -13,7 +13,7 @@ export default StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 8,
-    marginBottom: 16
+    marginBottom: 12
   },
   current_main_group: {
     flex: 1,
@@ -65,8 +65,29 @@ export default StyleSheet.create({
   list: {
     flexGrow: 0,
   },
+  actions_container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderRadius: 8,
+    marginBottom: 12
+  },
+  action_button: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ffffff",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  action_button_icon: {
+    fontSize: 28,
+    color: "#C2C2C2",
+  },
   hours_container: {
-    marginBottom: 16,
+    marginBottom: 12,
     backgroundColor: "#ffffff",
     paddingVertical: 16,
     paddingHorizontal: 24,

@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { useFocusEffect } from "@react-navigation/native";
-import { View, Text, ActivityIndicator, Button, ScrollView, FlatList } from "react-native";
+import { View, Text, ActivityIndicator, Button, ScrollView, FlatList, Pressable } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import type { Location } from "../../domain/entities/LocationEntities";
 import { useWeatherVM, UseWeatherVMDeps } from "./useWeatherVM";
@@ -25,8 +26,12 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     current, 
     next24h, 
     next72h, 
-    days, 
-    refetch 
+    days,
+    isFavourite,
+    isSaved,
+    fetchWeather,
+    toggleFavourite,
+    toggleSaved
   } = useWeatherVM(coordinates, deps, name);
 
   const showLocationName = locationName && locationName.length > 0;
@@ -39,7 +44,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   if (error || (!current || !next24h || !next72h || !days)) return (
     <View style={styles.errorContainer}>
       <Text style={styles.errorText}>{error}</Text>
-      <Button title="Reintentar" onPress={refetch} />
+      <Button title="Reintentar" onPress={fetchWeather} />
     </View>
   );
 
@@ -87,10 +92,18 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
           <Text style={styles.current_weather_desc}>{current.weather_desc}</Text>
         </View>
         <View style={styles.current_sec_group}>
-          <Text style={styles.secondary_text}>🌫️  {Math.round(current.humidity)} %</Text> 
+          <Text style={styles.secondary_text}>🌫️ {Math.round(current.humidity)} %</Text> 
           <Text style={styles.secondary_text}>🌧️ {Math.round(current.precipitationMm)} mm</Text>
           <Text style={styles.secondary_text}>💨 {Math.round(current.windSpeedKmh)} km/h</Text>
         </View>
+      </View>
+      <View style={ styles.actions_container }>
+          <Pressable accessibilityRole="button" onPress={toggleFavourite} style={ styles.action_button}>
+            <Ionicons name={isFavourite ? "star" : "star-outline"} style={ styles.action_button_icon }/>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={toggleSaved} style={ styles.action_button}>
+            <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} style={ styles.action_button_icon }/>
+          </Pressable>
       </View>
       <GestureHandlerRootView>
         <GestureDetector gesture={tapHour}>
