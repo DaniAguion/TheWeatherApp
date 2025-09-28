@@ -61,6 +61,25 @@ export class StorageServiceImpl implements StorageService {
     }
   }
 
+  // Load saved locations
+  async loadSavedLocations(): Promise<Location[]> {
+    try {
+      const raw = await AsyncStorage.getItem(LOCATIONS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as UserLocations;
+        if (parsed && Array.isArray(parsed.savedLocations)) {
+          return parsed.savedLocations.filter(validLocation);
+        } 
+      }
+      await AsyncStorage.setItem(LOCATIONS_KEY, JSON.stringify(DEFAULT_LOCATIONS));
+      console.warn("[UserPrefs] No valid saved locations found, using default.");
+      return DEFAULT_LOCATIONS.savedLocations;
+    } catch (e) {
+      console.error("[UserPrefs] Error loading saved locations:", e);
+    }
+    return DEFAULT_LOCATIONS.savedLocations;
+  }
+
 
   // Load favourite location
   async loadFavouriteLocation(): Promise<Location> {
@@ -97,7 +116,7 @@ export class StorageServiceImpl implements StorageService {
  // Function saves either a favourite or a saved location
   private async saveLocation(favouriteLocation?: Location, savedLocation?: Location): Promise<Result<void>> {
      try {
-      if (!favouriteLocation && savedLocation) return {
+      if (!favouriteLocation && !savedLocation) return {
          success: false, error: DataError.invalidData(new Error("No location provided")) 
       };
       
@@ -136,6 +155,82 @@ export class StorageServiceImpl implements StorageService {
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving location:", e);
+      return { success: false, error: DataError.unknown(e) };
+    }
+  }
+
+
+  // Remove location from favourite
+  async removeFavouriteLocation(location: Location): Promise<Result<void>> {
+    return this.removeLocation(location, undefined);
+  }
+
+
+  // Remove location from locations list
+  async removeLocationFromSaved(location: Location): Promise<Result<void>> {
+    return this.removeLocation(undefined, location);
+  }
+
+
+ // Function remove either a favourite or a saved location
+  private async removeLocation(favouriteLocation?: Location, savedLocation?: Location): Promise<Result<void>> {
+     try {
+      if (!favouriteLocation && !savedLocation) return {
+         success: false, error: DataError.invalidData(new Error("No location provided")) 
+      };
+      
+      if (favouriteLocation && !validLocation(favouriteLocation)) {
+        console.error("[UserPrefs] Invalid location format:", favouriteLocation);
+        return {
+          success: false,
+          error: DataError.invalidData(new Error("Invalid location")),
+        };
+      }
+
+      if (savedLocation && !validLocation(savedLocation)) {
+        console.error("[UserPrefs] Invalid location format:", savedLocation);
+        return {
+          success: false,
+          error: DataError.invalidData(new Error("Invalid location")),
+        };
+      }
+
+      let base: UserLocations = DEFAULT_LOCATIONS;
+      const raw = await AsyncStorage.getItem(LOCATIONS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as UserLocations;
+        base = {
+            savedLocations: parsed.savedLocations ?? DEFAULT_LOCATIONS.savedLocations,
+            favouriteLocation: parsed.favouriteLocation ?? DEFAULT_LOCATIONS.favouriteLocation,
+        };
+      }
+
+      let newSaved = base.savedLocations;
+      let newFavourite = base.favouriteLocation;
+
+      if (savedLocation) {
+        newSaved = newSaved.filter(l =>!(l.coordinates.lat === savedLocation.coordinates.lat &&
+            l.coordinates.lon === savedLocation.coordinates.lon));
+      }
+
+      if (favouriteLocation) {
+        const matches =
+          base.favouriteLocation.coordinates.lat === favouriteLocation.coordinates.lat &&
+          base.favouriteLocation.coordinates.lon === favouriteLocation.coordinates.lon;
+        if (matches) {
+          newFavourite = DEFAULT_LOCATIONS.favouriteLocation;
+        }
+      }
+
+      const newUserLocations: UserLocations = {
+        savedLocations: newSaved,
+        favouriteLocation: newFavourite,
+      };
+
+      await AsyncStorage.setItem(LOCATIONS_KEY, JSON.stringify(newUserLocations));
+      return { success: true, value: undefined };
+    } catch (e) {
+      console.error("[UserPrefs] Error removing location:", e);
       return { success: false, error: DataError.unknown(e) };
     }
   }

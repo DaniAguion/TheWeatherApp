@@ -44,9 +44,35 @@ export function useWeatherVM(
     const [days, setDays] = useState<Day[] | null>(null);
     const [isFavourite, setIsFavourite] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const { storageService } = deps;
 
     // Fetch weather data when lat/lon changes
     useEffect(() => { fetchWeather() }, [coordinates]);
+
+
+    // Fetch favourite and saved status when coordinates change
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+        try {
+            const fav = await storageService.loadFavouriteLocation();
+            if (!cancelled) {
+                setIsFavourite(fav.coordinates.lat === coordinates.lat && fav.coordinates.lon === coordinates.lon);
+            }
+            const saved = await storageService.loadSavedLocations();
+            if (!cancelled) {
+                setIsSaved(
+                    saved.some(l => l.coordinates.lat === coordinates.lat && l.coordinates.lon === coordinates.lon)
+                );
+            }
+        } catch(err) {
+            console.log("Failed to get weather from location:", err);
+        }
+        })();
+        return () => { cancelled = true; };
+    }, [coordinates, storageService]);
+
+
 
     // Function to fetch location and weather data
     const fetchWeather = useCallback(async () => {
@@ -108,8 +134,6 @@ export function useWeatherVM(
         const newValue = !isSaved;
         setIsSaved(newValue);
     }, [, ]);
-
-
 
     
     return { 
