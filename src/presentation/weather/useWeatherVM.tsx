@@ -120,20 +120,36 @@ export function useWeatherVM(
     }, [current, hours]);
 
 
-    //
-    // TO DO: Implement favourite and saved logic
-    //
-    const toggleFavourite = useCallback(() => {
-        // Placeholder
-        const newValue = !isFavourite;
-        setIsFavourite(newValue);
-    }, [, ]);
+    const toggleFavourite = useCallback(async () => {
+        const location = { coordinates, name: locationName ?? "Unknown" };
+        try {
+            if (!isFavourite) {
+                const res = await storageService.removeFavouriteLocation(location);
+                if (res.success) setIsFavourite(false);
+            } else {
+                const res = await storageService.storeFavouriteLocation(location);
+                if (res.success) setIsFavourite(true);
+            }
+        } catch (e) {
+            console.log("toggleFavourite failed:", e);
+        }
+    }, [isFavourite, locationName, coordinates, storageService]);
 
-    const toggleSaved = useCallback(() => {
-        // Placeholder
-        const newValue = !isSaved;
-        setIsSaved(newValue);
-    }, [, ]);
+
+    const toggleSaved = useCallback(async () => {
+        const location = { coordinates, name: locationName ?? "Unknown" };
+        try {
+            if (isSaved) {
+                const res = await storageService.removeSaveLocation(location);
+                if (res.success) setIsSaved(false);
+            } else {
+                const res = await storageService.storeSavedLocation(location);
+                if (res.success) setIsSaved(true);
+            }
+        } catch (e) {
+            console.log("toggleSaved failed:", e);
+        }
+    }, [isSaved, locationName, coordinates, storageService]);
 
     
     return { 

@@ -1,5 +1,7 @@
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -24,9 +26,17 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
     currentLocation,
     favouriteLocation,
     handleSelectCurrent,
-    handleSelectFavourite,
+    handleSelectFavourite, 
+    refreshPreferences
   } = useMainVM(deps);
 
+
+  // Refresh preferences when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      refreshPreferences();
+    }, [refreshPreferences])
+  );
 
   return (
     <View style={styles.screen_container}>

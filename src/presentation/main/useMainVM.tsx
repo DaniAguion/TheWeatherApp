@@ -19,6 +19,7 @@ type VMState = {
 type VMFunctions = {
     handleSelectCurrent: () => void;
     handleSelectFavourite: () => void;
+    refreshPreferences: () => Promise<void>;
 };
 
 export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
@@ -32,8 +33,6 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         favouriteLocation: { name: "Favorita", coordinates: { lat: 0, lon: 0 } },
     });
 
-    const mounted = useRef(true);
-
     const {
         coords,
         loading: loadingLocation,
@@ -43,30 +42,36 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
 
 
     // Get the preferences of the user when the component is mounted
-    useEffect(() => {
-        mounted.current = true;
-        (async () => {
-            try {
-                const prefs = await StorageService.loadPreferences();
-                const favourite = await StorageService.loadFavouriteLocation();
-                if (!mounted.current) return;
-                const usingCurrent = !!prefs.useCurrentLocation;
-                setState(st => ({ ...st, 
-                    loading: false, 
-                    error: null,
-                    usingCurrentLocation: usingCurrent,
-                    favouriteLocation: favourite,
-                }));
-            } catch (err) {
-                if (!mounted.current) return;
-                setState(st => ({ ...st, 
-                    loading: false, 
-                    error: "Error cargando las preferencias de usuario" 
-                }));
-            }
-        })();
-        return () => { mounted.current = false; };
+    const loadPreferences = useCallback(async () => {
+        try {
+        const prefs = await StorageService.loadPreferences();
+        const favourite = await StorageService.loadFavouriteLocation();
+        const usingCurrent = !!prefs.useCurrentLocation;
+        setState(st => ({
+            ...st,
+            loading: false,
+            error: null,
+            usingCurrentLocation: usingCurrent,
+            favouriteLocation: favourite,
+        }));
+        } catch {
+        setState(st => ({
+            ...st,
+            loading: false,
+            error: "Error cargando las preferencias de usuario"
+        }));
+        }
     }, [StorageService]);
+
+
+    useEffect(() => {
+        loadPreferences();
+    }, [loadPreferences, state.usingCurrentLocation]);
+
+
+    const refreshPreferences = useCallback(async () => {
+        await loadPreferences();
+    }, [loadPreferences]);
 
 
     // Update state when location or usingCurrentLocation changes
@@ -136,6 +141,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         favouriteLocation: state.favouriteLocation,
         handleSelectCurrent,
         handleSelectFavourite,
+        refreshPreferences
     };
 }
    

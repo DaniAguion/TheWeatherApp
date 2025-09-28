@@ -30,6 +30,15 @@ function validLocation(loc: any): boolean {
   );
 }
 
+function sameLocation(a: Location, b: Location): boolean {
+  return (
+    a &&
+    b &&
+    a.coordinates.lat === b.coordinates.lat &&
+    a.coordinates.lon === b.coordinates.lon
+  );
+}
+
 export class StorageServiceImpl implements StorageService {
 
   // Load preferences
@@ -106,6 +115,8 @@ export class StorageServiceImpl implements StorageService {
   // Remove location from favourite
   async removeFavouriteLocation(location: Location): Promise<Result<void>> {
     try {
+      if (sameLocation(location, DEFAULT_VALUES.favouriteLocation)) return { success: false, error: new Error("Cannot remove default location") };
+      console.log("Removing favourite location:", location);
       await AsyncStorage.removeItem(KEYS.favouriteLocation);
       return { success: true, value: undefined };
     } catch (e) {
