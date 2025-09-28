@@ -1,5 +1,6 @@
 // src/AppNavigator.tsx
 import * as React from "react";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { Text, useColorScheme } from "react-native";
 import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -54,7 +55,7 @@ function TabsNavigator() {
         options={{
           title: "Explorar",
           headerTitleAlign: "center",
-          tabBarIcon: () => <Text style={tabBarIconFontSize}>🧭</Text>,
+          tabBarIcon: () =>  <Ionicons name={"compass-outline"} size={32} color={"gray"} />,
         }}
       />
       <Tab.Screen
@@ -63,17 +64,16 @@ function TabsNavigator() {
         options={{
           title: "Principal",
           headerTitleAlign: "center",
-          tabBarIcon: () => <Text style={tabBarIconFontSize}>🌤️</Text>,
-        
+          tabBarIcon: () =>  <Ionicons name={"sunny-outline"} size={32} color={"gray"} />,
         }}
       />
       <Tab.Screen
         name="SavedMain"
         component={SavedScreen}
         options={{
-          title: "Guardadas",
+          title: "Guardado",
           headerTitleAlign: "center",
-          tabBarIcon: () => <Text style={tabBarIconFontSize}>📌</Text>,
+          tabBarIcon: () =>  <Ionicons name={"bookmark-outline"} size={32} color={"gray"} />,
         }}
       />
     </Tab.Navigator>

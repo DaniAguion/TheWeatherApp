@@ -74,9 +74,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   
   // Main render
   return (
-    <ScrollView
-      style={styles.container}
-    >
+    <ScrollView style={styles.container}>
       <View style={styles.current_container}>
         <View style={styles.current_main_group}>
           <Text style={styles.location}>{
