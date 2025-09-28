@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
-import { UserPreferencesService } from "../../domain/ports/UserPreferencesService";
+import { UserStoreService } from "../../domain/ports/UserStoreService";
 import type { Coordinates, Location } from "../../domain/entities/LocationEntities";
 
 
 export type UseMainVMDeps = {
-    userPreferencesService: UserPreferencesService;
+    userStoreService: UserStoreService;
 };
 
 type VMState = {
@@ -22,7 +22,7 @@ type VMFunctions = {
 };
 
 export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
-    const { userPreferencesService } = deps;
+    const { userStoreService } = deps;
 
     const [state, setState] = useState<VMState>({
         loading: true,
@@ -47,8 +47,8 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         mounted.current = true;
         (async () => {
             try {
-                const prefs = await userPreferencesService.loadPreferences();
-                const favourite = await userPreferencesService.loadFavouriteLocation();
+                const prefs = await userStoreService.loadPreferences();
+                const favourite = await userStoreService.loadFavouriteLocation();
                 if (!mounted.current) return;
                 const usingCurrent = !!prefs.useCurrentLocation;
                 setState(st => ({ ...st, 
@@ -66,7 +66,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             }
         })();
         return () => { mounted.current = false; };
-    }, [userPreferencesService]);
+    }, [userStoreService]);
 
 
     // Update state when location or usingCurrentLocation changes
@@ -95,14 +95,14 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
              favouriteLocation: st.favouriteLocation
         }));
         try {
-            await userPreferencesService.savePreferences({ useCurrentLocation: false });
+            await userStoreService.storePreferences({ useCurrentLocation: false });
         } catch {
             setState(st => ({ ...st,
                 usingCurrentLocation: true,
                 error: "No se pudo activar la ubicación favorita" 
             }));
         }
-    }, [state.usingCurrentLocation, state.favouriteLocation, userPreferencesService]);
+    }, [state.usingCurrentLocation, state.favouriteLocation, userStoreService]);
 
 
     // Select current location
@@ -115,7 +115,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         }));
 
         try {
-            await userPreferencesService.savePreferences({ useCurrentLocation: true });
+            await userStoreService.storePreferences({ useCurrentLocation: true });
             await refreshCurrent();
         } catch {
             setState(st => ({ ...st,
@@ -124,7 +124,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
                 error: "No se pudo activar la ubicación actual",
             }));
         }
-    }, [state.usingCurrentLocation, userPreferencesService, refreshCurrent]);
+    }, [state.usingCurrentLocation, userStoreService, refreshCurrent]);
     
     const loading = state.loading || loadingLocation;
 

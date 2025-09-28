@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { UserPreferences, UserLocations } from "../../domain/entities/UserPreferences";
-import type { UserPreferencesService } from "../../domain/ports/UserPreferencesService";
+import type { UserStoreService } from "../../domain/ports/UserStoreService";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
@@ -30,7 +30,7 @@ function validLocation(loc: any): boolean {
 }
 
 
-export class UserPreferencesServiceImpl implements UserPreferencesService {
+export class UserStoreServiceImpl implements UserStoreService {
 
   // Load preferences
   async loadPreferences(): Promise<UserPreferences> {
@@ -51,7 +51,7 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
 
 
   // Save preferences
-  async savePreferences(prefs: UserPreferences) : Promise<Result<void>> {
+  async storePreferences(prefs: UserPreferences) : Promise<Result<void>> {
     try {
       await AsyncStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
       return { success: true, value: undefined };
@@ -83,13 +83,13 @@ export class UserPreferencesServiceImpl implements UserPreferencesService {
 
 
   // Save a location as favourite
-  async saveLocationAsFavourite(location: Location): Promise<Result<void>> {
+  async storeLocationAsFavourite(location: Location): Promise<Result<void>> {
     return this.saveLocation(location, undefined);
   }
 
 
   // Save a location to saved locations list
-  async saveLocationAsSaved(location: Location): Promise<Result<void>> {
+  async storeLocationAsSaved(location: Location): Promise<Result<void>> {
     return this.saveLocation(undefined, location);
   }
 
