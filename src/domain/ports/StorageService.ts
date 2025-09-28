@@ -6,9 +6,9 @@ export interface StorageService {
     loadPreferences(): Promise<UserPreferences>;
     storePreferences(prefs: UserPreferences): Promise<Result<void>>;
     loadFavouriteLocation(): Promise<Location>;
-    loadSavedLocations(): Promise<Location[]>;
-    storeLocationAsFavourite(location: Location): Promise<Result<void>>;
-    storeLocationAsSaved(location: Location): Promise<Result<void>>;
+    storeFavouriteLocation(location: Location): Promise<Result<void>>;
     removeFavouriteLocation(location: Location): Promise<Result<void>>;
-    removeLocationFromSaved(location: Location): Promise<Result<void>>;
+    loadSavedLocations(): Promise<Location[]>;
+    storeSavedLocation(location: Location): Promise<Result<void>>;
+    removeSaveLocation(location: Location): Promise<Result<void>>;
 }
