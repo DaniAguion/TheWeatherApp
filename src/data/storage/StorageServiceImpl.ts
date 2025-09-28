@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { UserPreferences, UserLocations } from "../../domain/entities/UserPreferences";
-import type { UserStoreService } from "../../domain/ports/UserStoreService";
+import type { StorageService as StorageService } from "../../domain/ports/StorageService";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
 import { DataError } from "../../domain/errors/DataError";
@@ -30,7 +30,7 @@ function validLocation(loc: any): boolean {
 }
 
 
-export class UserStoreServiceImpl implements UserStoreService {
+export class StorageServiceImpl implements StorageService {
 
   // Load preferences
   async loadPreferences(): Promise<UserPreferences> {
