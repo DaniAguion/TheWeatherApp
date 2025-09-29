@@ -42,9 +42,7 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
   }, [navigation]);
 
   const renderLocation = useCallback(({ item }: { item: Location }) => {
-    const metaParts = [item.administration, item.country].filter(Boolean);
-    const metaLabel = metaParts.join(", ");
-    const coordsLabel = `Lat: ${item.coordinates.lat.toFixed(2)}°, Lon: ${item.coordinates.lon.toFixed(2)}°`;
+  const coordsLabel = `Lat: ${item.coordinates.lat.toFixed(2)}°, Lon: ${item.coordinates.lon.toFixed(2)}°`;
 
     return (
       <Pressable
@@ -53,9 +51,6 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
         style={styles.location_card}
       >
         <Text style={styles.location_title}>{item.name ?? "Ubicación guardada"}</Text>
-        {metaLabel ? (
-          <Text style={styles.location_meta}>{metaLabel}</Text>
-        ) : null}
         <Text style={styles.location_coords}>{coordsLabel}</Text>
       </Pressable>
     );
