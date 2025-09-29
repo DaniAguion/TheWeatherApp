@@ -56,7 +56,6 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   useFocusEffect(
     useCallback(() => {
       refreshPreferences();
-      runFadeIn();
     }, [refreshPreferences])
   );
 

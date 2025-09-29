@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { Animated } from "react-native";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, FlatList, Pressable } from "react-native";
@@ -35,6 +36,9 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   } = useWeatherVM(coordinates, deps, name);
 
   const showLocationName = locationName && locationName.length > 0;
+
+  const favScale = useRef(new Animated.Value(1)).current;
+  const savedScale = useRef(new Animated.Value(1)).current;
 
   // Clear view when navigating away
   useFocusEffect(useCallback(() => { return () => {} }, []));
@@ -76,6 +80,14 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
       }
     });
 
+
+  const animatePressIn = (val: Animated.Value) => {
+    Animated.spring(val, { toValue: 0.85, useNativeDriver: true, speed: 30, bounciness: 0 }).start();
+  };
+  const animatePressOut = (val: Animated.Value) => {
+    Animated.spring(val, { toValue: 1, useNativeDriver: true, friction: 5 }).start();
+  };
+
   
   // Main render
   return (
@@ -98,12 +110,26 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
         </View>
       </View>
       <View style={ styles.actions_container }>
-          <Pressable accessibilityRole="button" onPress={toggleFavourite} style={ styles.action_button}>
+        <Animated.View style={[styles.action_button, { transform: [{ scale: favScale }] }]}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={toggleFavourite}
+            onPressIn={() => animatePressIn(favScale)}
+            onPressOut={() => animatePressOut(favScale)}
+          >
             <Ionicons name={isFavourite ? "star" : "star-outline"} style={ styles.action_button_icon }/>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={toggleSaved} style={ styles.action_button}>
+        </Animated.View>
+        <Animated.View style={[styles.action_button, { transform: [{ scale: savedScale }] }]}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={toggleSaved}
+            onPressIn={() => animatePressIn(savedScale)}
+            onPressOut={() => animatePressOut(savedScale)}
+          >
             <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} style={ styles.action_button_icon }/>
           </Pressable>
+        </Animated.View>
       </View>
       <GestureHandlerRootView>
         <GestureDetector gesture={tapHour}>
