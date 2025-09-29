@@ -39,7 +39,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
     if (!loading && !error) {
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 500,
+        duration: 1000,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
@@ -60,7 +60,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   );
 
   return (
-    <Animated.View style={[styles.screen_container, { opacity }]}>
+    <View style={styles.screen_container}>
       <View style={styles.selector_container}>
         <TouchableOpacity
           accessibilityRole="button"
@@ -101,7 +101,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.content_container}>
+      <Animated.View style={[styles.content_container, { opacity }]}>
         {loading ? (
           <View style={styles.state_container}>
             <ActivityIndicator size="large" />
@@ -131,7 +131,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
             <Text style={styles.error_text}>No ha sido posible cargar la localización</Text>
           </View>
         )}
-      </View>
-    </Animated.View>
+      </Animated.View>
+    </View>
   );
 }
