@@ -53,7 +53,7 @@ export function useWeatherVM(
     useEffect(() => { fetchWeather() }, [coordinates]);
 
 
-    // Fetch favourite and saved status when coordinates change
+    // Fetch favourite and saved status
     const refreshPersistedStatus = useCallback(async () => {
         try {
             const favouriteLocation = await storageService.loadFavouriteLocation();

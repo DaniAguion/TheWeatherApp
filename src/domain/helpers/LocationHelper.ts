@@ -39,11 +39,14 @@ export function normalizeLocation(loc: Location): Location {
 }
 
 // Check if two locations are the same based on their coordinates
+// or names (if coordinates are close enough)
 export function sameLocation(a: Location, b: Location): boolean {
+  if (!a || !b) {
+    return false;
+  }
   return (
-    a &&
-    b &&
-    a.coordinates.lat === b.coordinates.lat &&
-    a.coordinates.lon === b.coordinates.lon
+    (a.coordinates.lat === b.coordinates.lat && a.coordinates.lon === b.coordinates.lon) ||
+    (typeof a.name === "string" && typeof b.name === "string" && a.name == b.name &&
+      Math.abs(a.coordinates.lat - b.coordinates.lat) <= 1 && Math.abs(a.coordinates.lon - b.coordinates.lon) <= 1)
   );
 }
