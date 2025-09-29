@@ -1,4 +1,5 @@
 import React from "react";
+import Ionicons from "@react-native-vector-icons/ionicons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useRef } from "react";
@@ -71,6 +72,13 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
             usingCurrentLocation && styles.selector_button_active,
           ]}
         >
+          <Ionicons 
+            name={"location-outline"} 
+            style={[
+              styles.selector_button_text,
+              usingCurrentLocation && styles.selector_button_text_active,
+            ]}
+          />
           <Text
             style={[
               styles.selector_button_text,
@@ -90,6 +98,12 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
             !usingCurrentLocation && styles.selector_button_active,
           ]}
         >
+          <Ionicons 
+            name={"star-outline"} 
+            style={[
+              styles.selector_button_text,
+              !usingCurrentLocation && styles.selector_button_text_active,
+            ]}></Ionicons>
           <Text
             style={[
               styles.selector_button_text,

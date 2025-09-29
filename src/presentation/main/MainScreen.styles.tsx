@@ -12,6 +12,8 @@ export default StyleSheet.create({
     },
     selector_button: {
         flex: 1,
+        flexDirection: "row",
+        gap: 8,
         paddingVertical: 10,
         borderWidth: 2,
         borderColor: "#d0d0d0",
