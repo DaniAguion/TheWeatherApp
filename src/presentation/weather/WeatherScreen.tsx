@@ -44,7 +44,12 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   useFocusEffect(useCallback(() => { return () => {} }, []));
 
   // Render loading, error
-  if (loading) return <ActivityIndicator style={styles.loading} />;
+  if (loading) return (
+    <View style={styles.loading_container}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+
   if (error || (!current || !next24h || !next72h || !days)) return (
     <View style={styles.errorContainer}>
       <Text style={styles.errorText}>{error}</Text>

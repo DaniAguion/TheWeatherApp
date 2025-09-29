@@ -55,8 +55,10 @@ export default StyleSheet.create({
   errorText: {
     marginBottom: 8,
   },
-  loading: {
-    marginTop: 40,
+  loading_container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   list_container: {
     flexDirection: "row",

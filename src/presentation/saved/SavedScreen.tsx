@@ -75,13 +75,13 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
           <ActivityIndicator size="large" />
         </View>
       ) : error ? (
-        <View style={styles.empty_state_container}>
+        <View style={styles.empty_list}>
           <Text style={styles.error_text}>{error}</Text>
         </View>
       ) : savedLocations.length === 0 ? (
-        <View style={styles.empty_state_container}>
-          <Text style={styles.empty_state_text}>Todavía no tienes ubicaciones guardadas.</Text>
-          <Text style={styles.empty_state_subtext}>
+        <View style={styles.empty_list}>
+          <Text style={styles.empty_list_text}>Todavía no tienes ubicaciones guardadas.</Text>
+          <Text style={styles.empty_list_subtext}>
             Busca una ubicación y toca el icono de marcador para guardarla.
           </Text>
         </View>

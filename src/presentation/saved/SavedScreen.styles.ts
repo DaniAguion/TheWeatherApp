@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-    screen_container: {
+  screen_container: {
     flex: 1,
     backgroundColor: "#ffffff",
     paddingTop: 32,
@@ -49,19 +49,19 @@ export default StyleSheet.create({
     fontSize: 12,
     color: "#7a7a7a",
   },
-  empty_state_container: {
+  empty_list: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 16,
-    gap: 8,
   },
-  empty_state_text: {
+  empty_list_text: {
     textAlign: "center",
     fontSize: 14,
     color: "#555555",
+    marginBottom: 8,
   },
-  empty_state_subtext: {
+  empty_list_subtext: {
     textAlign: "center",
     fontSize: 13,
     color: "#7a7a7a",

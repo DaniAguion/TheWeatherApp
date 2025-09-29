@@ -32,7 +32,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   } = useMainVM(deps);
 
 
-  // Fade in animation when data is loaded
+  // Fade in animation for content
   const opacity = useRef(new Animated.Value(0)).current;
   const runFadeIn = useCallback(() => {
     opacity.setValue(0);
