@@ -1,7 +1,8 @@
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { Animated, Easing } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -31,15 +32,36 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   } = useMainVM(deps);
 
 
+  // Fade in animation when data is loaded
+  const opacity = useRef(new Animated.Value(0)).current;
+  const runFadeIn = useCallback(() => {
+    opacity.setValue(0);
+    if (!loading && !error) {
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading, error, opacity]);
+
+  // Run the fade-in animation when loading, error or usingCurrentLocation changes
+  useEffect(() => {
+    runFadeIn();
+  }, [loading, error, usingCurrentLocation]);
+
+
   // Refresh preferences when the screen is focused
   useFocusEffect(
     useCallback(() => {
       refreshPreferences();
+      runFadeIn();
     }, [refreshPreferences])
   );
 
   return (
-    <View style={styles.screen_container}>
+    <Animated.View style={[styles.screen_container, { opacity }]}>
       <View style={styles.selector_container}>
         <TouchableOpacity
           accessibilityRole="button"
@@ -111,6 +133,6 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
           </View>
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 }
