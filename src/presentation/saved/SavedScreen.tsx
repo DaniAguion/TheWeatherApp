@@ -6,23 +6,28 @@ import type { CompositeScreenProps } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamsList, TabParamList } from "../../AppNavigator";
 import type { Location } from "../../domain/entities/LocationEntities";
+import type { PreviewWeatherLocation } from "./useSavedVM";
 import { useServices } from "../../di/ServicesProvider";
 import { useSavedVM, UseSavedVMDeps } from "./useSavedVM";
 import styles from "./SavedScreen.styles";
+
+
+
 
 type SavedScreenProps = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, "SavedMain">,
   NativeStackScreenProps<RootStackParamsList>
 >;
 
+
 export default function SavedScreen({ navigation }: SavedScreenProps) {
   const deps: UseSavedVMDeps = useServices();
-  const { loading, error, savedLocations, refreshSavedLocations } = useSavedVM(deps);
+  const { loading, error, savedLocationsWeather, refreshData } = useSavedVM(deps);
   const isFirstFocus = useRef(true);
 
   useEffect(() => {
-    refreshSavedLocations();
-  }, [refreshSavedLocations]);
+    refreshData();
+  }, [refreshData]);
 
   useFocusEffect(
     useCallback(() => {
@@ -30,8 +35,8 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
         isFirstFocus.current = false;
         return;
       }
-      refreshSavedLocations();
-    }, [refreshSavedLocations])
+      refreshData();
+    }, [refreshData])
   );
 
   const handleSelect = useCallback((location: Location) => {
@@ -41,20 +46,24 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
     });
   }, [navigation]);
 
-  const renderLocation = useCallback(({ item }: { item: Location }) => {
-  const coordsLabel = `Lat: ${item.coordinates.lat.toFixed(2)}°, Lon: ${item.coordinates.lon.toFixed(2)}°`;
 
+  // Render each location item
+  const renderLocation = useCallback(({ item }: { item: PreviewWeatherLocation }) => {
     return (
       <Pressable
         accessibilityRole="button"
-        onPress={() => handleSelect(item)}
+        onPress={() => handleSelect(item.location)}
         style={styles.location_card}
       >
-        <Text style={styles.location_title}>{item.name ?? "Ubicación guardada"}</Text>
-        <Text style={styles.location_coords}>{coordsLabel}</Text>
+        <Text style={styles.location_title}>{item.location.name ?? "Ubicación guardada"}</Text>
+        <View style={styles.weather_container}>
+          <Text style={styles.location_weather_icon}>{item.currentWeather.icon}</Text>
+          <Text style={styles.location_temp}>{Math.round(item.currentWeather.tempC)}°</Text>
+        </View>
       </Pressable>
     );
   }, [handleSelect]);
+
 
   return (
     <View style={styles.screen_container}>
@@ -73,7 +82,7 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
         <View style={styles.empty_list}>
           <Text style={styles.error_text}>{error}</Text>
         </View>
-      ) : savedLocations.length === 0 ? (
+      ) : savedLocationsWeather.length === 0 ? (
         <View style={styles.empty_list}>
           <Text style={styles.empty_list_text}>Todavía no tienes ubicaciones guardadas.</Text>
           <Text style={styles.empty_list_subtext}>
@@ -82,8 +91,8 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
         </View>
       ) : (
         <FlatList
-          data={savedLocations}
-          keyExtractor={(item) => `${item.coordinates.lat},${item.coordinates.lon}`}
+          data={savedLocationsWeather}
+          keyExtractor={(item) => `${item.location.coordinates.lat},${item.location.coordinates.lon}`}
           renderItem={renderLocation}
           contentContainerStyle={styles.locations_list}
           showsVerticalScrollIndicator={false}

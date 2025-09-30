@@ -1,25 +1,34 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { StorageService } from "../../domain/ports/StorageService";
+import { WeatherService } from "../../domain/ports/WeatherService";
+import type { Current } from "../../domain/entities/WeatherEntities";
+
+
+export type PreviewWeatherLocation = {
+  location: Location;
+  currentWeather: Current;
+};
 
 export type UseSavedVMDeps = {
+  weatherService: WeatherService;
   storageService: StorageService;
 };
 
 type VMState = {
   loading: boolean;
   error: string | null;
-  savedLocations: Location[];
+  savedLocationsWeather: PreviewWeatherLocation[];
 };
 
 type VMFunctions = {
-  refreshSavedLocations: () => Promise<void>;
+  refreshData: () => Promise<void>;
 };
 
-export function useSavedVM({ storageService }: UseSavedVMDeps): VMState & VMFunctions {
+export function useSavedVM({ storageService, weatherService }: UseSavedVMDeps): VMState & VMFunctions {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [savedLocations, setSavedLocations] = useState<Location[]>([]);
+  const [savedLocationsWeather, setSavedLocationsWeather] = useState<PreviewWeatherLocation[]>([]);
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -32,9 +41,23 @@ export function useSavedVM({ storageService }: UseSavedVMDeps): VMState & VMFunc
   const loadSavedLocations = useCallback(async () => {
     setLoading(true);
     try {
-      const locations = await storageService.loadSavedLocations();
+      const savedLocations = await storageService.loadSavedLocations();
+
       if (!mounted.current) return;
-      setSavedLocations(locations);
+
+      const savedLocationsData: PreviewWeatherLocation[] = [];
+      for (const location of savedLocations) {
+        const result = await weatherService.getCurrentWeather(location.coordinates);
+        if (result.success) {
+          savedLocationsData.push({
+            location,
+            currentWeather: result.value,
+          });
+        } else {
+          console.warn(`Failed to fetch weather for saved location ${location.name}:`, result.error);
+        }
+      }
+      setSavedLocationsWeather(savedLocationsData);
       setError(null);
     } catch (err) {
       if (!mounted.current) return;
@@ -46,14 +69,15 @@ export function useSavedVM({ storageService }: UseSavedVMDeps): VMState & VMFunc
     }
   }, [storageService]);
 
-  const refreshSavedLocations = useCallback(async () => {
+
+  const refreshData = useCallback(async () => {
     await loadSavedLocations();
   }, [loadSavedLocations]);
 
   return {
     loading,
     error,
-    savedLocations,
-    refreshSavedLocations,
+    savedLocationsWeather,
+    refreshData,
   };
 }

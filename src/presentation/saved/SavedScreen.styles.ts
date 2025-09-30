@@ -31,23 +31,32 @@ export default StyleSheet.create({
     gap: 12,
   },
   location_card: {
-    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 24,
     borderRadius: 12,
     backgroundColor: "#f4f4f4",
   },
   location_title: {
-    fontSize: 16,
+    flex: 1,
+    marginRight: 16,
+    fontSize: 18,
     fontWeight: "600",
   },
-  location_meta: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#666666",
+  weather_container: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8
   },
-  location_coords: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#7a7a7a",
+  location_temp: {
+    fontSize: 18,
+    fontWeight: "500"
+  },
+  location_weather_icon: {
+    fontSize: 40,
   },
   empty_list: {
     flex: 1,

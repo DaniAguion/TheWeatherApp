@@ -47,6 +47,39 @@ export class OpenMeteoWeatherService implements WeatherService {
   }
 
 
+
+  // Fetch only current weather data for preview purposes
+  async getCurrentWeather({ lat, lon }: Coordinates): Promise<Result<Current>> {
+    // Check cache first
+    const cacheKey = `weatherInfo:preview:${lat.toFixed(3)},${lon.toFixed(3)}`;
+    const cached = await getCached<Current>(cacheKey);
+    if (cached) return { success: true, value: cached };
+
+    // Fetch from API if not in cache or expired
+    try {
+      const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
+      const apiRequestUrl = baseUrl + currentOptions;
+      const response = await fetch(apiRequestUrl);
+      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
+      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+
+      const data = (await response.json()) as OpenMeteoResponse;
+      const current: Current = currentDtoToEntity(data.current);
+
+      try {
+        await setCached(cacheKey, current);
+      } catch (error) {
+        console.warn("Failed to cache weather data:", error);
+      }
+      return { success: true, value: current};
+
+    } catch (error) {
+      return { success:false, error: DataError.unknown(error)};
+    }
+  }
+
+
+
   // Search for locations using Open-Meteo Geocoding API
   async searchLocations(query: string): Promise<Result<Location[]>> {
     const trimmed = query.trim();
@@ -64,7 +97,6 @@ export class OpenMeteoWeatherService implements WeatherService {
       if (data.results === undefined) return { success: true, value: [] };
       if (!Array.isArray(data.results)) return { success: false, error: DataError.invalidData(new Error("Malformed geocoding response")) };
 
-
       const locations: Location[] = data.results
         .filter(entry => entry != null)
         .map(locationSuggestionDtoToEntity);
@@ -75,6 +107,8 @@ export class OpenMeteoWeatherService implements WeatherService {
     }
   }
 }
+
+
 
 // Parameters to request from Open-Meteo API
 const params = {
