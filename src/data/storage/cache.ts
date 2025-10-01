@@ -19,7 +19,11 @@ function obtainTtl(key: string): number {
 
 // Function to set cache data.
 export async function setCached<T>(key: string, data: T) {
-  await AsyncStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch (e) {
+    console.warn("setCached failed:", e);
+  }
 }
 
 

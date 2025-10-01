@@ -1,6 +1,8 @@
-import { useCallback } from "react";
+import Toast from "react-native-toast-message";
+import { useCallback, useEffect } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { toUIErrorMessage } from "../errorMessages"
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
@@ -26,6 +28,21 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
     handleSearch,
     resetSearch
   } = useExploreVM(deps);
+
+
+  // Show error toast when error changes
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: toUIErrorMessage(error),
+        position: "bottom",
+        visibilityTime: 2000
+      });
+    }
+  }, [error]);
+
 
   // Clear the location finder field and the results when the user navigates away from this tab
   useFocusEffect(
@@ -97,7 +114,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
             loading ? (
               <ActivityIndicator style={styles.loading_indication} />
             ) : error ? (
-              <Text style={styles.error_text}>{error}</Text>
+              <Text style={styles.error_text}>{"No se pudieron cargar las ubicaciones"}</Text>
             ) : <Text style={styles.no_result_text}>
               No se han encontrado resultados.
             </Text>}

@@ -5,7 +5,7 @@ import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEn
 import type { Coordinates, Location } from "../../domain/entities/LocationEntities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity, locationSuggestionDtoToEntity } from "./mappers";
 import type { Result } from "../../domain/errors/Result";
-import { DataError } from "../../domain/errors/DataError";
+import { DomainError } from "../../domain/errors/DomainError";
 
 
 export class OpenMeteoWeatherService implements WeatherService {
@@ -21,10 +21,9 @@ export class OpenMeteoWeatherService implements WeatherService {
       const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
       const apiRequestUrl = baseUrl + currentOptions + hourlyOptions + dailyOptions;
       const response = await fetch(apiRequestUrl);
-      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
-      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+      if (!response) return {success:false, error: DomainError.network(new Error("No response from weather service."))};
+      if (!response.ok) return {success:false, error: DomainError.network(new Error("Error http: " + response.status))};
 
-      
       const data = (await response.json()) as OpenMeteoResponse;
       const current: Current = currentDtoToEntity(data.current);
       const hours: Hour[] = hourlyDtoToEntity(data.hourly);
@@ -41,8 +40,9 @@ export class OpenMeteoWeatherService implements WeatherService {
       }
       return { success: true, value: { current, hours, days }};
 
-    } catch (error) {
-      return { success:false, error: DataError.unknown(error)};
+    } catch (e) {
+      console.error("[OpenMeteoWeatherService] Error fetching weather data.", e);
+      return { success:false, error: DomainError.unknown(e)};
     }
   }
 
@@ -60,8 +60,8 @@ export class OpenMeteoWeatherService implements WeatherService {
       const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
       const apiRequestUrl = baseUrl + currentOptions;
       const response = await fetch(apiRequestUrl);
-      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
-      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+      if (!response) return {success:false, error: DomainError.network(new Error("No response from weather service."))};
+      if (!response.ok) return {success:false, error: DomainError.network(new Error("Error http: " + response.status))};
 
       const data = (await response.json()) as OpenMeteoResponse;
       const current: Current = currentDtoToEntity(data.current);
@@ -73,8 +73,9 @@ export class OpenMeteoWeatherService implements WeatherService {
       }
       return { success: true, value: current};
 
-    } catch (error) {
-      return { success:false, error: DataError.unknown(error)};
+    } catch (e) {
+      console.error("[OpenMeteoWeatherService] Error fetching weather data.", e);
+      return { success:false, error: DomainError.unknown(e)};
     }
   }
 
@@ -89,21 +90,22 @@ export class OpenMeteoWeatherService implements WeatherService {
 
     try {
       const response = await fetch(url);
-      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
-      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+      if (!response) return {success:false, error: DomainError.network(new Error("No response from locations service."))};
+      if (!response.ok) return {success:false, error: DomainError.network(new Error("Error http: " + response.status))};
 
       const data = (await response.json()) as OpenMeteoGeocodingResponse;
  
       if (data.results === undefined) return { success: true, value: [] };
-      if (!Array.isArray(data.results)) return { success: false, error: DataError.invalidData(new Error("Malformed geocoding response")) };
+      if (!Array.isArray(data.results)) return { success: false, error: DomainError.invalidData(new Error("Malformed geocoding response")) };
 
       const locations: Location[] = data.results
         .filter(entry => entry != null)
         .map(locationSuggestionDtoToEntity);
 
       return { success: true, value: locations };
-    } catch (error) {
-      return { success:false, error: DataError.unknown(error)};
+    } catch (e) {
+      console.error("[OpenMeteoWeatherService] Error fetching locations.", e);
+      return { success:false, error: DomainError.unknown(e)};
     }
   }
 }

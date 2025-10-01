@@ -1,6 +1,8 @@
+import Toast from "react-native-toast-message";
 import { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { toUIErrorMessage } from "../errorMessages"
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -10,8 +12,6 @@ import type { PreviewWeatherLocation } from "./useSavedVM";
 import { useServices } from "../../di/ServicesProvider";
 import { useSavedVM, UseSavedVMDeps } from "./useSavedVM";
 import styles from "./SavedScreen.styles";
-
-
 
 
 type SavedScreenProps = CompositeScreenProps<
@@ -25,6 +25,20 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
   const { loading, error, savedLocationsWeather, refreshData } = useSavedVM(deps);
   const isFirstFocus = useRef(true);
 
+  // Show error toast when error changes
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: toUIErrorMessage(error),
+        position: "bottom",
+        visibilityTime: 2000
+      });
+    }
+  }, [error]);
+
+  // Initial data load
   useEffect(() => {
     refreshData();
   }, [refreshData]);
@@ -39,6 +53,7 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
     }, [refreshData])
   );
 
+  // Navigate to Weather screen on location select
   const handleSelect = useCallback((location: Location) => {
     navigation.navigate("Weather", {
       name: location.name ?? "Ubicación guardada",
@@ -80,7 +95,7 @@ export default function SavedScreen({ navigation }: SavedScreenProps) {
         </View>
       ) : error ? (
         <View style={styles.empty_list}>
-          <Text style={styles.error_text}>{error}</Text>
+          <Text style={styles.error_text}>{"No se pudieron cargar las ubicaciones guardadas"}</Text>
         </View>
       ) : savedLocationsWeather.length === 0 ? (
         <View style={styles.empty_list}>

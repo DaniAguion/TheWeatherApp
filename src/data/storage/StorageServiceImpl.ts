@@ -3,7 +3,7 @@ import type { UserPreferences } from "../../domain/entities/UserPreferences";
 import type { StorageService as StorageService } from "../../domain/ports/StorageService";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
-import { DataError } from "../../domain/errors/DataError";
+import { DomainError } from "../../domain/errors/DomainError";
 import { isValidLocation, normalizeLocation, sameLocation } from "../../domain/helpers/LocationHelper";
 
 
@@ -45,7 +45,7 @@ export class StorageServiceImpl implements StorageService {
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving preferences:", e);
-      return { success: false, error: DataError.unknown(e) };
+      return { success: false, error: DomainError.unknown(e) };
     }
   }
 
@@ -75,7 +75,7 @@ export class StorageServiceImpl implements StorageService {
       console.error("[UserPrefs] Invalid location format:", location);
       return {
         success: false,
-        error: DataError.invalidData(new Error("Invalid location")),
+        error: DomainError.invalidData(new Error("Invalid location")),
       };
     }
 
@@ -85,7 +85,7 @@ export class StorageServiceImpl implements StorageService {
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving favourite location:", e);
-      return { success: false, error: DataError.unknown(e) };
+      return { success: false, error: DomainError.unknown(e) };
     }
   }
 
@@ -93,35 +93,35 @@ export class StorageServiceImpl implements StorageService {
   // Remove location from favourite
   async removeFavouriteLocation(location: Location): Promise<Result<void>> {
     try {
-      if (sameLocation(location, DEFAULT_VALUES.favouriteLocation)) return { success: false, error: new Error("Cannot remove default location") };
-      console.log("Removing favourite location:", location);
+      if (sameLocation(location, DEFAULT_VALUES.favouriteLocation)) {
+        return { success: false, error: DomainError.storage(new Error("Cannot remove default location")) };
+      }
       await AsyncStorage.removeItem(KEYS.favouriteLocation);
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error removing favourite location:", e);
-      return { success: false, error: DataError.unknown(e) };
+      return { success: false, error: DomainError.unknown(e) };
     }
   }
 
 
 
   // Load saved locations
-  async loadSavedLocations(): Promise<Location[]> {
+  async loadSavedLocations(): Promise<Result<Location[]>> {
     try {
       const raw = await AsyncStorage.getItem(KEYS.savedLocations);
       if (raw) {
         const parsedLocations = JSON.parse(raw) as Location[];
         if (parsedLocations && Array.isArray(parsedLocations)) {
-          return parsedLocations
+          return { success: true, value: parsedLocations };
         } 
       }
-      await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(DEFAULT_VALUES.savedLocations));
-      console.warn("[UserPrefs] No valid saved locations found, using default.");
-      return DEFAULT_VALUES.savedLocations;
+      const savedLocations = await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(DEFAULT_VALUES.savedLocations));
+      return { success: true, value: DEFAULT_VALUES.savedLocations };
     } catch (e) {
       console.error("[UserPrefs] Error loading saved locations:", e);
+      return { success: false, error: DomainError.unknown(e) };
     }
-    return DEFAULT_VALUES.savedLocations;
   }
 
 
@@ -131,22 +131,28 @@ export class StorageServiceImpl implements StorageService {
       console.error("[UserPrefs] Invalid location format:", location);
       return {
         success: false,
-        error: DataError.invalidData(new Error("Invalid location")),
+        error: DomainError.invalidData(new Error("Invalid location")),
       };
     }
     
     try {
-      const savedLocations = await this.loadSavedLocations();
+      let savedLocations: Location[] = [];
+      const loadSavedLocations = await this.loadSavedLocations()
+      if (loadSavedLocations.success) {
+        savedLocations = loadSavedLocations.value;
+      } else {
+        return { success: false, error: DomainError.unknown(new Error("Could not save location")) };
+      }
       const normalizedLoc = normalizeLocation(location);
       if (savedLocations.some(l => sameLocation(l, normalizedLoc))) {
-        return { success: false, error: DataError.unknown(new Error("Location already saved")) };
+        return { success: false, error: DomainError.unknown(new Error("Location already saved")) };
       }
       const newSavedLocations = [...savedLocations, normalizedLoc];
       await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(newSavedLocations));
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving location:", e);
-      return { success: false, error: DataError.unknown(e) };
+      return { success: false, error: DomainError.unknown(e) };
     }
   }
 
@@ -158,19 +164,25 @@ export class StorageServiceImpl implements StorageService {
       console.error("[UserPrefs] Invalid location format:", location);
       return {
         success: false,
-        error: DataError.invalidData(new Error("Invalid location")),
+        error: DomainError.invalidData(new Error("Invalid location")),
       };
     }
     
     try {
-      const savedLocations = await this.loadSavedLocations();
+      let savedLocations: Location[] = [];
+      const loadSavedLocations = await this.loadSavedLocations()
+      if (loadSavedLocations.success) {
+        savedLocations = loadSavedLocations.value;
+      } else {
+        return { success: false, error: DomainError.unknown(new Error("Could not load saved locations")) };
+      }
       const newSavedLocations = savedLocations.filter(l =>!((l.coordinates.lat === location.coordinates.lat &&
             l.coordinates.lon === location.coordinates.lon)) || l.name !== location.name);
       await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(newSavedLocations));
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving location:", e);
-      return { success: false, error: DataError.unknown(e) };
+      return { success: false, error: DomainError.unknown(e) };
     }
   }
 }

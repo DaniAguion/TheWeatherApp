@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Location } from "../../domain/entities/LocationEntities";
-import { DataError } from "../../domain/errors/DataError";
+import { DomainError } from "../../domain/errors/DomainError";
 import type { WeatherService } from "../../domain/ports/WeatherService";
 
 export type UseExploreVMDeps = {
@@ -10,7 +10,7 @@ export type UseExploreVMDeps = {
 type VMState = {
   query: string;
   loading: boolean;
-  error: string | null;
+  error: DomainError | null;
   results: Location[];
 };
 
@@ -21,28 +21,14 @@ type VMFunctions = {
   resetSearch: () => void;
 };
 
-function getErrorMessage(error: Error): string {
-  if (error instanceof DataError) {
-    switch (error.kind) {
-      case "data.network":
-        return "Error de red al buscar ubicaciones";
-      case "data.http":
-        return `Error ${error.status ?? ""} buscando ubicaciones`;
-      case "data.invalidData":
-        return "Respuesta inesperada del servicio de ubicaciones";
-      default:
-        return "No se pudo buscar ubicaciones";
-    }
-  }
-  return error.message || "No se pudo buscar ubicaciones";
-}
 
 export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VMFunctions {
   const [query, setQueryState] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DomainError | null>(null);
   const [results, setResults] = useState<Location[]>([]);
   const mounted = useRef(true);
+
 
   useEffect(() => {
     mounted.current = true;
@@ -51,15 +37,22 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
     };
   }, []);
 
+
+  // Function to update the search query
   const setQuery = useCallback((value: string) => {
     setQueryState(value);
   }, []);
 
+
+  // Function to clear results and error
   const clearResults = useCallback(() => {
     setResults([]);
     setError(null);
   }, []);
 
+
+  // Function to reset the entire search screen data
+  // Used in the Explore Screen to reset the screen the user changes the tab
   const resetSearch = useCallback(() => {
     setQueryState("");
     setResults([]);
@@ -67,6 +60,9 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
     setLoading(false);
   }, []);
 
+
+
+  // Function to perform the search
   const handleSearch = useCallback(async () => {
     const trimmed = query.trim();
     if (!trimmed) {
@@ -78,27 +74,28 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
     setError(null);
 
     try {
-      const outcome = await weatherService.searchLocations(trimmed);
+      const searchLocationsResult = await weatherService.searchLocations(trimmed);
       if (!mounted.current) return;
 
-      if (outcome.success) {
-        setResults(outcome.value);
+      if (searchLocationsResult.success) {
+        setResults(searchLocationsResult.value);
         setError(null);
       } else {
         setResults([]);
-        setError(getErrorMessage(outcome.error));
+        setError(searchLocationsResult.error);
       }
     } catch (err) {
       if (!mounted.current) return;
 
       setResults([]);
-      const message = err instanceof Error ? getErrorMessage(err) : "No se pudo buscar ubicaciones";
-      setError(message);
+      //setError(message);
     } finally {
       if (!mounted.current) return;
       setLoading(false);
     }
   }, [query, weatherService, clearResults]);
+
+
 
   return {
     query,

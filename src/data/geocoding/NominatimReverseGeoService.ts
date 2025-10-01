@@ -3,7 +3,7 @@ import type { NominatimResponse } from "./dto";
 import { getCached, setCached } from "../storage/cache";
 import { Coordinates } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
-import { DataError } from "../../domain/errors/DataError";
+import { DomainError } from "../../domain/errors/DomainError";
 
 export class NominatimReverseGeoService implements ReverseGeoService {
 
@@ -17,23 +17,18 @@ export class NominatimReverseGeoService implements ReverseGeoService {
     try {
       const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&zoom=10&format=jsonv2`;
       const response = await fetch(url, { headers: { "User-Agent": "TheWeatherApp" } });
-      if (!response) return {success:false, error: DataError.network(new Error("No response from geolocation server"))};
-      if (!response.ok) return {success:false, error: DataError.http(response.status)};
+      if (!response) return {success:false, error: DomainError.network(new Error("No response from geolocation server."))};
+      if (!response.ok) return {success:false, error: DomainError.network(new Error("Error http: " + response.status))};
       
       const data = (await response.json()) as NominatimResponse;
-      if (data.name && typeof data.name === "string" && data.name.length > 0) {
-        try {
-          await setCached(cacheKey, data.name);
-        } catch (error) {
-          console.error("[ReverseGeoService] Failed to cache the location name:", error);
-        }
-        return { success: true, value: data.name};
+      if (!data.name || typeof data.name !== "string") {
+        return { success:false, error: DomainError.invalidData(new Error("Invalid data from geolocation server."))};
       }
-    } catch (error) {
-      console.error("[ReverseGeoService] Failed to get location name:", error);
-      return { success:false, error: DataError.unknown(error)};
+      await setCached(cacheKey, data.name);
+      return { success: true, value: data.name};
+    } catch (e) {
+      console.error("[NominatimReverseGeoService] Error loading location name:", e);
+      return { success:false, error: DomainError.unknown(e)};
     }
-    console.error("[ReverseGeoService] Failed to get location name.");
-    return { success:false, error: DataError.unknown()};
   }
 }
