@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
     screen_container: {
         flex: 1,
+        backgroundColor: "#ffffff",
         paddingHorizontal: 16,
         paddingTop: 16,
     },

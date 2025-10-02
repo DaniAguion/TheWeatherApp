@@ -154,10 +154,12 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
       </View>
       <GestureHandlerRootView>
         <GestureDetector gesture={tapHour}>
-          <View style={styles.hours_container}>
+          <View style={styles.days_hours_container}>
             <Text style={styles.hours_title}>Próximas horas</Text>
+            <View style={styles.list_container}>
             <FlatList
               data={next24h}
+              style={styles.list}
               keyExtractor={(h) => String(h.dateTime)}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -169,12 +171,13 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
                 </View>
               )}
             />
+            </View>
           </View>
         </GestureDetector>
       </GestureHandlerRootView>
       <GestureHandlerRootView>
         <GestureDetector gesture={tapDay}>
-          <View style={styles.hours_container}>
+          <View style={styles.days_hours_container}>
             <Text style={styles.hours_title}>Pronóstico 7 días</Text>
             <View style={styles.list_container}>
               <FlatList

@@ -1,22 +1,42 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet,Dimensions } from "react-native";
+
+
+// Calculate item width for 5 columns with padding and margin for horizontal scrolling lists
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const CONTAINER_H_PADDING = 24;
+const ELEMENTS_H_PADDING = 6;
+const N_COLUMNS = 5;
+const ITEM_WIDTH = (SCREEN_WIDTH - (CONTAINER_H_PADDING * 2 + (ELEMENTS_H_PADDING * 2 * N_COLUMNS))) / N_COLUMNS;
+
+// Common shadow style for cards
+const cardShadow = {
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+};
 
 export default StyleSheet.create({
   container: {
     padding: 12,
+    backgroundColor: "#ffffff",
   },
   current_container: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-around", 
-    gap: 8,
-    backgroundColor: "#ffffff",
+    justifyContent: "space-around",
+    backgroundColor: "#fbfbfb",
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 8,
-    marginBottom: 12
+    marginBottom: 16,
   },
   current_main_group: {
-    flex: 1,
+    flex: 1.2,
     flexDirection: "column",
     justifyContent: "center",
   },
@@ -25,13 +45,12 @@ export default StyleSheet.create({
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "center",
-    paddingLeft: 16,
     paddingVertical: 16,
   },
   current_subgroup: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4
+    gap: 4,
   },
   location: {
     fontSize: 20,
@@ -72,8 +91,7 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    borderRadius: 8,
-    marginBottom: 12
+    marginBottom: 16,
   },
   action_button: {
     flex: 1,
@@ -82,31 +100,30 @@ export default StyleSheet.create({
     backgroundColor: "#ffffff",
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    ...cardShadow
   },
   action_button_icon: {
     fontSize: 28,
     color: "#1273de",
   },
-  hours_container: {
-    marginBottom: 12,
+  days_hours_container: {
+    width: "100%",
+    marginBottom: 16,
     backgroundColor: "#ffffff",
     paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    width: "100%",
+    paddingHorizontal: CONTAINER_H_PADDING,
+    ...cardShadow
   },
   hours_title: {
     fontSize: 18,
     fontWeight: "600"
   },
   hour_column: {
-    flex: 1,
+    width: ITEM_WIDTH,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 4,
     paddingVertical: 10,
-    paddingHorizontal: 6,
+    paddingHorizontal: ELEMENTS_H_PADDING,
     borderRadius: 12,
     backgroundColor: "#fff"
   },
@@ -122,11 +139,11 @@ export default StyleSheet.create({
     textAlign: "center",
   },
   day_column: {
+    width: ITEM_WIDTH,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 4,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: ELEMENTS_H_PADDING,
     borderRadius: 12,
     backgroundColor: "#fff"
   },

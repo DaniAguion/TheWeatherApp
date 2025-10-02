@@ -174,8 +174,9 @@ export class StorageServiceImpl implements StorageService {
       } else {
         return { success: false, error: DomainError.unknown(new Error("Could not load saved locations")) };
       }
-      const newSavedLocations = savedLocations.filter(l =>!((l.coordinates.lat === location.coordinates.lat &&
-            l.coordinates.lon === location.coordinates.lon)) || l.name !== location.name);
+      const normalizedLoc = normalizeLocation(location);
+      const newSavedLocations = savedLocations.filter(l =>!((l.coordinates.lat === normalizedLoc.coordinates.lat &&
+            l.coordinates.lon === normalizedLoc.coordinates.lon)) || l.name !== normalizedLoc.name);
       await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(newSavedLocations));
       return { success: true, value: undefined };
     } catch (e) {
