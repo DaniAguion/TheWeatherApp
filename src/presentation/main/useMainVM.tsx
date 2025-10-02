@@ -22,6 +22,7 @@ type VMFunctions = {
     handleSelectCurrent: () => void;
     handleSelectFavourite: () => void;
     refreshPreferences: () => Promise<void>;
+    refreshLocation: () => Promise<void>;
 };
 
 export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
@@ -129,6 +130,13 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             }));
         }
     }, [state.usingCurrentLocation, StorageService, refreshCurrent]);
+
+
+    // Handle refresh location if using current location
+    const refreshLocation = useCallback(async () => {
+        if (!state.usingCurrentLocation) return;
+        await refreshCurrent();
+    }, [state.usingCurrentLocation, refreshCurrent]);
     
     const loading = state.loading || loadingLocation;
 
@@ -140,7 +148,8 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         favouriteLocation: state.favouriteLocation,
         handleSelectCurrent,
         handleSelectFavourite,
-        refreshPreferences
+        refreshPreferences,
+        refreshLocation
     };
 }
    

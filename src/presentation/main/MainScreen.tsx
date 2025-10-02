@@ -1,7 +1,7 @@
 import Toast from "react-native-toast-message";
 import React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View, Button } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
@@ -31,7 +31,8 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
     favouriteLocation,
     handleSelectCurrent,
     handleSelectFavourite, 
-    refreshPreferences
+    refreshPreferences,
+    refreshLocation
   } = useMainVM(deps);
 
 
@@ -141,6 +142,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         ) : error ? (
           <View style={styles.state_container}>
             <Text style={styles.error_text}>No se ha podido cargar la localización</Text>
+            {usingCurrentLocation ? <Button title="Reintentar" onPress={refreshLocation} /> : null}
           </View>
         ) : (usingCurrentLocation && currentLocation != null) ? (
           <WeatherScreen
