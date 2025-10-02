@@ -1,9 +1,11 @@
-import { useCallback, useRef } from "react";
+import Toast from "react-native-toast-message";
+import { useCallback, useRef, useEffect } from "react";
 import { Animated } from "react-native";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, ActivityIndicator, Button, ScrollView, FlatList, Pressable } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
+import { toUIErrorMessage } from "../errorMessages"
 import type { Location } from "../../domain/entities/LocationEntities";
 import { useWeatherVM, UseWeatherVMDeps } from "./useWeatherVM";
 import { useServices } from "../../di/ServicesProvider";
@@ -43,6 +45,20 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   // Clear view when navigating away
   useFocusEffect(useCallback(() => { return () => {} }, []));
 
+  // Show error toast when error changes
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: toUIErrorMessage(error),
+        position: "bottom",
+        visibilityTime: 2000
+      });
+    }
+  }, [error]);
+
+
   // Render loading, error
   if (loading) return (
     <View style={styles.loading_container}>
@@ -50,9 +66,9 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     </View>
   );
 
-  if (error || (!current || !next24h || !next72h || !days)) return (
+  if ((!current || !next24h || !next72h || !days)) return (
     <View style={styles.errorContainer}>
-      <Text style={styles.errorText}>{error}</Text>
+      <Text style={styles.errorText}>No se ha podido obtener el pronóstico.</Text>
       <Button title="Reintentar" onPress={fetchWeather} />
     </View>
   );

@@ -6,7 +6,7 @@ import { StorageService } from "../../domain/ports/StorageService";
 import { normalizeLocation, sameLocation } from "../../domain/helpers/LocationHelper";
 import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
-import { toUIErrorMessage } from "../errorMessages";
+import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
 
 export type UseWeatherVMDeps = {
@@ -17,7 +17,7 @@ export type UseWeatherVMDeps = {
 
 type VMState = {
     loading: boolean;
-    error: string | null;
+    error: DomainError | null;
     locationName: string | null;
     current: Current | null;
     next24h: Hour[] | null;
@@ -40,7 +40,7 @@ export function useWeatherVM(
 ) : VMState & VMFunctions {
     const { weatherService, reverseGeoService } = deps;
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<DomainError | null>(null);
     const [locationName, setLocationName] = useState<string | null>(routeLocationName ?? null);
     const [current, setCurrent] = useState<Current | null>(null);
     const [hours, setHours] = useState<Hour[] | null>(null);
@@ -56,12 +56,20 @@ export function useWeatherVM(
     // Fetch favourite and saved status
     const refreshPersistedStatus = useCallback(async () => {
         try {
-            const favouriteLocation = await storageService.loadFavouriteLocation();
-            const normalized = normalizeLocation({ coordinates } as Location);
-            setIsFavourite(sameLocation(favouriteLocation, normalized));
-
-            const savedLocations = await storageService.loadSavedLocations();
-            setIsSaved(savedLocations.some(l => sameLocation(l, normalized)));
+            const loadFavouriteResult = await storageService.loadFavouriteLocation();
+            if (loadFavouriteResult.success) {
+                const normalized = normalizeLocation({ coordinates } as Location);
+                setIsFavourite(sameLocation(loadFavouriteResult.value, normalized));
+            } else {
+                setError(loadFavouriteResult.error);
+            }
+            const loadSavedResult = await storageService.loadSavedLocations();
+            if (loadSavedResult.success) {
+                const normalized = normalizeLocation({ coordinates } as Location);
+                setIsSaved(loadSavedResult.value.some(l => sameLocation(l, normalized)));
+            } else {
+                setError(loadSavedResult.error);
+            }
         } catch (err) {
             console.log("Failed to refresh persisted status:", err);
         }
@@ -97,8 +105,7 @@ export function useWeatherVM(
                     setHours(result.value.hours ?? []);
                     setDays(result.value.days ?? []);
             } else {
-                console.log("Failed to get weather from location:", result.error);
-                setError(toUIErrorMessage(result.error));
+                setError(result.error);
             }
         });
         setLoading(false);

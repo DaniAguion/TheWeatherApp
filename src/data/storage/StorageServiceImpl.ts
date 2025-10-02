@@ -22,19 +22,19 @@ const DEFAULT_VALUES = {
 
 export class StorageServiceImpl implements StorageService {
   // Load preferences
-  async loadPreferences(): Promise<UserPreferences> {
+  async loadPreferences(): Promise<Result<UserPreferences>> {
     try {
       const raw = await AsyncStorage.getItem(KEYS.preferences);
       if (raw) {
         const parsed = JSON.parse(raw) as UserPreferences;
-        return { useCurrentLocation: parsed.useCurrentLocation };
+        return { success: true, value: {useCurrentLocation: parsed.useCurrentLocation }};
       }
       await AsyncStorage.setItem(KEYS.preferences, JSON.stringify(DEFAULT_VALUES.preferences));
-      return DEFAULT_VALUES.preferences;
+      return { success: true, value: DEFAULT_VALUES.preferences };
     } catch (e) {
       console.error("[UserPrefs] Error loading preferences:", e);
+      return { success: true, value: DEFAULT_VALUES.preferences };
     }
-    return DEFAULT_VALUES.preferences;
   }
 
 
@@ -52,20 +52,19 @@ export class StorageServiceImpl implements StorageService {
 
 
   // Load favourite location
-  async loadFavouriteLocation(): Promise<Location> {
+  async loadFavouriteLocation(): Promise<Result<Location>> {
     try {
       const raw = await AsyncStorage.getItem(KEYS.favouriteLocation);
       if (raw) {
         const parsedLocation = JSON.parse(raw) as Location;
-        if (parsedLocation ) return parsedLocation;
+        if (parsedLocation ) return { success: true, value: parsedLocation };
       }
-      const normalizedDefault = normalizeLocation(DEFAULT_VALUES.favouriteLocation);
       await AsyncStorage.setItem(KEYS.favouriteLocation, JSON.stringify(DEFAULT_VALUES.favouriteLocation));
-      return DEFAULT_VALUES.favouriteLocation;
+      return { success: true, value: DEFAULT_VALUES.favouriteLocation };
     } catch (e) {
       console.error("[UserPrefs] Error loading favourite location:", e);
+      return { success: false, error: DomainError.unknown(e) };
     }
-    return DEFAULT_VALUES.favouriteLocation;
   }
 
 
@@ -105,7 +104,6 @@ export class StorageServiceImpl implements StorageService {
   }
 
 
-
   // Load saved locations
   async loadSavedLocations(): Promise<Result<Location[]>> {
     try {
@@ -116,7 +114,7 @@ export class StorageServiceImpl implements StorageService {
           return { success: true, value: parsedLocations };
         } 
       }
-      const savedLocations = await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(DEFAULT_VALUES.savedLocations));
+      await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(DEFAULT_VALUES.savedLocations));
       return { success: true, value: DEFAULT_VALUES.savedLocations };
     } catch (e) {
       console.error("[UserPrefs] Error loading saved locations:", e);

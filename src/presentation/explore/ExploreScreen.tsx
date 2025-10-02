@@ -111,13 +111,9 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
           renderItem={renderSuggestion}
           contentContainerStyle={styles.results_list}
           ListEmptyComponent={
-            loading ? (
-              <ActivityIndicator style={styles.loading_indication} />
-            ) : error ? (
-              <Text style={styles.error_text}>{"No se pudieron cargar las ubicaciones"}</Text>
-            ) : <Text style={styles.no_result_text}>
-              No se han encontrado resultados.
-            </Text>}
+            loading ? ( <ActivityIndicator style={styles.loading_indication} />
+            ) : error ? ( <Text style={styles.error_text}>No se han podido cargar las ubicaciones</Text>
+            ) : <Text style={styles.no_result_text}>No se han encontrado resultados.</Text>}
         />
       </View>
     </View>

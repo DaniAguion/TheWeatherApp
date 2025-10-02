@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { StorageService } from "../../domain/ports/StorageService";
+import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
+
 
 
 export type UseMainVMDeps = {
@@ -10,7 +12,7 @@ export type UseMainVMDeps = {
 
 type VMState = {
     loading: boolean;
-    error: string | null;
+    error: DomainError | null;
     usingCurrentLocation: boolean;
     currentLocation: Location | null;
     favouriteLocation: Location;
@@ -44,21 +46,23 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     // Get the preferences of the user when the component is mounted
     const loadPreferences = useCallback(async () => {
         try {
-        const prefs = await StorageService.loadPreferences();
-        const favourite = await StorageService.loadFavouriteLocation();
-        const usingCurrent = !!prefs.useCurrentLocation;
-        setState(st => ({
-            ...st,
-            loading: false,
-            error: null,
-            usingCurrentLocation: usingCurrent,
-            favouriteLocation: favourite,
-        }));
+            const loadPreferencesResult = await StorageService.loadPreferences();
+            if (loadPreferencesResult.success) {
+                setState(st => ({ ...st, usingCurrentLocation: loadPreferencesResult.value.useCurrentLocation,}));
+            } else {
+                setState(st => ({ ...st, error: loadPreferencesResult.error}));
+            }
+            const loadFavouriteResult = await StorageService.loadFavouriteLocation();
+            if (loadFavouriteResult.success) {
+                setState(st => ({ ...st, favouriteLocation: loadFavouriteResult.value, loading: false }));
+            } else {
+                setState(st => ({ ...st, error: loadFavouriteResult.error, loading: false }));
+            }
         } catch {
         setState(st => ({
             ...st,
             loading: false,
-            error: "Error cargando las preferencias de usuario"
+            error: DomainError.storage("No se pudieron obtener las preferencias.")
         }));
         }
     }, [StorageService]);
@@ -81,18 +85,13 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             currentLocation: { coordinates: coords },
             error: null
         }));
-        else if (locationError) setState(st => ({ ...st, error: locationError }));
+        else if (locationError) setState(st => ({ ...st, error: DomainError.locationUnavailable() }));
     }, [state.usingCurrentLocation, coords, locationError]);
 
 
     // Select favourite location
     const handleSelectFavourite = useCallback(async () => {
         if (!state.usingCurrentLocation) return;
-
-        if (!state.favouriteLocation) {
-            setState(st => ({ ...st, error: "No hay ubicación favorita" }));
-            return;
-        }
 
         setState(st => ({ ...st,
              error: null, 
@@ -104,7 +103,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         } catch {
             setState(st => ({ ...st,
                 usingCurrentLocation: true,
-                error: "No se pudo activar la ubicación favorita" 
+                error: DomainError.storage("No se pudo guardar la preferencia.")
             }));
         }
     }, [state.usingCurrentLocation, state.favouriteLocation, StorageService]);
@@ -126,7 +125,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             setState(st => ({ ...st,
                 usingCurrentLocation: false,
                 favouriteLocation: state.favouriteLocation,
-                error: "No se pudo activar la ubicación actual",
+                error: DomainError.storage("No se pudo guardar la preferencia."),
             }));
         }
     }, [state.usingCurrentLocation, StorageService, refreshCurrent]);

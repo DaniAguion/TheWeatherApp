@@ -1,9 +1,11 @@
+import Toast from "react-native-toast-message";
 import React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
+import { toUIErrorMessage } from "../errorMessages"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -31,6 +33,20 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
     handleSelectFavourite, 
     refreshPreferences
   } = useMainVM(deps);
+
+
+  // Show error toast when error changes
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: toUIErrorMessage(error),
+        position: "bottom",
+        visibilityTime: 2000
+      });
+    }
+  }, [error]);
 
 
   // Fade in animation for content
@@ -65,6 +81,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
       <View style={styles.selector_container}>
         <TouchableOpacity
           accessibilityRole="button"
+          disabled={usingCurrentLocation}
           onPress={handleSelectCurrent}
           style={[
             styles.selector_button,
@@ -91,6 +108,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
 
         <TouchableOpacity
           accessibilityRole="button"
+          disabled={!usingCurrentLocation}
           onPress={handleSelectFavourite}
           style={[
             styles.selector_button,
@@ -99,7 +117,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
           ]}
         >
           <Ionicons 
-            name={"star-outline"} 
+            name={"star-outline"}
             style={[
               styles.selector_button_text,
               !usingCurrentLocation && styles.selector_button_text_active,
@@ -122,7 +140,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
           </View>
         ) : error ? (
           <View style={styles.state_container}>
-            <Text style={styles.error_text}>{error}</Text>
+            <Text style={styles.error_text}>No se ha podido cargar la localización</Text>
           </View>
         ) : (usingCurrentLocation && currentLocation != null) ? (
           <WeatherScreen

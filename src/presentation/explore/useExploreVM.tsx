@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Location } from "../../domain/entities/LocationEntities";
 import { DomainError } from "../../domain/errors/DomainError";
+import type { Location } from "../../domain/entities/LocationEntities";
 import type { WeatherService } from "../../domain/ports/WeatherService";
 
 export type UseExploreVMDeps = {

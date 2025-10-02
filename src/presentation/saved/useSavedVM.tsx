@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Location } from "../../domain/entities/LocationEntities";
-import type { StorageService } from "../../domain/ports/StorageService";
+import { StorageService } from "../../domain/ports/StorageService";
 import { WeatherService } from "../../domain/ports/WeatherService";
-import type { Current } from "../../domain/entities/WeatherEntities";
 import { DomainError } from "../../domain/errors/DomainError";
+import type { Location } from "../../domain/entities/LocationEntities";
+import type { Current } from "../../domain/entities/WeatherEntities";
+
 
 
 export type PreviewWeatherLocation = {
