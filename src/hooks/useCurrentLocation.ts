@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
-import { LocationPermission, type Status } from "../infraestructure/LocationPermission";
+import { LocationPermission, type LocStatus as Status } from "../infraestructure/LocationPermission";
 import { DomainError } from "../domain/errors/DomainError";
 import type { Coordinates } from "../domain/entities/LocationEntities";
 
@@ -9,9 +9,18 @@ type Coords = { coordinates: Coordinates; accuracy?: number };
 
 type UseCurrentLocationOptions = {
   enabled?: boolean;
+  highAccuracy?: boolean;
+  timeoutMs?: number;
+  maximumAgeMs?: number;
 };
 
-export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions = {}) {
+
+export function useCurrentLocation({
+  enabled = true,
+  highAccuracy = true,
+  timeoutMs = 7000,
+  maximumAgeMs = 15000,
+}: UseCurrentLocationOptions = {}) {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<DomainError | null>(null);
@@ -38,12 +47,12 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
 
     try {
       status = await LocationPermission.checkStatus();
-    } catch (_err) {
-      status = {
-        state: "denied",
-        accuracy: "unknown",
-        scope: "none",
-      };
+    } catch {
+      status = { 
+        state: "denied", 
+        accuracy: "unknown", 
+        scope: "none", 
+        locationEnabled: servicesAvailable };
     }
 
     if (status.state !== "granted") {
@@ -58,19 +67,15 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
     }
 
     if (status.state !== "granted") {
-      if (mounted.current) {
-        setError(DomainError.locationPermission());
-      }
+      if (mounted.current) setError(DomainError.locationPermission());
       return false;
     }
-
     return true;
   }, []);
 
-  const getCurrentLocation = useCallback(async () => {
-    if (!enabled || !mounted.current) {
-      return;
-    }
+
+const getCurrentLocation = useCallback(async () => {
+    if (!enabled || !mounted.current) return;
 
     setLoading(true);
     setError(null);
@@ -87,32 +92,32 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
           (pos) => {
             if (!mounted.current) return resolve();
             const fresh: Coords = {
-              coordinates: { lat: pos.coords.latitude, lon: pos.coords.longitude},
+              coordinates: { lat: pos.coords.latitude, lon: pos.coords.longitude },
               accuracy: pos.coords.accuracy,
             };
             setCoordinates(fresh.coordinates);
             resolve();
           },
-          (err) => {
+          () => {
             if (!mounted.current) return resolve();
             setError(DomainError.locationUnavailable());
             resolve();
           },
           {
-            enableHighAccuracy: true,
-            timeout: 7000,
-            maximumAge: 15000,
+            enableHighAccuracy: highAccuracy,
+            timeout: timeoutMs,
+            maximumAge: maximumAgeMs,
             forceRequestLocation: true,
-            showLocationDialog: true,
+            showLocationDialog: true, // Android: sugiere activar ubicación si está desactivada
           }
         );
       });
-    } catch (e: any) {
+    } catch {
       if (mounted.current) setError(DomainError.locationUnavailable());
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [enabled, ensurePermission]);
+  }, [enabled, ensurePermission, highAccuracy, timeoutMs, maximumAgeMs]);
 
   const refresh = useCallback(() => {
     if (!enabled) {
@@ -133,7 +138,6 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
       setLoading(false);
       setError(null);
     }
-
     return () => {
       mounted.current = false;
     };

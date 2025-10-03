@@ -2,256 +2,162 @@ package com.theweatherapp.locationpermission
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.WritableMap
-import com.facebook.react.module.annotations.ReactModule
+import android.content.pm.PackageManager
+import com.facebook.react.bridge.*
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 
-@ReactModule(name = RNLocationPermissionModule.NAME)
-class RNLocationPermissionModule(
-  private val reactContext: ReactApplicationContext
-) : ReactContextBaseJavaModule(reactContext), PermissionListener {
+class RNLocationPermissionModule(private val reactContext: ReactApplicationContext)
+  : ReactContextBaseJavaModule(reactContext), PermissionListener {
 
-  companion object {
-    const val NAME = "RNLocationPermission"
-    private const val REQUEST_FOREGROUND = 10101
-    private const val REQUEST_BACKGROUND = 10102
+  override fun getName() = "RNLocationPermission"
+
+  private var pendingPromise: Promise? = null
+  private val REQ_CODE_LOCATION = 0xCAFE
+
+  private fun mapState(granted: Boolean, denied: Boolean, blocked: Boolean): String {
+    return when {
+      granted -> "granted"
+      blocked -> "blocked"
+      denied  -> "denied"
+      else    -> "prompt"
+    }
   }
 
-  private enum class RequestType { FOREGROUND, BACKGROUND }
+  private fun isGranted(vararg perms: String): Boolean {
+    return perms.any { ContextCompat.checkSelfPermission(reactContext, it) == PackageManager.PERMISSION_GRANTED }
+  }
 
-  private val prefs = reactContext.getSharedPreferences("rn_location_permission", Context.MODE_PRIVATE)
-  private var pendingPromise: Promise? = null
-  private var pendingRequest: RequestType? = null
+  private fun isDenied(vararg perms: String): Boolean {
+    return perms.any { ContextCompat.checkSelfPermission(reactContext, it) == PackageManager.PERMISSION_DENIED }
+  }
 
-  override fun getName(): String = NAME
+  private fun isBlocked(activity: Activity?, perm: String): Boolean {
+    if (activity == null) return false
+    val granted = ContextCompat.checkSelfPermission(reactContext, perm) == PackageManager.PERMISSION_GRANTED
+    if (granted) return false
+    // blocked = !shouldShowRequestPermissionRationale después de haber pedido una vez
+    return !ActivityCompat.shouldShowRequestPermissionRationale(activity, perm)
+  }
+
+  private fun locationEnabled(): Boolean {
+    val lm = reactContext.getSystemService(LocationManager::class.java)
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      lm.isLocationEnabled
+    } else {
+      val gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+      val net = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+      gps || net
+    }
+  }
+
+  private fun statusObj(state: String, scope: String, accuracy: String): WritableMap {
+    val map = Arguments.createMap()
+    map.putString("state", state)
+    map.putString("scope", scope)
+    map.putString("accuracy", accuracy)
+    map.putBoolean("locationEnabled", locationEnabled())
+    return map
+  }
 
   @ReactMethod
   fun checkStatus(promise: Promise) {
-    promise.resolve(buildStatus())
+    val fine = Manifest.permission.ACCESS_FINE_LOCATION
+    val coarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    val bg = Manifest.permission.ACCESS_BACKGROUND_LOCATION
+
+    val granted = isGranted(fine, coarse)
+    val denied = isDenied(fine, coarse)
+    val activity = currentActivity
+
+    val blocked = activity?.let { isBlocked(it, fine) || isBlocked(it, coarse) } ?: false
+
+    val state = mapState(granted, denied, blocked)
+    val scope = if (Build.VERSION.SDK_INT >= 29 && ContextCompat.checkSelfPermission(reactContext, bg) == PackageManager.PERMISSION_GRANTED && granted) {
+      "always"
+    } else if (granted) {
+      "whenInUse"
+    } else {
+      "none"
+    }
+
+    // Accuracy heurística: FINE => full, COARSE => reduced
+    val accuracy = when {
+      ContextCompat.checkSelfPermission(reactContext, fine) == PackageManager.PERMISSION_GRANTED -> "full"
+      ContextCompat.checkSelfPermission(reactContext, coarse) == PackageManager.PERMISSION_GRANTED -> "reduced"
+      else -> "unknown"
+    }
+
+    promise.resolve(statusObj(state, scope, accuracy))
   }
 
   @ReactMethod
   fun requestWhenInUse(promise: Promise) {
-    if (hasForegroundPermission()) {
-      promise.resolve(buildStatus())
+    val activity = currentActivity as? PermissionAwareActivity
+    if (activity == null) {
+      promise.reject("E_NO_ACTIVITY", "No current activity")
       return
     }
-
-    requestPermissions(
+    pendingPromise = promise
+    activity.requestPermissions(
       arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
       ),
-      RequestType.FOREGROUND,
-      REQUEST_FOREGROUND,
-      promise
+      REQ_CODE_LOCATION,
+      this
     )
   }
 
   @ReactMethod
-  fun requestBackground(promise: Promise) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-      // Background permission does not exist before Android 10
-      promise.resolve(buildStatus())
+  fun requestAlways(promise: Promise) {
+    val activity = currentActivity as? PermissionAwareActivity
+    if (activity == null) {
+      promise.reject("E_NO_ACTIVITY", "No current activity")
       return
     }
-
-    if (hasBackgroundPermission()) {
-      promise.resolve(buildStatus())
-      return
-    }
-
-    requestPermissions(
-      arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-      RequestType.BACKGROUND,
-      REQUEST_BACKGROUND,
-      promise
+    pendingPromise = promise
+    val perms = mutableListOf(
+      android.Manifest.permission.ACCESS_FINE_LOCATION,
+      android.Manifest.permission.ACCESS_COARSE_LOCATION
     )
+    if (android.os.Build.VERSION.SDK_INT >= 29) {
+      perms.add(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    }
+    activity.requestPermissions(perms.toTypedArray(), REQ_CODE_LOCATION, this)
   }
 
   @ReactMethod
   fun isLocationEnabled(promise: Promise) {
-    val locationManager = reactContext.getSystemService(LocationManager::class.java)
-    val enabled = if (locationManager != null) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        locationManager.isLocationEnabled
-      } else {
-        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-          locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-      }
-    } else {
-      false
-    }
-
-    promise.resolve(enabled)
+    promise.resolve(locationEnabled())
   }
 
   @ReactMethod
   fun openSettings(promise: Promise) {
-    try {
-      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-      intent.data = Uri.fromParts("package", reactContext.packageName, null)
-      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      reactContext.startActivity(intent)
-      promise.resolve(null)
-    } catch (t: Throwable) {
-      promise.reject("E_OPEN_SETTINGS", "Unable to open settings", t)
-    }
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    intent.data = android.net.Uri.parse("package:" + reactContext.packageName)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    reactContext.startActivity(intent)
+    promise.resolve(true)
   }
 
+  // PermissionListener
   override fun onRequestPermissionsResult(
     requestCode: Int,
     permissions: Array<String>,
     grantResults: IntArray
   ): Boolean {
+    if (requestCode != REQ_CODE_LOCATION) return false
     val promise = pendingPromise ?: return false
-    val requestType = pendingRequest
     pendingPromise = null
-    pendingRequest = null
-
-    val granted = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-
-    if (granted) {
-      promise.resolve(buildStatus())
-    } else {
-      if (requestType == RequestType.BACKGROUND) {
-        promise.resolve(buildStatus())
-      } else {
-        val blocked = isPermissionBlocked(permissions)
-        promise.resolve(
-          createStatus(
-            state = if (blocked) "blocked" else "denied",
-            accuracy = "unknown",
-            scope = "none"
-          )
-        )
-      }
-    }
-
-    return true
-  }
-
-  private fun requestPermissions(
-    permissions: Array<String>,
-    requestType: RequestType,
-    requestCode: Int,
-    promise: Promise
-  ) {
-    if (pendingPromise != null) {
-      promise.reject("E_IN_PROGRESS", "Another permission request is already in progress")
-      return
-    }
-
-    val activity = currentActivity
-    if (activity == null) {
-      promise.reject("E_ACTIVITY", "Activity is null")
-      return
-    }
-
-    val permissionAware = activity as? PermissionAwareActivity
-    if (permissionAware == null) {
-      promise.reject("E_ACTIVITY", "Activity does not implement PermissionAwareActivity")
-      return
-    }
-
-    pendingPromise = promise
-    pendingRequest = requestType
-    when (requestType) {
-      RequestType.FOREGROUND -> prefs.edit().putBoolean("foreground_requested", true).apply()
-      RequestType.BACKGROUND -> prefs.edit().putBoolean("background_requested", true).apply()
-    }
-    permissionAware.requestPermissions(permissions, requestCode, this)
-  }
-
-  private fun buildStatus(): WritableMap {
-    val hasForeground = hasForegroundPermission()
-    val hasBackground = hasBackgroundPermission()
-    val requestedForeground = prefs.getBoolean("foreground_requested", false)
-    val state = when {
-      hasForeground -> "granted"
-      requestedForeground && isPermissionBlocked(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) -> "blocked"
-      else -> "denied"
-    }
-
-    val scope = when {
-      hasBackground -> "always"
-      hasForeground -> "whenInUse"
-      else -> "none"
-    }
-
-    val accuracy = if (hasFinePermission()) {
-      "full"
-    } else if (hasCoarsePermission()) {
-      "reduced"
-    } else {
-      "unknown"
-    }
-
-    val map = createStatus(state, accuracy, scope)
-    return map
-  }
-
-  private fun createStatus(state: String, accuracy: String, scope: String): WritableMap {
-    val map = Arguments.createMap()
-    map.putString("state", state)
-    map.putString("accuracy", accuracy)
-    map.putString("scope", scope)
-    return map
-  }
-
-  private fun hasFinePermission(): Boolean =
-    ContextCompat.checkSelfPermission(
-      reactContext,
-      Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-
-  private fun hasCoarsePermission(): Boolean =
-    ContextCompat.checkSelfPermission(
-      reactContext,
-      Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-
-  private fun hasBackgroundPermission(): Boolean {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-      hasForegroundPermission()
-    } else {
-      ContextCompat.checkSelfPermission(
-        reactContext,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-      ) == PackageManager.PERMISSION_GRANTED
-    }
-  }
-
-  private fun hasForegroundPermission(): Boolean = hasFinePermission() || hasCoarsePermission()
-
-  private fun isPermissionBlocked(permissions: Array<out String>): Boolean {
-    val activity: Activity = currentActivity ?: return false
-
-    for (permission in permissions) {
-      if (ContextCompat.checkSelfPermission(reactContext, permission) == PackageManager.PERMISSION_GRANTED) {
-        return false
-      }
-
-      if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-        return false
-      }
-    }
-
+    checkStatus(promise)
     return true
   }
 }
