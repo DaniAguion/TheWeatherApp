@@ -27,15 +27,14 @@ export function useCurrentLocation({
   const mounted = useRef(false);
 
   const ensurePermission = useCallback(async (): Promise<boolean> => {
+    // First, check if location services are enabled
     let servicesAvailable = true;
-
     try {
       servicesAvailable = await LocationPermission.isLocationEnabled();
     } catch (err) {
-      // On some iOS versions the native helper might reject; fall back to system platform default.
+      // On some iOS versions might be rejected, fall back to system platform default.
       servicesAvailable = Platform.OS === "ios";
     }
-
     if (!servicesAvailable) {
       if (mounted.current) {
         setError(DomainError.locationUnavailable());
@@ -43,8 +42,8 @@ export function useCurrentLocation({
       return false;
     }
 
+    // Check permission status and request if needed
     let status: Status;
-
     try {
       status = await LocationPermission.checkStatus();
     } catch {
@@ -54,18 +53,17 @@ export function useCurrentLocation({
         scope: "none", 
         locationEnabled: servicesAvailable };
     }
-
     if (status.state !== "granted") {
       try {
         status = await LocationPermission.requestWhenInUse();
       } catch (requestError: any) {
         if (mounted.current) {
-          setError(requestError?.message ?? "No se pudo solicitar el permiso de ubicación");
+          setError(DomainError.locationPermission(requestError.message));
         }
         return false;
       }
     }
-
+    // Re-check status after request
     if (status.state !== "granted") {
       if (mounted.current) setError(DomainError.locationPermission());
       return false;
@@ -74,7 +72,9 @@ export function useCurrentLocation({
   }, []);
 
 
-const getCurrentLocation = useCallback(async () => {
+
+  // Fetch current location
+  const getCurrentLocation = useCallback(async () => {
     if (!enabled || !mounted.current) return;
 
     setLoading(true);
@@ -108,7 +108,7 @@ const getCurrentLocation = useCallback(async () => {
             timeout: timeoutMs,
             maximumAge: maximumAgeMs,
             forceRequestLocation: true,
-            showLocationDialog: true, // Android: sugiere activar ubicación si está desactivada
+            showLocationDialog: true,
           }
         );
       });
@@ -117,8 +117,10 @@ const getCurrentLocation = useCallback(async () => {
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [enabled, ensurePermission, highAccuracy, timeoutMs, maximumAgeMs]);
+  }, [enabled, ensurePermission]);
 
+
+  // Refresh function to manually trigger location fetch
   const refresh = useCallback(() => {
     if (!enabled) {
       setCoordinates(null);
@@ -129,6 +131,8 @@ const getCurrentLocation = useCallback(async () => {
     void getCurrentLocation();
   }, [enabled, getCurrentLocation]);
 
+
+  // Effect to fetch location on mount and when 'enabled' changes
   useEffect(() => {
     mounted.current = true;
     if (enabled) {
@@ -142,6 +146,8 @@ const getCurrentLocation = useCallback(async () => {
       mounted.current = false;
     };
   }, [enabled, getCurrentLocation]);
+
+
 
   return { coords: coordinates, loading, error, refresh };
 }

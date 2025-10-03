@@ -1,7 +1,13 @@
 import { NativeModules, NativeEventEmitter, Platform } from "react-native";
 
-type PermissionState = "granted" | "denied" | "blocked" | "prompt";
+type PermissionState = 
+  | "granted" // User granted permission
+  | "denied" // In ios, user denied permission; in Android, permission denied but can ask again
+  | "blocked" // Denied and cannot ask again
+  | "prompt"; // Not determined yet (iOS only)
+
 type Scope = "whenInUse" | "always" | "none";
+
 type Accuracy = "full" | "reduced" | "unknown";
 
 export type LocStatus = {
