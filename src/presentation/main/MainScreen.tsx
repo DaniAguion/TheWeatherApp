@@ -139,7 +139,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
           </View>
         ) : error ? (
           <View style={styles.state_container}>
-            <Text style={styles.error_text}>No se ha podido cargar la localización</Text>
+            <Text style={styles.error_text}>{toUIErrorMessage(error)}</Text>
             { usingCurrentLocation ?
               <TouchableOpacity
                 onPress={refreshLocation}

@@ -86,7 +86,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             currentLocation: { coordinates: coords },
             error: null
         }));
-        else if (locationError) setState(st => ({ ...st, error: DomainError.locationUnavailable() }));
+        else if (locationError) setState(st => ({ ...st, error: locationError }));
     }, [state.usingCurrentLocation, coords, locationError]);
 
 

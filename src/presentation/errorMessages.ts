@@ -2,7 +2,7 @@ import { DomainErrorKind, isDomainError } from "../domain/errors/DomainError";
 
 const dataErrorMessages: Record<DomainErrorKind, string> = {
   "STORAGE_UNAVAILABLE": "Ha ocurrido un error al acceder a la información.",
-  "LOCATION_PERMISSION_DENIED": "Permiso de ubicación denegado. Otorge permiso para acceder a la ubicación.",
+  "LOCATION_PERMISSION_DENIED": "Permiso de ubicación denegado. \n Otorge permiso para acceder a la ubicación.",
   "LOCATION_UNAVAILABLE": "No se pudo obtener la ubicación.",
   "NETWORK": "Error de red. Por favor, verifica tu conexión a internet.",
   "INVALID_DATA": "Los datos no son válidos.",

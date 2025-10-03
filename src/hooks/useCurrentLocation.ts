@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
-import { LocationPermission, type LocStatus as Status } from "../infraestructure/LocationPermission";
+import { LocationPermission, type LocStatus as Status } from "../native/LocationPermission";
 import { DomainError } from "../domain/errors/DomainError";
 import type { Coordinates } from "../domain/entities/LocationEntities";
 
