@@ -49,6 +49,16 @@ class RNLocationPermission: NSObject, CLLocationManagerDelegate {
   }
 
   @objc func requestWhenInUse(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    let current = CLLocationManager.authorizationStatus()
+    if current != .notDetermined {
+      resolve(buildStatus())
+      return
+    }
+    if pendingResolve != nil {
+      let prev = pendingResolve
+      pendingResolve = nil
+      prev?(buildStatus())
+    }
     pendingResolve = resolve
     DispatchQueue.main.async { self.manager.requestWhenInUseAuthorization() }
   }
