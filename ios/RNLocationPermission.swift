@@ -13,27 +13,16 @@ class RNLocationPermission: NSObject, CLLocationManagerDelegate {
     manager.delegate = self
   }
 
-  // React Native (Swift) necesita esto aunque el shim .m haga el puente
   @objc static func requiresMainQueueSetup() -> Bool { true }
 
-  // MARK: - Helpers
-
+  // Map iOS authorization status to our PermissionState
   private func mapAuth(_ status: CLAuthorizationStatus) -> String {
     switch status {
-      case .authorizedAlways: return "granted"
       case .authorizedWhenInUse: return "granted"
       case .denied: return "denied"
       case .restricted: return "blocked"
       case .notDetermined: return "prompt"
       @unknown default: return "prompt"
-    }
-  }
-
-  private func scope(_ status: CLAuthorizationStatus) -> String {
-    switch status {
-      case .authorizedAlways: return "always"
-      case .authorizedWhenInUse: return "whenInUse"
-      default: return "none"
     }
   }
 
@@ -44,17 +33,16 @@ class RNLocationPermission: NSObject, CLLocationManagerDelegate {
     return "unknown"
   }
 
+  // Build the status object to return to JS
   private func buildStatus() -> [String: Any] {
-    let s = CLLocationManager.authorizationStatus()
+    let s: CLAuthorizationStatus = CLLocationManager.authorizationStatus()
     return [
       "state": mapAuth(s),
-      "scope": scope(s),
+      "scope": "whenInUse",
       "accuracy": accuracyAuth(),
       "locationEnabled": CLLocationManager.locationServicesEnabled()
     ]
   }
-
-  // MARK: - Exported methods
 
   @objc func checkStatus(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     resolve(buildStatus())
@@ -65,28 +53,25 @@ class RNLocationPermission: NSObject, CLLocationManagerDelegate {
     DispatchQueue.main.async { self.manager.requestWhenInUseAuthorization() }
   }
 
-  @objc func requestAlways(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
-    pendingResolve = resolve
-    DispatchQueue.main.async { self.manager.requestAlwaysAuthorization() }
-  }
-
   @objc func isLocationEnabled(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     resolve(CLLocationManager.locationServicesEnabled())
   }
 
-  @objc func openSettings(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
-    guard let url = URL(string: UIApplication.openSettingsURLString) else { resolve(false); return }
-    DispatchQueue.main.async { UIApplication.shared.open(url, options: [:]) { ok in resolve(ok) } }
+  // Check if we have a pending resolver and make sure there are not two calls at the same time
+  private func resolveIfPending() {
+    guard let r = pendingResolve else { return }
+    let status = buildStatus()
+    pendingResolve = nil
+    r(status)
   }
 
-  // MARK: - Delegate
-
+  // iOS 14+
   func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-    if let r = pendingResolve { r(buildStatus()); pendingResolve = nil }
+    resolveIfPending()
   }
 
   // iOS < 14
   func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-    if let r = pendingResolve { r(buildStatus()); pendingResolve = nil }
+    resolveIfPending()
   }
 }

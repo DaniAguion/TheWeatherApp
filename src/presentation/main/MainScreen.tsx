@@ -54,14 +54,12 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const runFadeIn = useCallback(() => {
     opacity.setValue(0);
-    if (!loading) {
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 1000,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }).start();
-    }
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 1000,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
   }, [loading, opacity]);
 
   // Run the fade-in animation when loading or usingCurrentLocation changes

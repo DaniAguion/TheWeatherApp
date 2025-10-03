@@ -34,12 +34,5 @@ const emitter = new NativeEventEmitter(
 export const LocationPermission = {
   checkStatus: () => Native.checkStatus(),
   requestWhenInUse: () => Native.requestWhenInUse(),
-  requestAlways: () => Native.requestAlways(),
   isLocationEnabled: () => Native.isLocationEnabled(),
-  openSettings: () => Native.openSettings(),
-  addAccuracyListener(cb: (a: Accuracy) => void) {
-    if (Platform.OS !== "ios") return () => {};
-    const sub = emitter.addListener("accuracyChanged", (e: { accuracy: Accuracy }) => cb(e.accuracy));
-    return () => sub.remove();
-  },
 };

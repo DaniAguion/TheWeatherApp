@@ -117,35 +117,8 @@ class RNLocationPermissionModule(private val reactContext: ReactApplicationConte
   }
 
   @ReactMethod
-  fun requestAlways(promise: Promise) {
-    val activity = currentActivity as? PermissionAwareActivity
-    if (activity == null) {
-      promise.reject("E_NO_ACTIVITY", "No current activity")
-      return
-    }
-    pendingPromise = promise
-    val perms = mutableListOf(
-      android.Manifest.permission.ACCESS_FINE_LOCATION,
-      android.Manifest.permission.ACCESS_COARSE_LOCATION
-    )
-    if (android.os.Build.VERSION.SDK_INT >= 29) {
-      perms.add(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    }
-    activity.requestPermissions(perms.toTypedArray(), REQ_CODE_LOCATION, this)
-  }
-
-  @ReactMethod
   fun isLocationEnabled(promise: Promise) {
     promise.resolve(locationEnabled())
-  }
-
-  @ReactMethod
-  fun openSettings(promise: Promise) {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-    intent.data = android.net.Uri.parse("package:" + reactContext.packageName)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    reactContext.startActivity(intent)
-    promise.resolve(true)
   }
 
   // PermissionListener

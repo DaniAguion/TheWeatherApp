@@ -37,6 +37,7 @@ export function useCurrentLocation({
     }
     if (!servicesAvailable) {
       if (mounted.current) {
+        setLoading(false);
         setError(DomainError.locationUnavailable());
       }
       return false;
@@ -58,6 +59,7 @@ export function useCurrentLocation({
         status = await LocationPermission.requestWhenInUse();
       } catch (requestError: any) {
         if (mounted.current) {
+          setLoading(false);
           setError(DomainError.locationPermission(requestError.message));
         }
         return false;
@@ -65,7 +67,10 @@ export function useCurrentLocation({
     }
     // Re-check status after request
     if (status.state !== "granted") {
-      if (mounted.current) setError(DomainError.locationPermission());
+      if (mounted.current) {
+        setLoading(false);
+        setError(DomainError.locationPermission());
+      }
       return false;
     }
     return true;
@@ -122,13 +127,13 @@ export function useCurrentLocation({
 
   // Refresh function to manually trigger location fetch
   const refresh = useCallback(() => {
-    if (!enabled) {
+    if (enabled) {
+      void getCurrentLocation();
+    } else {
       setCoordinates(null);
       setLoading(false);
       setError(null);
-      return;
     }
-    void getCurrentLocation();
   }, [enabled, getCurrentLocation]);
 
 
