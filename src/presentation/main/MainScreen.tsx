@@ -54,7 +54,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const runFadeIn = useCallback(() => {
     opacity.setValue(0);
-    if (!loading && !error) {
+    if (!loading) {
       Animated.timing(opacity, {
         toValue: 1,
         duration: 1000,
@@ -62,12 +62,12 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         useNativeDriver: true,
       }).start();
     }
-  }, [loading, error, opacity]);
+  }, [loading, opacity]);
 
-  // Run the fade-in animation when loading, error or usingCurrentLocation changes
+  // Run the fade-in animation when loading or usingCurrentLocation changes
   useEffect(() => {
     runFadeIn();
-  }, [loading, error, usingCurrentLocation]);
+  }, [loading, usingCurrentLocation]);
 
 
   // Refresh preferences when the screen is focused
@@ -142,7 +142,15 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         ) : error ? (
           <View style={styles.state_container}>
             <Text style={styles.error_text}>No se ha podido cargar la localización</Text>
-            {usingCurrentLocation ? <Button title="Reintentar" onPress={refreshLocation} /> : null}
+            { usingCurrentLocation ?
+              <TouchableOpacity
+                onPress={refreshLocation}
+                style={styles.retry_button}
+                accessibilityRole="button"
+              >
+                <Text style={styles.retry_button_text}>Reintentar</Text>
+              </TouchableOpacity>
+            : null }
           </View>
         ) : (usingCurrentLocation && currentLocation != null) ? (
           <WeatherScreen
@@ -163,6 +171,15 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         ) : (
           <View style={styles.state_container}>
             <Text style={styles.error_text}>No ha sido posible cargar la localización</Text>
+            { usingCurrentLocation ?
+              <TouchableOpacity
+                onPress={refreshLocation}
+                style={styles.retry_button}
+                accessibilityRole="button"
+              >
+                <Text style={styles.retry_button_text}>Reintentar</Text>
+              </TouchableOpacity>
+            : null }
           </View>
         )}
       </Animated.View>

@@ -40,7 +40,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         coords,
         loading: loadingLocation,
         error: locationError,
-        refresh: refreshCurrent
+        refresh: refreshCurrent,
     } = useCurrentLocation({ enabled: state.usingCurrentLocation });
 
 
@@ -132,7 +132,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     }, [state.usingCurrentLocation, StorageService, refreshCurrent]);
 
 
-    // Handle refresh location if using current location
+    // Handle refresh location if using current locationA
     const refreshLocation = useCallback(async () => {
         if (!state.usingCurrentLocation) return;
         await refreshCurrent();

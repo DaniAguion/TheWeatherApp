@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import { LocationPermission, type Status } from "../infraestructure/LocationPermission";
+import { DomainError } from "../domain/errors/DomainError";
 import type { Coordinates } from "../domain/entities/LocationEntities";
 
 type Coords = { coordinates: Coordinates; accuracy?: number };
@@ -13,7 +14,7 @@ type UseCurrentLocationOptions = {
 export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions = {}) {
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(enabled);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DomainError | null>(null);
   const mounted = useRef(false);
 
   const ensurePermission = useCallback(async (): Promise<boolean> => {
@@ -28,7 +29,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
 
     if (!servicesAvailable) {
       if (mounted.current) {
-        setError("Servicios de ubicación desactivados");
+        setError(DomainError.locationUnavailable());
       }
       return false;
     }
@@ -58,9 +59,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
 
     if (status.state !== "granted") {
       if (mounted.current) {
-        setError(status.state === "blocked"
-          ? "Permiso de ubicación bloqueado, habilítalo en Ajustes"
-          : "Permiso de ubicación no concedido");
+        setError(DomainError.locationPermission());
       }
       return false;
     }
@@ -96,7 +95,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
           },
           (err) => {
             if (!mounted.current) return resolve();
-            setError(err.message || "No se pudo obtener la ubicación");
+            setError(DomainError.locationUnavailable());
             resolve();
           },
           {
@@ -109,7 +108,7 @@ export function useCurrentLocation({ enabled = true }: UseCurrentLocationOptions
         );
       });
     } catch (e: any) {
-      if (mounted.current) setError(e?.message ?? "Error de ubicación");
+      if (mounted.current) setError(DomainError.locationUnavailable());
     } finally {
       if (mounted.current) setLoading(false);
     }

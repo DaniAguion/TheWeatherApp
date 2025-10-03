@@ -60,5 +60,24 @@ export default StyleSheet.create({
         fontSize: 14,
         fontWeight: "400",
         textAlign: "center"
-    }
+    },
+    retry_button: {
+        backgroundColor: "#1273de",
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+        borderRadius: 24,
+        alignSelf: "center",
+        borderWidth: 1,
+        borderColor: "#e0e0e0",
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+    },
+    retry_button_text: {
+        color: "#ffffff",
+        fontSize: 16,
+        fontWeight: "600",
+    },
 });
