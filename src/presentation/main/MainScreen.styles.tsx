@@ -56,10 +56,11 @@ export default StyleSheet.create({
         gap: 8,
     },
     error_text: {
-        color: "red",
-        fontSize: 14,
-        fontWeight: "400",
-        textAlign: "center"
+        fontSize: 16,
+        fontWeight: "500",
+        textAlign: "center",
+        marginTop: 16,
+        marginBottom: 32,
     },
     retry_button: {
         backgroundColor: "#1273de",
