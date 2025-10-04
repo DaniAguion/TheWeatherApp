@@ -19,6 +19,8 @@ const DEFAULT_VALUES = {
   savedLocations: [] as Location[]
 };
 
+export const DEFAULT_FAVOURITE = { name: "Madrid", coordinates: { lat: 40.4, lon: -3.7 } } as Location;
+
 
 export class StorageServiceImpl implements StorageService {
   // Load preferences
@@ -59,6 +61,7 @@ export class StorageServiceImpl implements StorageService {
         const parsedLocation = JSON.parse(raw) as Location;
         if (parsedLocation ) return { success: true, value: parsedLocation };
       }
+      // If no favourite location is set, return the default one
       await AsyncStorage.setItem(KEYS.favouriteLocation, JSON.stringify(DEFAULT_VALUES.favouriteLocation));
       return { success: true, value: DEFAULT_VALUES.favouriteLocation };
     } catch (e) {
@@ -70,17 +73,8 @@ export class StorageServiceImpl implements StorageService {
 
   // Save a location as favourite
   async storeFavouriteLocation(location: Location): Promise<Result<void>> {
-    if (!isValidLocation(location)) {
-      console.error("[UserPrefs] Invalid location format:", location);
-      return {
-        success: false,
-        error: DomainError.invalidData(new Error("Invalid location")),
-      };
-    }
-
     try {
-      const normalizedLoc = normalizeLocation(location);
-      await AsyncStorage.setItem(KEYS.favouriteLocation, JSON.stringify(normalizedLoc));
+      await AsyncStorage.setItem(KEYS.favouriteLocation, JSON.stringify(location));
       return { success: true, value: undefined };
     } catch (e) {
       console.error("[UserPrefs] Error saving favourite location:", e);
@@ -90,11 +84,8 @@ export class StorageServiceImpl implements StorageService {
 
 
   // Remove location from favourite
-  async removeFavouriteLocation(location: Location): Promise<Result<void>> {
+  async removeFavouriteLocation(): Promise<Result<void>> {
     try {
-      if (sameLocation(location, DEFAULT_VALUES.favouriteLocation)) {
-        return { success: false, error: DomainError.storage(new Error("Cannot remove default location")) };
-      }
       await AsyncStorage.removeItem(KEYS.favouriteLocation);
       return { success: true, value: undefined };
     } catch (e) {

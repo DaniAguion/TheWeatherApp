@@ -1,4 +1,3 @@
-import { WeatherService } from "../domain/ports/WeatherService";
 import { StorageService } from "../domain/ports/StorageService";
 import { OpenMeteoWeatherService } from "../data/weather/OpenMeteoWeatherService";
 import { OpenMeteoGeocodingService } from "../data/geocoding/OpenMeteoGeocodingService";
@@ -11,7 +10,7 @@ import { GetLocationNameUseCase } from "../domain/usecases/GetLocationNameUseCas
 import { SearchLocationUseCase } from "../domain/usecases/SearchLocationsUseCase";
 import { GetSavedLocationUseCase } from "../domain/usecases/GetSavedLocationsUseCase";
 import { GetLocationStatusUseCase } from "../domain/usecases/GetLocationStatusUseCase";
-
+import { ToggleFavouriteUseCase } from "../domain/usecases/ToggleFavouriteUseCase";
 
 export type Services = {
   storageService: StorageService;
@@ -24,6 +23,7 @@ export type UseCases = {
   searchLocationUseCase: SearchLocationUseCase;
   getSavedLocationUseCase: GetSavedLocationUseCase;
   getLocationStatusUseCase: GetLocationStatusUseCase;
+  toggleFavouriteUseCase: ToggleFavouriteUseCase;
 };
 
 export type Dependencies = {
@@ -47,6 +47,7 @@ export function createDepedencies(): Dependencies {
     searchLocationUseCase: new SearchLocationUseCase(geocodingService),
     getSavedLocationUseCase: new GetSavedLocationUseCase(storageService),
     getLocationStatusUseCase: new GetLocationStatusUseCase(storageService),
+    toggleFavouriteUseCase: new ToggleFavouriteUseCase(storageService),
   };
 
   return { services, useCases };

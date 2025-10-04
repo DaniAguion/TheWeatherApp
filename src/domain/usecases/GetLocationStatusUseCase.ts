@@ -3,6 +3,7 @@ import type { Location } from "../entities/LocationEntities";
 import type { LocationStatus } from "../entities/UserPreferences";
 import { Result } from "../errors/Result";
 import { DomainError } from "../errors/DomainError";
+import { sameLocation } from "../helpers/LocationHelper";
 
 
 export class GetLocationStatusUseCase {
@@ -14,27 +15,14 @@ export class GetLocationStatusUseCase {
         this.storageService.loadFavouriteLocation(),
         this.storageService.loadSavedLocations()
       ]);
-
       if (!favouriteResult.success) {
         return { success: false, error: favouriteResult.error };
       }
       if (!savedResult.success) {
         return { success: false, error: savedResult.error };
       }
-
-      const favouriteLocation = favouriteResult.value;
-      const savedLocations = savedResult.value;
-
-      const isFavourite = favouriteLocation 
-        ? (favouriteLocation.coordinates.lat === location.coordinates.lat &&
-           favouriteLocation.coordinates.lon === location.coordinates.lon)
-        : false;
-
-      const isSaved = savedLocations.some(savedLoc => 
-        savedLoc.coordinates.lat === location.coordinates.lat &&
-        savedLoc.coordinates.lon === location.coordinates.lon
-      );
-
+      const isFavourite = sameLocation(favouriteResult.value, location);
+      const isSaved = savedResult.value.some(savedLoc => sameLocation(savedLoc, location));
       return { success: true, value: { isFavourite, isSaved } };
     } catch (error) {
       return { success: false, error: DomainError.unknown(error) };

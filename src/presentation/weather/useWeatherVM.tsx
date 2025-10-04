@@ -1,8 +1,10 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, use } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../../domain/ports/StorageService";
 import { GetWeatherUseCase } from "../../domain/usecases/GetWeatherUseCase";
 import { GetLocationNameUseCase } from "../../domain/usecases/GetLocationNameUseCase";
+import { GetLocationStatusUseCase } from "../../domain/usecases/GetLocationStatusUseCase";
+import { ToggleFavouriteUseCase } from "../../domain/usecases/ToggleFavouriteUseCase";
 import { normalizeLocation, sameLocation } from "../../domain/helpers/LocationHelper";
 import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
@@ -17,6 +19,8 @@ export type UseWeatherVMDeps_old = {
 export type UseWeatherVMDeps_new = {
     getWeatherUseCase: GetWeatherUseCase;
     getLocationNameUseCase: GetLocationNameUseCase;
+    getLocationStatusUseCase: GetLocationStatusUseCase;
+    toggleFavouriteUseCase: ToggleFavouriteUseCase;
 };
 
 type VMState = {
@@ -52,33 +56,32 @@ export function useWeatherVM(
     const [isFavourite, setIsFavourite] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const { storageService } = deps_old;
-    const { getWeatherUseCase, getLocationNameUseCase } = deps_new;
+    const { 
+        getWeatherUseCase,
+        getLocationNameUseCase,
+        getLocationStatusUseCase,
+        toggleFavouriteUseCase
+     } = deps_new;
 
     // Fetch weather data when lat/lon changes
-    useEffect(() => { fetchWeather() }, [coordinates]);
+    useEffect(() => { fetchWeather()}, [coordinates]);
 
 
     // Fetch favourite and saved status
-    const refreshPersistedStatus = useCallback(async () => {
+    const refreshPersistedStatus = async () => {
         try {
-            const loadFavouriteResult = await storageService.loadFavouriteLocation();
-            if (loadFavouriteResult.success) {
-                const normalized = normalizeLocation({ coordinates } as Location);
-                setIsFavourite(sameLocation(loadFavouriteResult.value, normalized));
+            const location = { coordinates, name: locationName ?? "Unknown" } as Location;
+            const getStatusResult = await getLocationStatusUseCase.execute(location);
+            if (getStatusResult.success) {
+                setIsFavourite(getStatusResult.value.isFavourite);
+                setIsSaved(getStatusResult.value.isSaved);
             } else {
-                setError(loadFavouriteResult.error);
-            }
-            const loadSavedResult = await storageService.loadSavedLocations();
-            if (loadSavedResult.success) {
-                const normalized = normalizeLocation({ coordinates } as Location);
-                setIsSaved(loadSavedResult.value.some(l => sameLocation(l, normalized)));
-            } else {
-                setError(loadSavedResult.error);
+                setError(getStatusResult.error);
             }
         } catch (err) {
             console.log("Failed to refresh persisted status:", err);
         }
-    }, [coordinates, storageService]);
+    };
 
 
     // Refresh persisted status when screen is focused
@@ -132,12 +135,11 @@ export function useWeatherVM(
     const toggleFavourite = useCallback(async () => {
         const location = { coordinates, name: locationName ?? "Unknown" };
         try {
-            if (isFavourite) {
-                const res = await storageService.removeFavouriteLocation(location);
-                if (res.success) setIsFavourite(false);
+            const res = await toggleFavouriteUseCase.execute(location);
+            if (res.success) {
+                refreshPersistedStatus();
             } else {
-                const res = await storageService.storeFavouriteLocation(location);
-                if (res.success) setIsFavourite(true);
+                setError(res.error);
             }
         } catch (e) {
             console.log("toggleFavourite failed:", e);
