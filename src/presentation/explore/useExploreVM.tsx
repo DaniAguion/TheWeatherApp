@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DomainError } from "../../domain/errors/DomainError";
+import { SearchLocationUseCase } from "../../domain/usecases/SearchLocationsUseCase";
 import type { Location } from "../../domain/entities/LocationEntities";
-import type { WeatherService } from "../../domain/ports/WeatherService";
+
 
 export type UseExploreVMDeps = {
-  weatherService: WeatherService;
+  searchLocationUseCase: SearchLocationUseCase;
 };
 
 type VMState = {
@@ -22,7 +23,7 @@ type VMFunctions = {
 };
 
 
-export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VMFunctions {
+export function useExploreVM({ searchLocationUseCase }: UseExploreVMDeps): VMState & VMFunctions {
   const [query, setQueryState] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<DomainError | null>(null);
@@ -74,7 +75,7 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
     setError(null);
 
     try {
-      const searchLocationsResult = await weatherService.searchLocations(trimmed);
+      const searchLocationsResult = await searchLocationUseCase.execute(trimmed);
       if (!mounted.current) return;
 
       if (searchLocationsResult.success) {
@@ -93,7 +94,7 @@ export function useExploreVM({ weatherService }: UseExploreVMDeps): VMState & VM
       if (!mounted.current) return;
       setLoading(false);
     }
-  }, [query, weatherService, clearResults]);
+  }, [query, clearResults]);
 
 
 

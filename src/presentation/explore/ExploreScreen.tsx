@@ -8,7 +8,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { TabParamList, RootStackParamsList } from "../../AppNavigator";
 import type { Location } from "../../domain/entities/LocationEntities";
-import { useServices } from "../../di/ServicesProvider";
+import { useUseCases } from "../../di/ServicesProvider";
 import { useExploreVM, UseExploreVMDeps } from "./useExploreVM";
 import styles from "./ExploreScreen.styles";
 
@@ -18,7 +18,7 @@ export type ExploreScreenProps = CompositeScreenProps<
 >;
 
 export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
-  const deps: UseExploreVMDeps = useServices();
+  const deps: UseExploreVMDeps = useUseCases();
   const {
     query,
     loading,
