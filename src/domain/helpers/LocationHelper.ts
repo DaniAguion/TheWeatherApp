@@ -14,19 +14,9 @@ export function isValidLocation(loc: Location): Boolean {
 
 
 // Normalize location by rounding coordinates to one decimal place
+// This helps in caching and comparing locations effectively
 export function normalizeLocation(loc: Location): Location {
   const coord = loc.coordinates;
-  const isValidCoordinates = (
-    Number.isFinite(coord.lat) &&
-    Number.isFinite(coord.lon) &&
-    coord.lat >= -90 && coord.lat <= 90 &&
-    coord.lon >= -180 && coord.lon <= 180
-  );
-
-  if (!isValidCoordinates) {
-    throw new Error("Invalid coordinates");
-  }
-
   const normalizeCoordinates : Coordinates = {
     lat: Math.round(coord.lat * 10) / 10,
     lon: Math.round(coord.lon * 10) / 10,

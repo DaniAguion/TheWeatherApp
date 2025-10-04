@@ -94,14 +94,14 @@ export function useWeatherVM(
         if (routeLocationName) {
             setLocationName(routeLocationName);
         } else {
-            const locationName = await getLocationNameUseCase.execute(coordinates);
+            const locationName = await getLocationNameUseCase.execute({coordinates} as Location);
             setLocationName(locationName);
         }
-        await getWeatherUseCase.execute(coordinates).then(result => {
+        await getWeatherUseCase.execute({coordinates} as Location).then(result => {
             if (result.success) {
-                    setCurrent(result.value.current);
-                    setHours(result.value.hours ?? []);
-                    setDays(result.value.days ?? []);
+                setCurrent(result.value.current);
+                setHours(result.value.hours ?? []);
+                setDays(result.value.days ?? []);
             } else {
                 setError(result.error);
             }

@@ -59,7 +59,7 @@ export function useSavedVM({ getSavedLocationUseCase, getCurrentWeatherUseCase} 
 
       const savedLocationWeather: PreviewWeatherLocation[] = [];
       for (const location of savedLocations) {
-        await getCurrentWeatherUseCase.execute(location.coordinates).then(result => {
+        await getCurrentWeatherUseCase.execute(location).then(result => {
             if (result.success) {
               savedLocationWeather.push({
                   location,
