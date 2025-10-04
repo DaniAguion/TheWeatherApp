@@ -4,6 +4,7 @@ import { OpenMeteoGeocodingService } from "../data/geocoding/OpenMeteoGeocodingS
 import { NominatimReverseGeoService } from "../data/reverse-geocoding/NominatimReverseGeoService";
 import { StorageServiceImpl } from "../data/storage/StorageServiceImpl";
 import { CacheWeatherServiceImpl } from "../data/cache/CacheWeatherServiceImpl";
+import { LocationProviderImpl } from "../data/location/LocationProviderImpl";
 import { GetWeatherUseCase } from "../domain/usecases/GetWeatherUseCase";
 import { GetCurrentWeatherUseCase } from "../domain/usecases/GetCurrentWeatherUseCase";
 import { GetLocationNameUseCase } from "../domain/usecases/GetLocationNameUseCase";
@@ -15,6 +16,8 @@ import { ToggleSavedUseCase } from "../domain/usecases/ToggleSavedUseCase";
 import { GetPreferencesUseCase } from "../domain/usecases/GetPreferencesUseCase";
 import { ToggleMainSwitchUseCase } from "../domain/usecases/ToggleMainSwitchUseCase";
 import { GetFavouriteUseCase } from "../domain/usecases/GetFavouriteUseCase";
+import { GetCurrentLocationUseCase } from "../domain/usecases/GetCurrentLocationUseCase";
+
 
 
 export type UseCases = {
@@ -29,6 +32,7 @@ export type UseCases = {
   getPreferencesUseCase: GetPreferencesUseCase;
   toggleMainSwitchUseCase: ToggleMainSwitchUseCase;
   getFavouriteUseCase: GetFavouriteUseCase;
+  getCurrentLocationUseCase: GetCurrentLocationUseCase;
 };
 
 export type Dependencies = {
@@ -42,6 +46,7 @@ export function createDepedencies(): Dependencies {
   const geocodingService = new OpenMeteoGeocodingService();
   const storageService = new StorageServiceImpl();
   const cacheWeatherService = new CacheWeatherServiceImpl();
+  const locationProvider = new LocationProviderImpl();
 
   const useCases: UseCases = {
     getWeatherUseCase: new GetWeatherUseCase(weatherService, cacheWeatherService),
@@ -54,7 +59,8 @@ export function createDepedencies(): Dependencies {
     toggleSavedUseCase: new ToggleSavedUseCase(storageService),
     getPreferencesUseCase: new GetPreferencesUseCase(storageService),
     toggleMainSwitchUseCase: new ToggleMainSwitchUseCase(storageService),
-    getFavouriteUseCase: new GetFavouriteUseCase(storageService)
+    getFavouriteUseCase: new GetFavouriteUseCase(storageService),
+    getCurrentLocationUseCase: new GetCurrentLocationUseCase(locationProvider),
   };
 
   return { useCases };

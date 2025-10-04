@@ -4,6 +4,7 @@ import { DomainError } from "../../domain/errors/DomainError";
 import { GetPreferencesUseCase } from "../../domain/usecases/GetPreferencesUseCase";
 import { ToggleMainSwitchUseCase } from "../../domain/usecases/ToggleMainSwitchUseCase";
 import { GetFavouriteUseCase } from "../../domain/usecases/GetFavouriteUseCase";
+import { GetCurrentLocationUseCase } from "../../domain/usecases/GetCurrentLocationUseCase";
 import type { Location } from "../../domain/entities/LocationEntities";
 
 
@@ -11,6 +12,7 @@ export type UseMainVMDeps = {
     getPreferencesUseCase: GetPreferencesUseCase;
     toggleMainSwitchUseCase: ToggleMainSwitchUseCase;
     getFavouriteUseCase: GetFavouriteUseCase;
+    getCurrentLocationUseCase: GetCurrentLocationUseCase;
 };
 
 type VMState = {
@@ -31,7 +33,8 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     const { 
         getPreferencesUseCase, 
         toggleMainSwitchUseCase, 
-        getFavouriteUseCase 
+        getFavouriteUseCase,
+        getCurrentLocationUseCase
     } = deps;
 
     const [state, setState] = useState<VMState>({
@@ -42,12 +45,33 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         favouriteLocation: { name: "Favorita", coordinates: { lat: 0, lon: 0 } },
     });
 
-    const {
-        coords,
-        loading: loadingLocation,
-        error: locationError,
-        refresh: refreshCurrent,
-    } = useCurrentLocation({ enabled: state.usingCurrentLocation });
+
+    // Load current location
+    const loadCurrentLocation = useCallback(async () => {
+        if (!state.usingCurrentLocation) return;
+        setState(st => ({ ...st, loading: true }));
+        const res = await getCurrentLocationUseCase.execute();
+        if (res.success) {
+            setState(st => ({
+                ...st,
+                currentLocation: res.value,
+                loading: false,
+                error: null
+            }));
+        } else {
+            setState(st => ({ ...st, loading:false, error: res.error }));
+        }
+    }, [state.usingCurrentLocation, getCurrentLocationUseCase]);
+
+
+
+    // Load current location when usingCurrentLocation changes to true
+    useEffect(() => {
+        if (state.usingCurrentLocation) {
+            loadCurrentLocation();
+        }
+    }, [state.usingCurrentLocation, loadCurrentLocation]);
+
 
 
     // Get the preferences of the user when the component is mounted
@@ -59,11 +83,11 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
                 setState(st => ({
                     ...st,
                     usingCurrentLocation: res.value.useCurrentLocation,
-                    error: null,
-                    loading: false
+                    loading: false,
+                    error: null
                 }));
             } else {
-                setState(st => ({ ...st, error: res.error, loading: false }));
+                setState(st => ({ ...st, loading:false, error: res.error }));
             }
         } catch {
             setState(st => ({
@@ -83,11 +107,11 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
                 setState(st => ({
                     ...st,
                     favouriteLocation: res.value,
+                    loading: false,
                     error: null,
-                    loading: false
                 }));
             } else {
-                setState(st => ({ ...st, error: res.error, loading: false }));
+                setState(st => ({ ...st, loading:false, error: res.error }));
             }
         } catch {
             setState(st => ({
@@ -97,22 +121,14 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             }));
         }
     }, [getFavouriteUseCase]);
+    
 
     
-     const refreshMain = useCallback(async () => {
+    // Refresh main function to reload preferences and favourite location
+    const refreshMain = useCallback(async () => {
         await Promise.all([loadPreferences(), loadFavouriteLocation()]);
     }, [loadPreferences, loadFavouriteLocation]);
 
-
-    // Update state when location or usingCurrentLocation changes
-    useEffect(() => {
-        if (!state.usingCurrentLocation) return;
-        if (coords) setState(st => ({ ...st,
-            currentLocation: { coordinates: coords },
-            error: null
-        }));
-        else if (locationError) setState(st => ({ ...st, error: locationError }));
-    }, [state.usingCurrentLocation, coords, locationError]);
 
 
     // Select favourite location
@@ -135,16 +151,18 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     }, [state.usingCurrentLocation, state.favouriteLocation]);
 
 
-    // Handle refresh location if using current locationA
+    // Handle refresh location if using current location
     const refreshLocation = useCallback(async () => {
-        if (!state.usingCurrentLocation) return;
-        await refreshCurrent();
-    }, [state.usingCurrentLocation, refreshCurrent]);
+        if (state.usingCurrentLocation) {
+            await loadCurrentLocation();
+        } else {
+            await loadFavouriteLocation();
+        }
+    }, [state.usingCurrentLocation]);
     
-    const loading = state.loading || loadingLocation;
 
     return {
-        loading,
+        loading: state.loading,
         error: state.error,
         usingCurrentLocation: state.usingCurrentLocation,
         currentLocation: state.currentLocation,
