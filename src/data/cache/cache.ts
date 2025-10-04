@@ -4,9 +4,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const DEFAULT_TTL: number = 10 * 60 * 1000; // 10 min in miliseconds
 const TTL_RULES: Record<string, number> = {
   "weatherInfo:": 30 * 60 * 1000,
+  "currentWeather:": 30 * 60 * 1000,
   "locationName:": 10 * 60 * 1000,
 };
 
+// Obtain TTL based on key prefix rules
 function obtainTtl(key: string): number {
   for (const prefixe of Object.keys(TTL_RULES)) {
     if (key.startsWith(prefixe) && prefixe.length > 0) {
@@ -29,9 +31,9 @@ export async function setCached<T>(key: string, data: T) {
 
 // Function to get cache data from key. Return data only if its not expired.
 export async function getCached<T>(key: string): Promise<T | null> {
-  const item = await AsyncStorage.getItem(key);
-  if (!item) return null;
   try {
+    const item = await AsyncStorage.getItem(key);
+    if (!item) return null;
     const { data, ts } = JSON.parse(item);
     const ttlMs = obtainTtl(key);
     if (Date.now() - ts < ttlMs) return data as T;
@@ -40,7 +42,11 @@ export async function getCached<T>(key: string): Promise<T | null> {
     return null;
   } catch {
     // If parsing fails, remove corrupted cache entry
-    await AsyncStorage.removeItem(key);
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch {
+      console.warn("getCached failed to remove corrupted cache entry:", key);
+    }
     return null;
   }
 }

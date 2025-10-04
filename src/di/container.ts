@@ -1,23 +1,21 @@
 import { WeatherService } from "../domain/ports/WeatherService";
-import { ReverseGeoService } from "../domain/ports/ReverseGeoService";
 import { StorageService } from "../domain/ports/StorageService";
-import { CacheWeatherService } from "../domain/ports/CacheWeatherService";
 import { OpenMeteoWeatherService } from "../data/weather/OpenMeteoWeatherService";
 import { NominatimReverseGeoService } from "../data/geocoding/NominatimReverseGeoService";
 import { StorageServiceImpl } from "../data/storage/StorageServiceImpl";
 import { CacheWeatherServiceImpl } from "../data/cache/CacheWeatherServiceImpl";
 import { GetWeatherUseCase } from "../domain/usecases/GetWeatherUseCase";
+import { GetLocationNameUseCase } from "../domain/usecases/GetLocationNameUseCase";
 
 
 export type Services = {
   weatherService: WeatherService;
-  reverseGeoService: ReverseGeoService;
   storageService: StorageService;
-  cacheWeatherService?: CacheWeatherService;
 };
 
 export type UseCases = {
   getWeatherUseCase: GetWeatherUseCase;
+  getLocationNameUseCase: GetLocationNameUseCase;
 };
 
 export type Dependencies = {
@@ -32,9 +30,10 @@ export function createDepedencies(): Dependencies {
   const storageService = new StorageServiceImpl();
   const cacheWeatherService = new CacheWeatherServiceImpl();
 
-  const services: Services = { weatherService, reverseGeoService, storageService };
+  const services: Services = { weatherService, storageService };
   const useCases: UseCases = {
     getWeatherUseCase: new GetWeatherUseCase(weatherService, cacheWeatherService),
+    getLocationNameUseCase: new GetLocationNameUseCase(reverseGeoService, cacheWeatherService),
   };
 
   return { services, useCases };

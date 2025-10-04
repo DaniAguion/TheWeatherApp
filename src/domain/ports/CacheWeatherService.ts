@@ -10,4 +10,8 @@ export interface CacheWeatherService {
     getCurrentWeather(coordinates: Coordinates): Promise<Current | null>
 
     storageCurrentWeather(coordinates: Coordinates, weatherInfo: Current): Promise<void>
+
+    getLocationName(coordinates: Coordinates): Promise<string | null>
+
+    storageLocationName(coordinates: Coordinates, locationName: string): Promise<void>
 }
