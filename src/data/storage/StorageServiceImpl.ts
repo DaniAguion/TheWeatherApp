@@ -116,27 +116,15 @@ export class StorageServiceImpl implements StorageService {
 
   // Save a location to saved locations list
   async storeSavedLocation(location: Location): Promise<Result<void>> {
-    if (!isValidLocation(location)) {
-      console.error("[UserPrefs] Invalid location format:", location);
-      return {
-        success: false,
-        error: DomainError.invalidData(new Error("Invalid location")),
-      };
-    }
-    
     try {
       let savedLocations: Location[] = [];
       const loadSavedLocations = await this.loadSavedLocations()
       if (loadSavedLocations.success) {
         savedLocations = loadSavedLocations.value;
       } else {
-        return { success: false, error: DomainError.unknown(new Error("Could not save location")) };
+        return { success: false, error: loadSavedLocations.error };
       }
-      const normalizedLoc = normalizeLocation(location);
-      if (savedLocations.some(l => sameLocation(l, normalizedLoc))) {
-        return { success: false, error: DomainError.unknown(new Error("Location already saved")) };
-      }
-      const newSavedLocations = [...savedLocations, normalizedLoc];
+      const newSavedLocations = [...savedLocations, location];
       await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(newSavedLocations));
       return { success: true, value: undefined };
     } catch (e) {
@@ -148,26 +136,16 @@ export class StorageServiceImpl implements StorageService {
 
 
   // Remove location from locations list
-  async removeSaveLocation(location: Location): Promise<Result<void>> {
-    if (!isValidLocation(location)) {
-      console.error("[UserPrefs] Invalid location format:", location);
-      return {
-        success: false,
-        error: DomainError.invalidData(new Error("Invalid location")),
-      };
-    }
-    
+  async removeSavedLocation(location: Location): Promise<Result<void>> {
     try {
       let savedLocations: Location[] = [];
       const loadSavedLocations = await this.loadSavedLocations()
       if (loadSavedLocations.success) {
         savedLocations = loadSavedLocations.value;
       } else {
-        return { success: false, error: DomainError.unknown(new Error("Could not load saved locations")) };
+        return { success: false, error: loadSavedLocations.error };
       }
-      const normalizedLoc = normalizeLocation(location);
-      const newSavedLocations = savedLocations.filter(l =>!((l.coordinates.lat === normalizedLoc.coordinates.lat &&
-            l.coordinates.lon === normalizedLoc.coordinates.lon)) || l.name !== normalizedLoc.name);
+      const newSavedLocations = savedLocations.filter(savedLocation =>!sameLocation(savedLocation, location));
       await AsyncStorage.setItem(KEYS.savedLocations, JSON.stringify(newSavedLocations));
       return { success: true, value: undefined };
     } catch (e) {

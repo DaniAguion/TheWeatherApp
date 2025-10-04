@@ -5,7 +5,7 @@ import { GetWeatherUseCase } from "../../domain/usecases/GetWeatherUseCase";
 import { GetLocationNameUseCase } from "../../domain/usecases/GetLocationNameUseCase";
 import { GetLocationStatusUseCase } from "../../domain/usecases/GetLocationStatusUseCase";
 import { ToggleFavouriteUseCase } from "../../domain/usecases/ToggleFavouriteUseCase";
-import { normalizeLocation, sameLocation } from "../../domain/helpers/LocationHelper";
+import { ToggleSavedUseCase } from "../../domain/usecases/ToggleSavedUseCase";
 import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { DomainError } from "../../domain/errors/DomainError";
@@ -21,6 +21,7 @@ export type UseWeatherVMDeps_new = {
     getLocationNameUseCase: GetLocationNameUseCase;
     getLocationStatusUseCase: GetLocationStatusUseCase;
     toggleFavouriteUseCase: ToggleFavouriteUseCase;
+    toggleSavedUseCase: ToggleFavouriteUseCase;
 };
 
 type VMState = {
@@ -151,7 +152,7 @@ export function useWeatherVM(
         const location = { coordinates, name: locationName ?? "Unknown" };
         try {
             if (isSaved) {
-                const res = await storageService.removeSaveLocation(location);
+                const res = await storageService.removeSavedLocation(location);
                 if (res.success) setIsSaved(false);
             } else {
                 const res = await storageService.storeSavedLocation(location);

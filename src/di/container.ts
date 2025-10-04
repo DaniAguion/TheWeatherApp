@@ -11,6 +11,7 @@ import { SearchLocationUseCase } from "../domain/usecases/SearchLocationsUseCase
 import { GetSavedLocationUseCase } from "../domain/usecases/GetSavedLocationsUseCase";
 import { GetLocationStatusUseCase } from "../domain/usecases/GetLocationStatusUseCase";
 import { ToggleFavouriteUseCase } from "../domain/usecases/ToggleFavouriteUseCase";
+import { ToggleSavedUseCase } from "../domain/usecases/ToggleSavedUseCase";
 
 export type Services = {
   storageService: StorageService;
@@ -24,6 +25,7 @@ export type UseCases = {
   getSavedLocationUseCase: GetSavedLocationUseCase;
   getLocationStatusUseCase: GetLocationStatusUseCase;
   toggleFavouriteUseCase: ToggleFavouriteUseCase;
+  toggleSavedUseCase: ToggleSavedUseCase;
 };
 
 export type Dependencies = {
@@ -48,6 +50,7 @@ export function createDepedencies(): Dependencies {
     getSavedLocationUseCase: new GetSavedLocationUseCase(storageService),
     getLocationStatusUseCase: new GetLocationStatusUseCase(storageService),
     toggleFavouriteUseCase: new ToggleFavouriteUseCase(storageService),
+    toggleSavedUseCase: new ToggleSavedUseCase(storageService),
   };
 
   return { services, useCases };

@@ -12,5 +12,5 @@ export interface StorageService {
 
     loadSavedLocations(): Promise<Result<Location[]>>;   
     storeSavedLocation(location: Location): Promise<Result<void>>;
-    removeSaveLocation(location: Location): Promise<Result<void>>;
+    removeSavedLocation(location: Location): Promise<Result<void>>;
 }

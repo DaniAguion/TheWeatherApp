@@ -3,28 +3,23 @@ import type { Location } from "../entities/LocationEntities";
 import { DomainError } from "../errors/DomainError";
 import { Result } from "../errors/Result";
 import { isValidLocation, normalizeLocation, sameLocation } from "../helpers/LocationHelper";
-import { DEFAULT_FAVOURITE } from "../../data/storage/StorageServiceImpl";
 
-export class ToggleFavouriteUseCase {
+export class ToggleSavedUseCase {
   constructor(private readonly storageService: StorageService) {} 
 
   async execute(location: Location): Promise<Result<void>> {
     try {
       if (!isValidLocation(location)) return { success: false, error: DomainError.invalidData() };
-      
+
       const normalizedLocation = normalizeLocation(location);
 
-      const loadResult = await this.storageService.loadFavouriteLocation();
+      const loadResult = await this.storageService.loadSavedLocations();
       if (loadResult.success) {
-        // If location is the default favourite, don't do anything
-        if (sameLocation(normalizedLocation, DEFAULT_FAVOURITE)) {
-          return { success: true, value: undefined };
-        }
-        // If location is already the favourite, remove it
-        if (sameLocation(loadResult.value, normalizedLocation)) {
-          return await this.storageService.removeFavouriteLocation();
+        const isSaved = loadResult.value.some(savedLoc => sameLocation(savedLoc, normalizedLocation));
+        if (isSaved) {
+          return await this.storageService.removeSavedLocation(normalizedLocation);
         } else {
-          return await this.storageService.storeFavouriteLocation(normalizedLocation);
+          return await this.storageService.storeSavedLocation(normalizedLocation);
         }
       } else {
         return { success: false, error: loadResult.error };
