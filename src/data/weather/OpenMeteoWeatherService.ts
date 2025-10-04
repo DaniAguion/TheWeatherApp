@@ -1,6 +1,6 @@
 import type { WeatherService } from "../../domain/ports/WeatherService";
 import { OpenMeteoResponse, OpenMeteoGeocodingResponse }  from "./dto";
-import { getCached, setCached } from "../storage/cache";
+import { getCached, setCached } from "../cache/cache";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates, Location } from "../../domain/entities/LocationEntities";
 import { currentDtoToEntity, hourlyDtoToEntity, dailyDtoToEntity, locationSuggestionDtoToEntity } from "./mappers";
@@ -49,7 +49,7 @@ export class OpenMeteoWeatherService implements WeatherService {
 
 
   // Fetch only current weather data for preview purposes
-  async getCurrentWeather({ lat, lon }: Coordinates): Promise<Result<Current>> {
+  async getCurrentWeather_old({ lat, lon }: Coordinates): Promise<Result<Current>> {
     // Check cache first
     const cacheKey = `weatherInfo:preview:${lat.toFixed(3)},${lon.toFixed(3)}`;
     const cached = await getCached<Current>(cacheKey);
@@ -79,6 +79,37 @@ export class OpenMeteoWeatherService implements WeatherService {
     }
   }
 
+
+    // Fetch only current weather data for preview purposes
+  async getCurrentWeather_new({ lat, lon }: Coordinates): Promise<Result<Current>> {
+    // Check cache first
+    const cacheKey = `weatherInfo:preview:${lat.toFixed(3)},${lon.toFixed(3)}`;
+    const cached = await getCached<Current>(cacheKey);
+    if (cached) return { success: true, value: cached };
+
+    // Fetch from API if not in cache or expired
+    try {
+      const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&timezone=auto`;
+      const apiRequestUrl = baseUrl + currentOptions;
+      const response = await fetch(apiRequestUrl);
+      if (!response) return {success:false, error: DomainError.network(new Error("No response from weather service."))};
+      if (!response.ok) return {success:false, error: DomainError.network(new Error("Error http: " + response.status))};
+
+      const data = (await response.json()) as OpenMeteoResponse;
+      const current: Current = currentDtoToEntity(data.current);
+
+      try {
+        await setCached(cacheKey, current);
+      } catch (error) {
+        console.warn("Failed to cache weather data:", error);
+      }
+      return { success: true, value: current};
+
+    } catch (e) {
+      console.error("[OpenMeteoWeatherService] Error fetching weather data.", e);
+      return { success:false, error: DomainError.unknown(e)};
+    }
+  }
 
 
   // Search for locations using Open-Meteo Geocoding API

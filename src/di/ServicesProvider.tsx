@@ -1,20 +1,29 @@
-import React, { createContext, useContext, PropsWithChildren, useMemo } from "react";
-import { createServices, Services } from "./container";
+import React, { createContext, useContext, useMemo } from "react";
+import { Dependencies, UseCases, Services, createDepedencies } from "./container";
 
-const ServicesContext = createContext<Services | null>(null);
+const DependenciesContext = createContext<Dependencies | null>(null);
 
-export function ServicesProvider({ children }: PropsWithChildren) {
-    const services = useMemo(() => createServices(), []);
-    return (
-        <ServicesContext.Provider value={services}>
-            {children}
-        </ServicesContext.Provider>
-    );
+export const DependenciesProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const deps = useMemo(() => createDepedencies(), []);
+  return (
+    <DependenciesContext.Provider value={deps}>
+      {children}
+    </DependenciesContext.Provider>
+  );
+};
+
+export function useDeps() {
+  const ctx = useContext(DependenciesContext);
+  if (!ctx) throw new Error("DependenciesProvider missing");
+  return ctx;
 }
 
-export function useServices(): Services {
-    const ctx = useContext(ServicesContext);
-    if (!ctx) throw new Error("useServices must be used within ServicesProvider");
-    return ctx;
+export function useUseCases() : UseCases {
+  return useDeps().useCases;
 }
+
+export function useServices() : Services {
+  return useDeps().services;
+}
+
 

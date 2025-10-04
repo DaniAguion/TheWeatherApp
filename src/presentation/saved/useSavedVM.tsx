@@ -61,7 +61,7 @@ export function useSavedVM({ storageService, weatherService }: UseSavedVMDeps): 
 
       const savedLocationWeather: PreviewWeatherLocation[] = [];
       for (const location of savedLocations) {
-        const currentWeatherResult = await weatherService.getCurrentWeather(location.coordinates);
+        const currentWeatherResult = await weatherService.getCurrentWeather_old(location.coordinates);
         if (currentWeatherResult.success) {
           savedLocationWeather.push({
             location,

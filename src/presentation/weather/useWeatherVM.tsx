@@ -3,16 +3,22 @@ import { useFocusEffect } from "@react-navigation/native";
 import { WeatherService } from "../../domain/ports/WeatherService";
 import { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import { StorageService } from "../../domain/ports/StorageService";
+import { GetWeatherUseCase } from "../../domain/usecases/GetWeatherUseCase";
 import { normalizeLocation, sameLocation } from "../../domain/helpers/LocationHelper";
 import type { Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
 
-export type UseWeatherVMDeps = {
+
+export type UseWeatherVMDeps_old = {
     weatherService: WeatherService;
     reverseGeoService: ReverseGeoService;
     storageService: StorageService;
+};
+
+export type UseWeatherVMDeps_new = {
+    getWeatherUseCase: GetWeatherUseCase;
 };
 
 type VMState = {
@@ -35,10 +41,11 @@ type VMFunctions = {
 
 export function useWeatherVM(
     coordinates: Coordinates,
-    deps: UseWeatherVMDeps,
+    deps_old: UseWeatherVMDeps_old,
+    deps_new: UseWeatherVMDeps_new,
     routeLocationName?: string,
 ) : VMState & VMFunctions {
-    const { weatherService, reverseGeoService } = deps;
+    const { weatherService, reverseGeoService, storageService } = deps_old;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<DomainError | null>(null);
     const [locationName, setLocationName] = useState<string | null>(routeLocationName ?? null);
@@ -47,7 +54,7 @@ export function useWeatherVM(
     const [days, setDays] = useState<Day[] | null>(null);
     const [isFavourite, setIsFavourite] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
-    const { storageService } = deps;
+    const { getWeatherUseCase } = deps_new;
 
     // Fetch weather data when lat/lon changes
     useEffect(() => { fetchWeather() }, [coordinates]);
@@ -99,7 +106,7 @@ export function useWeatherVM(
                 }
             });
         };
-        await weatherService.getWeather(coordinates).then(result => {
+        await getWeatherUseCase.execute(coordinates).then(result => {
             if (result.success) {
                     setCurrent(result.value.current);
                     setHours(result.value.hours ?? []);

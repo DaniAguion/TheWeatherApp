@@ -7,8 +7,8 @@ import { View, Text, ActivityIndicator, Button, ScrollView, FlatList, Pressable 
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { toUIErrorMessage } from "../errorMessages"
 import type { Location } from "../../domain/entities/LocationEntities";
-import { useWeatherVM, UseWeatherVMDeps } from "./useWeatherVM";
-import { useServices } from "../../di/ServicesProvider";
+import { useWeatherVM, UseWeatherVMDeps_old, UseWeatherVMDeps_new } from "./useWeatherVM";
+import { useServices, useUseCases } from "../../di/ServicesProvider";
 import styles from "./WeatherScreen.styles";
 
 
@@ -20,7 +20,8 @@ type WeatherScreenProps = {
 };
 
 export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
-  const deps: UseWeatherVMDeps = useServices();
+  const deps_old: UseWeatherVMDeps_old = useServices();
+  const deps_new: UseWeatherVMDeps_new = useUseCases();
   const { coordinates, name } = route.params;
   const { 
     loading,
@@ -35,7 +36,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
     fetchWeather,
     toggleFavourite,
     toggleSaved
-  } = useWeatherVM(coordinates, deps, name);
+  } = useWeatherVM(coordinates, deps_old, deps_new, name);
 
   const showLocationName = locationName && locationName.length > 0;
 

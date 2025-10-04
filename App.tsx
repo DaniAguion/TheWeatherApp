@@ -2,9 +2,9 @@ import React from 'react';
 import Toast from 'react-native-toast-message';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/AppNavigator';
-import { ServicesProvider } from './src/di/ServicesProvider';
+import { DependenciesProvider } from './src/di/ServicesProvider';
 import { useEffect } from 'react';
-import { clearExpiredCache } from './src/data/storage/cache';
+import { clearExpiredCache } from './src/data/cache/cache';
 
 
 
@@ -15,11 +15,11 @@ export default function App() {
   }, []);
 
   return (
-    <ServicesProvider>
+    <DependenciesProvider>
       <SafeAreaProvider>
         <AppNavigator />
         <Toast/>
       </SafeAreaProvider>
-    </ServicesProvider>
+    </DependenciesProvider>
   );
 }

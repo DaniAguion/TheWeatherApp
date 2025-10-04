@@ -1,6 +1,6 @@
 import type { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
 import type { NominatimResponse } from "./dto";
-import { getCached, setCached } from "../storage/cache";
+import { getCached, setCached } from "../cache/cache";
 import { Coordinates } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
 import { DomainError } from "../../domain/errors/DomainError";
