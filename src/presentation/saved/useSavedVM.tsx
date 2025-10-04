@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StorageService } from "../../domain/ports/StorageService";
-import { WeatherService } from "../../domain/ports/WeatherService";
+import { GetCurrentWeatherUseCase } from "../../domain/usecases/GetCurrentWeatherUseCase";
 import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Current } from "../../domain/entities/WeatherEntities";
@@ -12,9 +12,12 @@ export type PreviewWeatherLocation = {
   currentWeather: Current;
 };
 
-export type UseSavedVMDeps = {
-  weatherService: WeatherService;
-  storageService: StorageService;
+export type UseSavedVMDeps_old = {
+    storageService: StorageService;
+};
+
+export type UseSavedVMDeps_new = {
+    getCurrentWeatherUseCase: GetCurrentWeatherUseCase
 };
 
 type VMState = {
@@ -27,7 +30,10 @@ type VMFunctions = {
   refreshData: () => Promise<void>;
 };
 
-export function useSavedVM({ storageService, weatherService }: UseSavedVMDeps): VMState & VMFunctions {
+export function useSavedVM(
+  { storageService }: UseSavedVMDeps_old,
+  { getCurrentWeatherUseCase }: UseSavedVMDeps_new,
+): VMState & VMFunctions {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<DomainError | null>(null);
   const [savedLocationsWeather, setSavedLocationsWeather] = useState<PreviewWeatherLocation[]>([]);
@@ -61,15 +67,21 @@ export function useSavedVM({ storageService, weatherService }: UseSavedVMDeps): 
 
       const savedLocationWeather: PreviewWeatherLocation[] = [];
       for (const location of savedLocations) {
-        const currentWeatherResult = await weatherService.getCurrentWeather_old(location.coordinates);
-        if (currentWeatherResult.success) {
-          savedLocationWeather.push({
-            location,
-            currentWeather: currentWeatherResult.value,
-          });
-        } else {
-          console.warn(`Failed to fetch weather for saved location ${location.name}:`, currentWeatherResult.error);
-        }
+        await getCurrentWeatherUseCase.execute(location.coordinates).then(result => {
+            if (result.success) {
+              savedLocationWeather.push({
+                  location,
+                  currentWeather: result.value,
+                });
+            } else {
+              // If there's an error fetching weather must still continue with other locations
+              // Don't repeat the error for each location
+              if (error != null) {
+              console.warn(`Failed to fetch weather for saved location ${location.name}:`, result.error);
+              setError(result.error);
+              }
+            }
+        });
       }
       setSavedLocationsWeather(savedLocationWeather);
       setError(null);

@@ -9,8 +9,8 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamsList, TabParamList } from "../../AppNavigator";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { PreviewWeatherLocation } from "./useSavedVM";
-import { useServices } from "../../di/ServicesProvider";
-import { useSavedVM, UseSavedVMDeps } from "./useSavedVM";
+import { useServices, useUseCases } from "../../di/ServicesProvider";
+import { useSavedVM, UseSavedVMDeps_new, UseSavedVMDeps_old } from "./useSavedVM";
 import styles from "./SavedScreen.styles";
 
 
@@ -21,8 +21,9 @@ type SavedScreenProps = CompositeScreenProps<
 
 
 export default function SavedScreen({ navigation }: SavedScreenProps) {
-  const deps: UseSavedVMDeps = useServices();
-  const { loading, error, savedLocationsWeather, refreshData } = useSavedVM(deps);
+  const deps_old: UseSavedVMDeps_old = useServices();
+  const deps_new: UseSavedVMDeps_new  = useUseCases();
+  const { loading, error, savedLocationsWeather, refreshData } = useSavedVM(deps_old, deps_new);
   const isFirstFocus = useRef(true);
 
   // Show error toast when error changes

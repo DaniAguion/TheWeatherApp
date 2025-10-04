@@ -6,9 +6,7 @@ export interface WeatherService {
 
   getWeather(coordinates: Coordinates): Promise<Result<WeatherInfo>>;
 
-  getCurrentWeather_old({ lat, lon }: Coordinates): Promise<Result<Current>>
-
-  getCurrentWeather_new({ lat, lon }: Coordinates): Promise<Result<Current>>
+  getCurrentWeather({ lat, lon }: Coordinates): Promise<Result<Current>>
   
   searchLocations(query: string): Promise<Result<Location[]>>;
 }
