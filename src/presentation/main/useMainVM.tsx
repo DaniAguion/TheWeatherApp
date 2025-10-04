@@ -1,13 +1,16 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
-import { StorageService } from "../../domain/ports/StorageService";
 import { DomainError } from "../../domain/errors/DomainError";
+import { GetPreferencesUseCase } from "../../domain/usecases/GetPreferencesUseCase";
+import { ToggleMainSwitchUseCase } from "../../domain/usecases/ToggleMainSwitchUseCase";
+import { GetFavouriteUseCase } from "../../domain/usecases/GetFavouriteUseCase";
 import type { Location } from "../../domain/entities/LocationEntities";
 
 
-
 export type UseMainVMDeps = {
-    storageService: StorageService;
+    getPreferencesUseCase: GetPreferencesUseCase;
+    toggleMainSwitchUseCase: ToggleMainSwitchUseCase;
+    getFavouriteUseCase: GetFavouriteUseCase;
 };
 
 type VMState = {
@@ -19,14 +22,17 @@ type VMState = {
 };
 
 type VMFunctions = {
-    handleSelectCurrent: () => void;
-    handleSelectFavourite: () => void;
-    refreshPreferences: () => Promise<void>;
+    toggleMainSwitch: () => Promise<void>;
+    refreshMain: () => Promise<void>;
     refreshLocation: () => Promise<void>;
 };
 
 export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
-    const { storageService: StorageService } = deps;
+    const { 
+        getPreferencesUseCase, 
+        toggleMainSwitchUseCase, 
+        getFavouriteUseCase 
+    } = deps;
 
     const [state, setState] = useState<VMState>({
         loading: true,
@@ -47,36 +53,55 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     // Get the preferences of the user when the component is mounted
     const loadPreferences = useCallback(async () => {
         try {
-            const loadPreferencesResult = await StorageService.loadPreferences();
-            if (loadPreferencesResult.success) {
-                setState(st => ({ ...st, usingCurrentLocation: loadPreferencesResult.value.useCurrentLocation,}));
+            setState(st => ({ ...st, loading: true }));
+            const res = await getPreferencesUseCase.execute();
+            if (res.success) {
+                setState(st => ({
+                    ...st,
+                    usingCurrentLocation: res.value.useCurrentLocation,
+                    error: null,
+                    loading: false
+                }));
             } else {
-                setState(st => ({ ...st, error: loadPreferencesResult.error}));
-            }
-            const loadFavouriteResult = await StorageService.loadFavouriteLocation();
-            if (loadFavouriteResult.success) {
-                setState(st => ({ ...st, favouriteLocation: loadFavouriteResult.value, loading: false }));
-            } else {
-                setState(st => ({ ...st, error: loadFavouriteResult.error, loading: false }));
+                setState(st => ({ ...st, error: res.error, loading: false }));
             }
         } catch {
-        setState(st => ({
-            ...st,
-            loading: false,
-            error: DomainError.storage("No se pudieron obtener las preferencias.")
-        }));
+            setState(st => ({
+                ...st,
+                loading: false,
+                error: DomainError.storage("No se pudieron obtener las preferencias.")
+            }));
         }
-    }, [StorageService]);
+    }, [getPreferencesUseCase]);
 
 
-    useEffect(() => {
-        loadPreferences();
-    }, [loadPreferences, state.usingCurrentLocation]);
+     const loadFavouriteLocation = useCallback(async () => {
+        try {
+            setState(st => ({ ...st, loading: true }));
+            const res = await getFavouriteUseCase.execute();
+            if (res.success) {
+                setState(st => ({
+                    ...st,
+                    favouriteLocation: res.value,
+                    error: null,
+                    loading: false
+                }));
+            } else {
+                setState(st => ({ ...st, error: res.error, loading: false }));
+            }
+        } catch {
+            setState(st => ({
+                ...st,
+                loading: false,
+                error: DomainError.storage("No se pudieron obtener las preferencias.")
+            }));
+        }
+    }, [getFavouriteUseCase]);
 
-
-    const refreshPreferences = useCallback(async () => {
-        await loadPreferences();
-    }, [loadPreferences]);
+    
+     const refreshMain = useCallback(async () => {
+        await Promise.all([loadPreferences(), loadFavouriteLocation()]);
+    }, [loadPreferences, loadFavouriteLocation]);
 
 
     // Update state when location or usingCurrentLocation changes
@@ -91,45 +116,23 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
 
 
     // Select favourite location
-    const handleSelectFavourite = useCallback(async () => {
-        if (!state.usingCurrentLocation) return;
-
-        setState(st => ({ ...st,
-             error: null, 
-             usingCurrentLocation: false, 
-             favouriteLocation: st.favouriteLocation
-        }));
+    const toggleMainSwitch = useCallback(async () => {
         try {
-            await StorageService.storePreferences({ useCurrentLocation: false });
+            const toggleResult = await toggleMainSwitchUseCase.execute();
+            if (toggleResult.success) {
+                await loadPreferences();
+                await loadFavouriteLocation();
+            } else {
+                setState(st => ({ ...st,
+                    error: toggleResult.error
+                }));
+            }
         } catch {
             setState(st => ({ ...st,
-                usingCurrentLocation: true,
-                error: DomainError.storage("No se pudo guardar la preferencia.")
+                error: DomainError.storage("No se ha podido guardar la preferencia.")
             }));
         }
-    }, [state.usingCurrentLocation, state.favouriteLocation, StorageService]);
-
-
-    // Select current location
-    const handleSelectCurrent = useCallback(async () => {
-        if (state.usingCurrentLocation) return;
-
-        setState(st => ({ ...st,
-            error: null, 
-            usingCurrentLocation: true
-        }));
-
-        try {
-            await StorageService.storePreferences({ useCurrentLocation: true });
-            await refreshCurrent();
-        } catch {
-            setState(st => ({ ...st,
-                usingCurrentLocation: false,
-                favouriteLocation: state.favouriteLocation,
-                error: DomainError.storage("No se pudo guardar la preferencia."),
-            }));
-        }
-    }, [state.usingCurrentLocation, StorageService, refreshCurrent]);
+    }, [state.usingCurrentLocation, state.favouriteLocation]);
 
 
     // Handle refresh location if using current locationA
@@ -146,9 +149,8 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         usingCurrentLocation: state.usingCurrentLocation,
         currentLocation: state.currentLocation,
         favouriteLocation: state.favouriteLocation,
-        handleSelectCurrent,
-        handleSelectFavourite,
-        refreshPreferences,
+        toggleMainSwitch,
+        refreshMain,
         refreshLocation
     };
 }

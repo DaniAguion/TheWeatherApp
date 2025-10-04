@@ -12,10 +12,10 @@ import { GetSavedLocationUseCase } from "../domain/usecases/GetSavedLocationsUse
 import { GetLocationStatusUseCase } from "../domain/usecases/GetLocationStatusUseCase";
 import { ToggleFavouriteUseCase } from "../domain/usecases/ToggleFavouriteUseCase";
 import { ToggleSavedUseCase } from "../domain/usecases/ToggleSavedUseCase";
+import { GetPreferencesUseCase } from "../domain/usecases/GetPreferencesUseCase";
+import { ToggleMainSwitchUseCase } from "../domain/usecases/ToggleMainSwitchUseCase";
+import { GetFavouriteUseCase } from "../domain/usecases/GetFavouriteUseCase";
 
-export type Services = {
-  storageService: StorageService;
-};
 
 export type UseCases = {
   getWeatherUseCase: GetWeatherUseCase;
@@ -26,10 +26,12 @@ export type UseCases = {
   getLocationStatusUseCase: GetLocationStatusUseCase;
   toggleFavouriteUseCase: ToggleFavouriteUseCase;
   toggleSavedUseCase: ToggleSavedUseCase;
+  getPreferencesUseCase: GetPreferencesUseCase;
+  toggleMainSwitchUseCase: ToggleMainSwitchUseCase;
+  getFavouriteUseCase: GetFavouriteUseCase;
 };
 
 export type Dependencies = {
-  services: Services;
   useCases: UseCases;
 };
 
@@ -41,7 +43,6 @@ export function createDepedencies(): Dependencies {
   const storageService = new StorageServiceImpl();
   const cacheWeatherService = new CacheWeatherServiceImpl();
 
-  const services: Services = { storageService };
   const useCases: UseCases = {
     getWeatherUseCase: new GetWeatherUseCase(weatherService, cacheWeatherService),
     getCurrentWeatherUseCase: new GetCurrentWeatherUseCase(weatherService, cacheWeatherService),
@@ -51,7 +52,10 @@ export function createDepedencies(): Dependencies {
     getLocationStatusUseCase: new GetLocationStatusUseCase(storageService),
     toggleFavouriteUseCase: new ToggleFavouriteUseCase(storageService),
     toggleSavedUseCase: new ToggleSavedUseCase(storageService),
+    getPreferencesUseCase: new GetPreferencesUseCase(storageService),
+    toggleMainSwitchUseCase: new ToggleMainSwitchUseCase(storageService),
+    getFavouriteUseCase: new GetFavouriteUseCase(storageService)
   };
 
-  return { services, useCases };
+  return { useCases };
 }

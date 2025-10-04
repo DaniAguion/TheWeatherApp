@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, use } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { StorageService } from "../../domain/ports/StorageService";
 import { GetWeatherUseCase } from "../../domain/usecases/GetWeatherUseCase";
 import { GetLocationNameUseCase } from "../../domain/usecases/GetLocationNameUseCase";
 import { GetLocationStatusUseCase } from "../../domain/usecases/GetLocationStatusUseCase";
@@ -12,16 +11,12 @@ import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
 
 
-export type UseWeatherVMDeps_old = {
-    storageService: StorageService;
-};
-
-export type UseWeatherVMDeps_new = {
+export type UseWeatherVMDeps = {
     getWeatherUseCase: GetWeatherUseCase;
     getLocationNameUseCase: GetLocationNameUseCase;
     getLocationStatusUseCase: GetLocationStatusUseCase;
     toggleFavouriteUseCase: ToggleFavouriteUseCase;
-    toggleSavedUseCase: ToggleFavouriteUseCase;
+    toggleSavedUseCase: ToggleSavedUseCase;
 };
 
 type VMState = {
@@ -44,8 +39,7 @@ type VMFunctions = {
 
 export function useWeatherVM(
     coordinates: Coordinates,
-    deps_old: UseWeatherVMDeps_old,
-    deps_new: UseWeatherVMDeps_new,
+    deps: UseWeatherVMDeps,
     routeLocationName?: string,
 ) : VMState & VMFunctions {
     const [loading, setLoading] = useState(true);
@@ -56,13 +50,13 @@ export function useWeatherVM(
     const [days, setDays] = useState<Day[] | null>(null);
     const [isFavourite, setIsFavourite] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
-    const { storageService } = deps_old;
     const { 
         getWeatherUseCase,
         getLocationNameUseCase,
         getLocationStatusUseCase,
-        toggleFavouriteUseCase
-     } = deps_new;
+        toggleFavouriteUseCase,
+        toggleSavedUseCase
+     } = deps;
 
     // Fetch weather data when lat/lon changes
     useEffect(() => { fetchWeather()}, [coordinates]);
@@ -145,23 +139,22 @@ export function useWeatherVM(
         } catch (e) {
             console.log("toggleFavourite failed:", e);
         }
-    }, [isFavourite, locationName, coordinates, storageService]);
+    }, [isFavourite, locationName, coordinates]);
 
 
     const toggleSaved = useCallback(async () => {
         const location = { coordinates, name: locationName ?? "Unknown" };
         try {
-            if (isSaved) {
-                const res = await storageService.removeSavedLocation(location);
-                if (res.success) setIsSaved(false);
+           const res = await toggleSavedUseCase.execute(location);
+            if (res.success) {
+                refreshPersistedStatus();
             } else {
-                const res = await storageService.storeSavedLocation(location);
-                if (res.success) setIsSaved(true);
+                setError(res.error);
             }
         } catch (e) {
             console.log("toggleSaved failed:", e);
         }
-    }, [isSaved, locationName, coordinates, storageService]);
+    }, [isSaved, locationName, coordinates]);
 
     
     return { 

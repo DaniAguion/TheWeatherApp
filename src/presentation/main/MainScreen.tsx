@@ -10,7 +10,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { RootStackParamsList, TabParamList } from "../../AppNavigator";
-import { useServices } from "../../di/ServicesProvider";
+import { useUseCases } from "../../di/ServicesProvider";
 import WeatherScreen from "../weather/WeatherScreen";
 import { useMainVM, UseMainVMDeps } from "./useMainVM";
 import styles from "./MainScreen.styles";
@@ -22,16 +22,15 @@ type MainScreenProps = CompositeScreenProps<
 >;
 
 export default function MainScreen({ navigation, route }: MainScreenProps) {
-  const deps: UseMainVMDeps = useServices();
+  const deps: UseMainVMDeps = useUseCases();
   const {
     loading,
     error,
     usingCurrentLocation,
     currentLocation,
     favouriteLocation,
-    handleSelectCurrent,
-    handleSelectFavourite, 
-    refreshPreferences,
+    toggleMainSwitch, 
+    refreshMain,
     refreshLocation
   } = useMainVM(deps);
 
@@ -71,8 +70,8 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
   // Refresh preferences when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      refreshPreferences();
-    }, [refreshPreferences])
+      refreshMain();
+    }, [refreshMain])
   );
 
   return (
@@ -81,7 +80,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         <TouchableOpacity
           accessibilityRole="button"
           disabled={usingCurrentLocation}
-          onPress={handleSelectCurrent}
+          onPress={toggleMainSwitch}
           style={[
             styles.selector_button,
             styles.selector_button_left,
@@ -108,7 +107,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
         <TouchableOpacity
           accessibilityRole="button"
           disabled={!usingCurrentLocation}
-          onPress={handleSelectFavourite}
+          onPress={toggleMainSwitch}
           style={[
             styles.selector_button,
             styles.selector_button_right,
