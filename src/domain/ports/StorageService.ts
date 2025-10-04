@@ -10,7 +10,7 @@ export interface StorageService {
     storeFavouriteLocation(location: Location): Promise<Result<void>>;
     removeFavouriteLocation(location: Location): Promise<Result<void>>;
 
-    loadSavedLocations(): Promise<Result<Location[]>>;
+    loadSavedLocations(): Promise<Result<Location[]>>;   
     storeSavedLocation(location: Location): Promise<Result<void>>;
     removeSaveLocation(location: Location): Promise<Result<void>>;
 }

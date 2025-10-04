@@ -1,7 +1,6 @@
 import type { Coordinates } from "../entities/LocationEntities";
 import type { ReverseGeoService } from "../ports/ReverseGeoService";
 import type { CacheWeatherService } from "../ports/CacheWeatherService";
-import { Result } from "../errors/Result";
 
 export class GetLocationNameUseCase {
   constructor(private readonly reverseGeoService: ReverseGeoService, private cacheWeatherService: CacheWeatherService) {} 

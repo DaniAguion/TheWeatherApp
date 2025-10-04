@@ -9,6 +9,8 @@ import { GetWeatherUseCase } from "../domain/usecases/GetWeatherUseCase";
 import { GetCurrentWeatherUseCase } from "../domain/usecases/GetCurrentWeatherUseCase";
 import { GetLocationNameUseCase } from "../domain/usecases/GetLocationNameUseCase";
 import { SearchLocationUseCase } from "../domain/usecases/SearchLocationsUseCase";
+import { GetSavedLocationUseCase } from "../domain/usecases/GetSavedLocationsUseCase";
+import { GetLocationStatusUseCase } from "../domain/usecases/GetLocationStatusUseCase";
 
 
 export type Services = {
@@ -20,6 +22,8 @@ export type UseCases = {
   getCurrentWeatherUseCase: GetCurrentWeatherUseCase;
   getLocationNameUseCase: GetLocationNameUseCase;
   searchLocationUseCase: SearchLocationUseCase;
+  getSavedLocationUseCase: GetSavedLocationUseCase;
+  getLocationStatusUseCase: GetLocationStatusUseCase;
 };
 
 export type Dependencies = {
@@ -41,6 +45,8 @@ export function createDepedencies(): Dependencies {
     getCurrentWeatherUseCase: new GetCurrentWeatherUseCase(weatherService, cacheWeatherService),
     getLocationNameUseCase: new GetLocationNameUseCase(reverseGeoService, cacheWeatherService),
     searchLocationUseCase: new SearchLocationUseCase(geocodingService),
+    getSavedLocationUseCase: new GetSavedLocationUseCase(storageService),
+    getLocationStatusUseCase: new GetLocationStatusUseCase(storageService),
   };
 
   return { services, useCases };

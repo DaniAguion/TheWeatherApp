@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { StorageService } from "../../domain/ports/StorageService";
 import { GetCurrentWeatherUseCase } from "../../domain/usecases/GetCurrentWeatherUseCase";
+import { GetSavedLocationUseCase } from "../../domain/usecases/GetSavedLocationsUseCase";
 import { DomainError } from "../../domain/errors/DomainError";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Current } from "../../domain/entities/WeatherEntities";
-
 
 
 export type PreviewWeatherLocation = {
@@ -12,12 +11,9 @@ export type PreviewWeatherLocation = {
   currentWeather: Current;
 };
 
-export type UseSavedVMDeps_old = {
-    storageService: StorageService;
-};
-
-export type UseSavedVMDeps_new = {
-    getCurrentWeatherUseCase: GetCurrentWeatherUseCase
+export type UseSavedVMDeps = {
+    getSavedLocationUseCase: GetSavedLocationUseCase,
+    getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
 };
 
 type VMState = {
@@ -30,15 +26,11 @@ type VMFunctions = {
   refreshData: () => Promise<void>;
 };
 
-export function useSavedVM(
-  { storageService }: UseSavedVMDeps_old,
-  { getCurrentWeatherUseCase }: UseSavedVMDeps_new,
-): VMState & VMFunctions {
+export function useSavedVM({ getSavedLocationUseCase, getCurrentWeatherUseCase} : UseSavedVMDeps ): VMState & VMFunctions {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<DomainError | null>(null);
   const [savedLocationsWeather, setSavedLocationsWeather] = useState<PreviewWeatherLocation[]>([]);
   const mounted = useRef(true);
-
 
 
   useEffect(() => {
@@ -54,7 +46,7 @@ export function useSavedVM(
     setLoading(true);
     try {
       let savedLocations: Location[] = [];
-      const loadSavedResult = await storageService.loadSavedLocations();
+      const loadSavedResult = await getSavedLocationUseCase.execute();
       if (loadSavedResult.success) {
         savedLocations = loadSavedResult.value; 
       } else {
@@ -93,7 +85,7 @@ export function useSavedVM(
       if (!mounted.current) return;
       setLoading(false);
     }
-  }, [storageService]);
+  }, []);
 
 
 

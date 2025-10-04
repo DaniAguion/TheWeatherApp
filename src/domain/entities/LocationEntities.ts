@@ -17,3 +17,4 @@ export type LocationSuggestion = {
   admin1?: string;
   coordinates: Coordinates;
 };
+
