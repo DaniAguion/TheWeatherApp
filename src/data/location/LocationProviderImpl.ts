@@ -49,7 +49,7 @@ export class LocationProviderImpl implements LocationProvider {
     }
 
 
-    const { highAccuracy = false, timeoutMs = 15000, maximumAgeMs = 10000 } = opts || {};
+    const { highAccuracy = false, timeoutMs = 7000, maximumAgeMs = 120000 } = opts || {};
     try {
       const coords = await new Promise<Coordinates>((resolve, reject) => {
         Geolocation.getCurrentPosition(
@@ -66,7 +66,6 @@ export class LocationProviderImpl implements LocationProvider {
             enableHighAccuracy: highAccuracy,
             timeout: timeoutMs,
             maximumAge: maximumAgeMs,
-            forceRequestLocation: true,
             showLocationDialog: true,
           }
         );
