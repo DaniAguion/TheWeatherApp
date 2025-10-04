@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
-import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 import { DomainError } from "../../domain/errors/DomainError";
 import { GetPreferencesUseCase } from "../../domain/usecases/GetPreferencesUseCase";
 import { ToggleMainSwitchUseCase } from "../../domain/usecases/ToggleMainSwitchUseCase";
