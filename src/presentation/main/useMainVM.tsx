@@ -26,6 +26,7 @@ type VMFunctions = {
     toggleMainSwitch: () => Promise<void>;
     refreshMain: () => Promise<void>;
     refreshLocation: () => Promise<void>;
+    refreshFavourite: () => Promise<void>;
 };
 
 export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
@@ -98,6 +99,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     }, [getPreferencesUseCase]);
 
 
+    // Load favourite location of the user to show in the switch
      const loadFavouriteLocation = useCallback(async () => {
         try {
             setState(st => ({ ...st, loading: true }));
@@ -150,7 +152,7 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
     }, [state.usingCurrentLocation, state.favouriteLocation]);
 
 
-    // Handle refresh location if using current location
+    // Handle refresh location using current/favourite location changes
     const refreshLocation = useCallback(async () => {
         if (state.usingCurrentLocation) {
             await loadCurrentLocation();
@@ -158,8 +160,29 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
             await loadFavouriteLocation();
         }
     }, [state.usingCurrentLocation]);
+
+
+    // Load favourite location when favourite button is toggled to change the switch label
+    const refreshFavouriteName = useCallback(async () => {
+          try {
+            const res = await getFavouriteUseCase.execute();
+            if (res.success && state.favouriteLocation.name !== res.value.name) {
+                setState(st => ({
+                    ...st,
+                    favouriteLocation: res.value,
+                    error: null,
+                }));
+            }
+        } catch {
+            setState(st => ({
+                ...st,
+                error: DomainError.unknown("No se ha podido obtener la localización favorita.")
+            }));
+        }
+    }, [getFavouriteUseCase, state.favouriteLocation]);
     
 
+    
     return {
         loading: state.loading,
         error: state.error,
@@ -168,7 +191,8 @@ export function useMainVM( deps: UseMainVMDeps ) : VMState & VMFunctions {
         favouriteLocation: state.favouriteLocation,
         toggleMainSwitch,
         refreshMain,
-        refreshLocation
+        refreshLocation,
+        refreshFavourite: refreshFavouriteName
     };
 }
    

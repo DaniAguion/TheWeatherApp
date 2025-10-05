@@ -17,9 +17,10 @@ export type WeatherScreenParams = Location;
 type WeatherScreenProps = {
   navigation: any;
   route: { params: WeatherScreenParams };
+  onFavouriteChange?: () => void;
 };
 
-export default function WeatherScreen({ navigation, route }: WeatherScreenProps) {
+export default function WeatherScreen({ navigation, route, onFavouriteChange }: WeatherScreenProps) {
   const deps: UseWeatherVMDeps = useUseCases();
   const { coordinates, name } = route.params;
   const { 
@@ -45,6 +46,7 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
   // Clear view when navigating away
   useFocusEffect(useCallback(() => { return () => {} }, []));
 
+
   // Show error toast when error changes
   useEffect(() => {
     if (error) {
@@ -57,6 +59,16 @@ export default function WeatherScreen({ navigation, route }: WeatherScreenProps)
       });
     }
   }, [error]);
+
+
+  // Notify parent when favourite changes
+  const prevFavRef = useRef(isFavourite);
+  useEffect(() => {
+    if (prevFavRef.current !== isFavourite) {
+      prevFavRef.current = isFavourite;
+      if (onFavouriteChange) onFavouriteChange();
+    }
+  }, [isFavourite, onFavouriteChange]);
 
 
   // Render loading, error

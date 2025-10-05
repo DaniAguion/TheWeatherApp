@@ -31,7 +31,8 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
     favouriteLocation,
     toggleMainSwitch, 
     refreshMain,
-    refreshLocation
+    refreshLocation,
+    refreshFavourite
   } = useMainVM(deps);
 
 
@@ -156,6 +157,7 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
               name: currentLocation.name, 
               coordinates: currentLocation.coordinates
             } }}
+            onFavouriteChange={refreshFavourite}
           />
         ) : (!usingCurrentLocation && favouriteLocation != null) ? (
           <WeatherScreen
@@ -163,7 +165,8 @@ export default function MainScreen({ navigation, route }: MainScreenProps) {
             route={{ params: { 
               name: favouriteLocation.name, 
               coordinates: favouriteLocation.coordinates
-            } }}
+            }}}
+            onFavouriteChange={refreshFavourite}
           />
         ) : (
           <View style={styles.state_container}>
