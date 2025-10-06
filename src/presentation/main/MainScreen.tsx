@@ -3,17 +3,18 @@ import React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { ActivityIndicator, Text, TouchableOpacity, View, Button } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useRef } from "react";
-import { Animated, Easing } from "react-native";
+import { useCallback, useEffect, useRef, useMemo } from "react";
+import { Animated, Easing, useColorScheme } from "react-native";
 import { toUIErrorMessage } from "../errorMessages"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { RootStackParamsList, TabParamList } from "../../AppNavigator";
+import { makeMainStyles } from "./MainScreen.styles";
 import { useUseCases } from "../../di/ServicesProvider";
 import WeatherScreen from "../weather/WeatherScreen";
 import { useMainVM, UseMainVMDeps } from "./useMainVM";
-import styles from "./MainScreen.styles";
+
 
 
 type MainScreenProps = CompositeScreenProps<
@@ -23,6 +24,8 @@ type MainScreenProps = CompositeScreenProps<
 
 export default function MainScreen({ navigation, route }: MainScreenProps) {
   const deps: UseMainVMDeps = useUseCases();
+  const scheme = useColorScheme();
+  const styles = useMemo(() => makeMainStyles(scheme), [scheme]);
   const {
     loading,
     error,

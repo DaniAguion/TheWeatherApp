@@ -1,5 +1,5 @@
 import Toast from "react-native-toast-message";
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useMemo } from "react";
 import { Animated } from "react-native";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -9,8 +9,8 @@ import { toUIErrorMessage } from "../errorMessages"
 import type { Location } from "../../domain/entities/LocationEntities";
 import { useWeatherVM, UseWeatherVMDeps } from "./useWeatherVM";
 import { useUseCases } from "../../di/ServicesProvider";
-import styles from "./WeatherScreen.styles";
-
+import { useColorScheme } from "react-native";
+import { makeWeatherStyles } from "./WeatherScreen.styles";
 
 export type WeatherScreenParams = Location;
 
@@ -22,6 +22,8 @@ type WeatherScreenProps = {
 
 export default function WeatherScreen({ navigation, route, onFavouriteChange }: WeatherScreenProps) {
   const deps: UseWeatherVMDeps = useUseCases();
+  const scheme = useColorScheme();
+  const styles = useMemo(() => makeWeatherStyles(scheme), [scheme]);
   const { coordinates, name } = route.params;
   const { 
     loading,

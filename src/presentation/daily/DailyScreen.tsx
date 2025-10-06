@@ -1,13 +1,18 @@
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, useColorScheme } from "react-native";
+import { useMemo } from "react";
+import { makeDailyStyles } from "./DailyScreen.styles";
 import type { Day } from "../../domain/entities/WeatherEntities"
-import styles from "./DailyScreen.styles";
+
 
 
 export type DailyScreenParams = { days: Day[]; title: string };
 type DailyyScreenProps = { route: { params: DailyScreenParams} };
 
 export default function DailyScreen({ route }: DailyyScreenProps) {
+  const scheme = useColorScheme();
+  const styles = useMemo(() => makeDailyStyles(scheme), [scheme]);
   const { days, title } = route.params;
+
 
   return (
     <View style={ styles.view_container }>

@@ -2,9 +2,10 @@
 import * as React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useColorScheme } from "react-native";
-import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
+import { NavigationContainer} from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { PersonalizedDarkTheme, PersonalizedLigthTheme } from "./presentation/Themes";
 
 import type { WeatherScreenParams } from "./presentation/weather/WeatherScreen";
 import type { HourlyScreenParams } from "./presentation/hourly/HourlyScreen";
@@ -36,6 +37,7 @@ const RootStack = createNativeStackNavigator<RootStackParamsList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 function TabsNavigator() {
+  
   return (
     <Tab.Navigator
       initialRouteName="HomeMain"
@@ -99,7 +101,7 @@ function TabsNavigator() {
 export default function AppNavigator() {
   const scheme = useColorScheme();
   return (
-    <NavigationContainer theme={scheme === "dark" ? DarkTheme : DefaultTheme}>
+    <NavigationContainer theme={scheme === "dark" ? PersonalizedDarkTheme : PersonalizedLigthTheme}>
       <RootStack.Navigator>
         <RootStack.Screen
           name="Tabs"

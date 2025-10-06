@@ -1,5 +1,5 @@
 import Toast from "react-native-toast-message";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useMemo } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { toUIErrorMessage } from "../errorMessages"
@@ -11,7 +11,8 @@ import type { Location } from "../../domain/entities/LocationEntities";
 import type { PreviewWeatherLocation } from "./useSavedVM";
 import { useUseCases } from "../../di/ServicesProvider";
 import { useSavedVM, UseSavedVMDeps} from "./useSavedVM";
-import styles from "./SavedScreen.styles";
+import { useColorScheme } from "react-native";
+import { makeSavedStyles } from "./SavedScreen.styles";
 
 
 type SavedScreenProps = CompositeScreenProps<
@@ -22,6 +23,8 @@ type SavedScreenProps = CompositeScreenProps<
 
 export default function SavedScreen({ navigation }: SavedScreenProps) {
   const deps: UseSavedVMDeps  = useUseCases();
+  const scheme = useColorScheme();
+  const styles = useMemo(() => makeSavedStyles(scheme), [scheme]);
   const { loading, error, savedLocationsWeather, refreshData } = useSavedVM(deps);
   const isFirstFocus = useRef(true);
 

@@ -1,12 +1,16 @@
 import { FlatList, Text, View } from "react-native";
 import type { Hour } from "../../domain/entities/WeatherEntities"
-import styles from "./HourlyScreen.styles";
+import { useMemo } from "react";
+import { makeHourlyStyles } from "./HourlyScreen.styles";
+import { useColorScheme } from "react-native";
 
 
 export type HourlyScreenParams = { hours: Hour[]; title: string };
 type HourlyScreenProps = { route: { params: HourlyScreenParams} };
 
 export default function HourlyScreen({ route }: HourlyScreenProps) {
+  const scheme = useColorScheme();
+  const styles = useMemo(() => makeHourlyStyles(scheme), [scheme]);
   const hours = route.params.hours;
 
   return (

@@ -66,7 +66,7 @@ export function useExploreVM({ searchLocationUseCase }: UseExploreVMDeps): VMSta
   // Function to perform the search
   const handleSearch = useCallback(async () => {
     const trimmed = query.trim();
-    if (!trimmed) {
+    if (!trimmed || trimmed.length === 0) {
       clearResults();
       return;
     }
