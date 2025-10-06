@@ -4,12 +4,12 @@ export default StyleSheet.create({
     screen_container: {
         flex: 1,
         backgroundColor: "#ffffff",
-        paddingHorizontal: 16,
         paddingTop: 16,
     },
     selector_container: {
         flexDirection: "row",
         marginBottom: 12,
+        paddingHorizontal: 16,
     },
     selector_button: {
         flex: 1,

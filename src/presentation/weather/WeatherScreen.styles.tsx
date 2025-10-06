@@ -2,11 +2,12 @@ import { StyleSheet,Dimensions } from "react-native";
 
 
 // Calculate item width for 5 columns with padding and margin for horizontal scrolling lists
-const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_WIDTH = Dimensions.get("screen").width;
+const SCREEN_H_PADDING = 16;
 const CONTAINER_H_PADDING = 24;
 const ELEMENTS_H_PADDING = 6;
 const N_COLUMNS = 5;
-const ITEM_WIDTH = (SCREEN_WIDTH - (CONTAINER_H_PADDING * 2 + (ELEMENTS_H_PADDING * 2 * N_COLUMNS))) / N_COLUMNS;
+const ITEM_WIDTH = (SCREEN_WIDTH - ((SCREEN_H_PADDING + CONTAINER_H_PADDING) * 2 + (ELEMENTS_H_PADDING * N_COLUMNS))) / N_COLUMNS;
 
 // Common shadow style for cards
 const cardShadow = {
@@ -17,8 +18,9 @@ const cardShadow = {
 };
 
 export default StyleSheet.create({
-  container: {
-    padding: 12,
+  component_container: {
+    paddingVertical: 12,
+    paddingHorizontal: CONTAINER_H_PADDING,
     backgroundColor: "#ffffff",
   },
   current_container: {

@@ -124,7 +124,7 @@ export default function WeatherScreen({ navigation, route, onFavouriteChange }: 
   
   // Main render
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.component_container}>
       <View style={styles.current_container}>
         <View style={styles.current_main_group}>
           <Text style={styles.location}>{
