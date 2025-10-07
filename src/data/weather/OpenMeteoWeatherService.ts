@@ -1,4 +1,4 @@
-import type { WeatherService } from "../../domain/ports/WeatherService";
+import type { WeatherService } from "../../domain/interfaces/WeatherService";
 import { OpenMeteoResponse }  from "./dto";
 import { WeatherInfo, Current, Hour, Day } from "../../domain/entities/WeatherEntities";
 import type { Coordinates } from "../../domain/entities/LocationEntities";

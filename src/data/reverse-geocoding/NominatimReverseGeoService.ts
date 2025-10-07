@@ -1,4 +1,4 @@
-import type { ReverseGeoService } from "../../domain/ports/ReverseGeoService";
+import type { ReverseGeoService } from "../../domain/interfaces/ReverseGeoService";
 import type { NominatimResponse } from "./dto";
 import { Coordinates } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";

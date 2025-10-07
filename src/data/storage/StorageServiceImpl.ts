@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { UserPreferences } from "../../domain/entities/UserPreferences";
-import type { StorageService as StorageService } from "../../domain/ports/StorageService";
+import type { StorageService as StorageService } from "../../domain/interfaces/StorageService";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
 import { DomainError } from "../../domain/errors/DomainError";

@@ -1,4 +1,3 @@
-import { StorageService } from "../domain/ports/StorageService";
 import { OpenMeteoWeatherService } from "../data/weather/OpenMeteoWeatherService";
 import { OpenMeteoGeocodingService } from "../data/geocoding/OpenMeteoGeocodingService";
 import { NominatimReverseGeoService } from "../data/reverse-geocoding/NominatimReverseGeoService";

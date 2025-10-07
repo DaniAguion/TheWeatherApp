@@ -1,6 +1,6 @@
 import { OpenMeteoGeocodingResponse }  from "./dto";
 import { locationSuggestionDtoToEntity } from "./mappers";
-import type { GeocodingService } from "../../domain/ports/GeocodingService";
+import type { GeocodingService } from "../../domain/interfaces/GeocodingService";
 import type { Location } from "../../domain/entities/LocationEntities";
 import type { Result } from "../../domain/errors/Result";
 import { DomainError } from "../../domain/errors/DomainError";

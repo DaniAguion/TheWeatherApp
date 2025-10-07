@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { LocationProvider } from "../../domain/ports/LocationProvider";
+import { LocationProvider } from "../../domain/interfaces/LocationProvider";
 import { Result } from "../../domain/errors/Result";
 import { Coordinates } from "../../domain/entities/LocationEntities";
 import { DomainError } from "../../domain/errors/DomainError";

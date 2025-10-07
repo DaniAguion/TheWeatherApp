@@ -1,4 +1,4 @@
-import type { CacheWeatherService } from "../../domain/ports/CacheWeatherService";
+import type { CacheWeatherService } from "../../domain/interfaces/CacheWeatherService";
 import { getCached, setCached } from "../cache/cache";
 import type { Coordinates } from "../../domain/entities/LocationEntities";
 import type { WeatherInfo, Current } from "../../domain/entities/WeatherEntities";
