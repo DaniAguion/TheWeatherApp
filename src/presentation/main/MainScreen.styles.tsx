@@ -62,13 +62,14 @@ export const makeMainStyles = (scheme: ColorSchemeName) => {
         },
         error_text: {
             fontSize: 16,
+            color: paletteTheme.text,
             fontWeight: "500",
             textAlign: "center",
             marginTop: 16,
             marginBottom: 32,
         },
         retry_button: {
-            backgroundColor: "#1273de",
+            backgroundColor: paletteTheme.higlighted,
             paddingVertical: 10,
             paddingHorizontal: 22,
             borderRadius: 24,
@@ -82,6 +83,7 @@ export const makeMainStyles = (scheme: ColorSchemeName) => {
         },
         retry_button_text: {
             fontSize: 16,
+            color: paletteTheme.inverted_text,
             fontWeight: "600",
         },
     });
