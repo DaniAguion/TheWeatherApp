@@ -1,4 +1,4 @@
-import type { StorageService } from "../ports/StorageService.ts";
+import type { StorageService } from "../interfaces/StorageService.ts";
 import type { Location } from "../entities/LocationEntities.ts";
 import { Result } from "../errors/Result.ts";
 

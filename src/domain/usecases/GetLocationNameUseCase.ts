@@ -1,5 +1,5 @@
-import type { ReverseGeoService } from "../ports/ReverseGeoService";
-import type { CacheWeatherService } from "../ports/CacheWeatherService";
+import type { ReverseGeoService } from "../interfaces/ReverseGeoService";
+import type { CacheWeatherService } from "../interfaces/CacheWeatherService";
 import type { Location } from "../entities/LocationEntities";
 import { normalizeLocation } from "../helpers/LocationHelper";
 

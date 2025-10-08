@@ -1,4 +1,4 @@
-import type { StorageService } from "../ports/StorageService";
+import type { StorageService } from "../interfaces/StorageService";
 import { DomainError } from "../errors/DomainError";
 import { Result } from "../errors/Result";
 

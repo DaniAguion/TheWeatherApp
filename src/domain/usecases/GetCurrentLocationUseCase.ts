@@ -1,6 +1,6 @@
 import type { Location } from "../entities/LocationEntities.ts";
 import { Result } from "../errors/Result.ts";
-import { LocationProvider } from "../ports/LocationProvider.ts";
+import { LocationProvider } from "../interfaces/LocationProvider.ts";
 
 export class GetCurrentLocationUseCase {
   constructor(private readonly locationProvider: LocationProvider) {} 

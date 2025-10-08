@@ -1,4 +1,4 @@
-import type { StorageService } from "../ports/StorageService";
+import type { StorageService } from "../interfaces/StorageService";
 import type { Location } from "../entities/LocationEntities";
 import type { LocationStatus } from "../entities/UserPreferences";
 import { Result } from "../errors/Result";

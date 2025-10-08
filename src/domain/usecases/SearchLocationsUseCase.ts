@@ -1,5 +1,5 @@
 import type { Location } from "../entities/LocationEntities";
-import type { GeocodingService } from "../ports/GeocodingService";
+import type { GeocodingService } from "../interfaces/GeocodingService";
 import { Result } from "../errors/Result";
 
 export class SearchLocationUseCase {

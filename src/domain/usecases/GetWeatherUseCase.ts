@@ -1,7 +1,7 @@
 import type { WeatherInfo } from "../entities/WeatherEntities";
-import type { WeatherService } from "../ports/WeatherService";
+import type { WeatherService } from "../interfaces/WeatherService";
 import type { Location } from "../entities/LocationEntities";
-import type { CacheWeatherService } from "../ports/CacheWeatherService";
+import type { CacheWeatherService } from "../interfaces/CacheWeatherService";
 import { normalizeLocation } from "../helpers/LocationHelper";
 import { Result } from "../errors/Result";
 
