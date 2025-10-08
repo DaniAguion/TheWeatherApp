@@ -1,6 +1,6 @@
 import Toast from "react-native-toast-message";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View, ScrollView } from "react-native";
 import { Animated } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { toUIErrorMessage } from "../errorMessages"
@@ -95,7 +95,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
 
 
   return (
-    <View style={styles.screen_container}>
+    <ScrollView style={styles.screen_container}>
       <View style={styles.header_container}>
         <Text style={styles.header_title}>Explorar otras ubicaciones</Text>
         <Text style={styles.header_desc}>
@@ -127,6 +127,7 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
       <View style={styles.results_container}>
         <Text style={styles.results_title}>Resultados</Text>
         <FlatList
+          scrollEnabled={false}
           data={results}
           keyExtractor={(item) => `${item.coordinates.lat},${item.coordinates.lon}`}
           renderItem={renderSuggestion}
@@ -137,6 +138,6 @@ export default function FavoriteScreen({ navigation }: ExploreScreenProps) {
             ) : <Text style={styles.no_result_text}>No se han encontrado resultados.</Text>}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }

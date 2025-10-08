@@ -74,7 +74,7 @@ function TabsNavigator() {
         component={ExploreScreen}
         options={{
           title: "Explorar",
-          headerTitleAlign: "center"
+          headerTitleAlign: "center",
         }}
       />
       <Tab.Screen

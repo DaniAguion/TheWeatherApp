@@ -11,7 +11,7 @@ export const makeExploreStyles = (scheme: ColorSchemeName) => {
       flex: 1,
       paddingTop: 32,
       paddingHorizontal: 32,
-      borderRadius: 8,
+      borderRadius: 8
     },
     header_container: {
       alignItems: "flex-start",
