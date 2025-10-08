@@ -20,9 +20,7 @@ export type LocStatus = {
 type NativeModuleType = {
   checkStatus(): Promise<LocStatus>;
   requestWhenInUse(): Promise<LocStatus>;
-  requestAlways(): Promise<LocStatus>;
   isLocationEnabled(): Promise<boolean>;
-  openSettings(): Promise<boolean | void>;
 };
 
 const Native: NativeModuleType = NativeModules.RNLocationPermission;
